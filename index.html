@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dice Arena - Telegram Mini App</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-container">
+        <!-- HEADER PROFILE SECTION -->
+        <header class="glass-panel profile-card">
+            <div class="user-info">
+                <div class="avatar-placeholder" id="user-avatar">
+                    <i class="fa-solid fa-user-ninja"></i>
+                </div>
+                <div class="user-details">
+                    <h2 id="username-display">Loading...</h2>
+                    <span class="user-rank"><i class="fa-solid fa-crown text-gold"></i> Dice Champion</span>
+                </div>
+            </div>
+            <div class="balance-container">
+                <span class="balance-label">Balance</span>
+                <span class="balance-value" id="balance-display">0 🪙</span>
+            </div>
+        </header>
+
+        <!-- ACTION BUTTONS -->
+        <div class="action-grid">
+            <button id="btn-create-room" class="btn btn-primary glass-button">
+                <i class="fa-solid fa-plus-circle"></i> Create Room
+            </button>
+            <button id="btn-claim-gift" class="btn btn-secondary glass-button">
+                <i class="fa-solid fa-gift"></i> Daily Bonus
+            </button>
+        </div>
+
+        <!-- ACTIVE LOBBY SECTION -->
+        <main class="glass-panel lobby-panel">
+            <div class="lobby-header">
+                <h3><i class="fa-solid fa-gamepad text-green"></i> Active Matches</h3>
+                <span class="online-indicator"><span class="dot pulse"></span> Live Lobby</span>
+            </div>
+            
+            <div class="rooms-list-container" id="rooms-list">
+                <!-- Rooms will be dynamically loaded here -->
+                <div class="no-rooms-message">
+                    <i class="fa-solid fa-circle-nodes fa-spin-pulse text-muted"></i>
+                    <p>Scanning for active matches...</p>
+                </div>
+            </div>
+        </main>
+        
+        <!-- FOOTER INFO -->
+        <footer class="footer-info">
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tiel rolls refund bets.</p>
+        </footer>
+    </div>
+
+    <!-- MODAL: CREATE ROOM -->
+    <div id="create-room-modal" class="modal-backdrop hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3>Create New Room</h3>
+                <button class="btn-close-modal" id="btn-close-create-modal"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <label for="input-bet">Enter Bet Amount</label>
+                <div class="bet-input-wrapper">
+                    <span class="currency-symbol">🪙</span>
+                    <input type="number" id="input-bet" placeholder="e.g. 500" min="10" step="10">
+                </div>
+                
+                <div class="preset-bets">
+                    <button class="btn-preset" data-val="100">100</button>
+                    <button class="btn-preset" data-val="500">500</button>
+                    <button class="btn-preset" data-val="1000">1K</button>
+                    <button class="btn-preset" data-val="5000">5K</button>
+                    <button class="btn-preset" data-val="10000">10K</button>
+                </div>
+
+                <div class="privacy-option">
+                    <label class="switch">
+                        <input type="checkbox" id="check-private">
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="privacy-label">Private Room (Invite link only)</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-confirm-create" class="btn btn-primary btn-block">Confirm Bet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN: GAMEPLAY ARENA (Hidden by default) -->
+    <div id="gameplay-screen" class="screen-backdrop hidden">
+        <div class="gameplay-content glass-panel">
+            <div class="game-header">
+                <h3>Arena Room</h3>
+                <span class="room-id-tag" id="game-room-id">ID: unknown</span>
+            </div>
+            
+            <div class="players-versus">
+                <!-- Player A -->
+                <div class="player-card" id="card-player-owner">
+                    <div class="avatar-placeholder avatar-owner">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <span class="player-name" id="name-player-owner">Owner</span>
+                    <div class="dice-wrapper">
+                        <!-- 3D Dice Object -->
+                        <div class="dice-cube" id="dice-owner">
+                            <div class="dice-face front"><div class="dot-pattern pattern-1"><span></span></div></div>
+                            <div class="dice-face back"><div class="dot-pattern pattern-6"><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+                            <div class="dice-face right"><div class="dot-pattern pattern-3"><span></span><span></span><span></span></div></div>
+                            <div class="dice-face left"><div class="dot-pattern pattern-4"><span></span><span></span><span></span><span></span></div></div>
+                            <div class="dice-face top"><div class="dot-pattern pattern-5"><span></span><span></span><span></span><span></span><span></span></div></div>
+                            <div class="dice-face bottom"><div class="dot-pattern pattern-2"><span></span><span></span></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vs-badge">VS</div>
+
+                <!-- Player B -->
+                <div class="player-card" id="card-player-opponent">
+                    <div class="avatar-placeholder avatar-opponent">
+                        <i class="fa-solid fa-user-ninja"></i>
+                    </div>
+                    <span class="player-name" id="name-player-opponent">Waiting...</span>
+                    <div class="dice-wrapper">
+                        <!-- 3D Dice Object -->
+                        <div class="dice-cube" id="dice-opponent">
+                            <div class="dice-face front"><div class="dot-pattern pattern-1"><span></span></div></div>
+                            <div class="dice-face back"><div class="dot-pattern pattern-6"><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+                            <div class="dice-face right"><div class="dot-pattern pattern-3"><span></span><span></span><span></span></div></div>
+                            <div class="dice-face left"><div class="dot-pattern pattern-4"><span></span><span></span><span></span><span></span></div></div>
+                            <div class="dice-face top"><div class="dot-pattern pattern-5"><span></span><span></span><span></span><span></span><span></span></div></div>
+                            <div class="dice-face bottom"><div class="dot-pattern pattern-2"><span></span><span></span></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Status / Results Panel -->
+            <div class="game-status-panel">
+                <p id="game-status-text">Waiting for opponent to connect...</p>
+                <div class="match-results-box hidden" id="match-results">
+                    <h2 id="result-title">Victory!</h2>
+                    <p id="result-subtitle">+1,000 coins</p>
+                    <button class="btn btn-secondary btn-block" id="btn-return-lobby">Back to Lobby</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM TOASTS -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
