@@ -58,6 +58,13 @@ const elements = {
     checkPrivate: document.getElementById('check-private'),
     presetBets: document.querySelectorAll('.btn-preset'),
     
+    adModal: document.getElementById('ad-modal'),
+    btnCloseAdModal: document.getElementById('btn-close-ad-modal'),
+    btnConfirmClaim: document.getElementById('btn-confirm-claim'),
+    countdownNumber: document.getElementById('countdown-number'),
+    countdownProgress: document.getElementById('countdown-progress'),
+    countdownStatusText: document.getElementById('countdown-status-text'),
+    
     gameplayScreen: document.getElementById('gameplay-screen'),
     gameRoomId: document.getElementById('game-room-id'),
     namePlayerOwner: document.getElementById('name-player-owner'),
@@ -161,6 +168,57 @@ async function fetchUserProfile() {
         showToast("Error connecting to server", "error");
         console.error(e);
     }
+}
+
+let adTimer = null;
+function showAdAndCountdown() {
+    elements.adModal.classList.remove('hidden');
+    
+    // Сбрасываем состояние кнопки
+    elements.btnConfirmClaim.classList.add('disabled');
+    elements.btnConfirmClaim.disabled = true;
+    elements.countdownStatusText.textContent = "Watching sponsor offer...";
+    
+    let secondsRemaining = 3;
+    elements.countdownNumber.textContent = secondsRemaining;
+    
+    // Сбрасываем прогресс-бар (круг)
+    const maxOffset = 188.4;
+    elements.countdownProgress.style.strokeDashoffset = maxOffset;
+    
+    let elapsedMs = 0;
+    const totalDurationMs = 3000;
+    const intervalMs = 100;
+    
+    if (adTimer) clearInterval(adTimer);
+    
+    adTimer = setInterval(() => {
+        elapsedMs += intervalMs;
+        const progress = Math.min(elapsedMs / totalDurationMs, 1);
+        
+        // Вычисляем смещение
+        const offset = maxOffset - (progress * maxOffset);
+        elements.countdownProgress.style.strokeDashoffset = offset;
+        
+        // Обновляем текст секунд
+        const currentSec = Math.ceil((totalDurationMs - elapsedMs) / 1000);
+        elements.countdownNumber.textContent = Math.max(currentSec, 0);
+        
+        if (elapsedMs >= totalDurationMs) {
+            clearInterval(adTimer);
+            
+            // Активируем кнопку получения
+            elements.btnConfirmClaim.classList.remove('disabled');
+            elements.btnConfirmClaim.disabled = false;
+            elements.countdownNumber.textContent = "✓";
+            elements.countdownStatusText.textContent = "Reward ready!";
+            
+            // Тактильный отклик в Telegram о готовности награды
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        }
+    }, intervalMs);
 }
 
 async function claimDailyGift() {
@@ -431,6 +489,16 @@ elements.btnConfirmCreate.onclick = () => {
 };
 
 elements.btnClaimGift.onclick = () => {
+    showAdAndCountdown();
+};
+
+elements.btnCloseAdModal.onclick = () => {
+    if (adTimer) clearInterval(adTimer);
+    elements.adModal.classList.add('hidden');
+};
+
+elements.btnConfirmClaim.onclick = () => {
+    elements.adModal.classList.add('hidden');
     claimDailyGift();
 };
 

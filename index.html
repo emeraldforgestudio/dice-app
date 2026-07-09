@@ -107,6 +107,44 @@
         </div>
     </div>
 
+    <!-- MODAL: ADS AND DAILY CLAIM -->
+    <div id="ad-modal" class="modal-backdrop hidden">
+        <div class="modal-content glass-panel ad-modal-content">
+            <div class="modal-header">
+                <h3>Daily Bonus Offer</h3>
+                <button class="btn-close-modal" id="btn-close-ad-modal"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="modal-body ad-body">
+                <!-- Sponsor Card -->
+                <div class="ad-banner">
+                    <span class="ad-badge">SPONSOR</span>
+                    <div class="ad-logo">🟢 VERDE CASINO</div>
+                    <p class="ad-text">Get 200% match bonus + 50 Free Spins on your first deposit! Fast withdrawals.</p>
+                    <div class="ad-visual-placeholder">
+                        <i class="fa-solid fa-circle-dollar-to-slot fa-bounce"></i>
+                    </div>
+                </div>
+                
+                <!-- Countdown Visualizer -->
+                <div class="countdown-container">
+                    <div class="countdown-circle">
+                        <svg>
+                            <circle cx="35" cy="35" r="30"></circle>
+                            <circle cx="35" cy="35" r="30" id="countdown-progress"></circle>
+                        </svg>
+                        <span id="countdown-number">3</span>
+                    </div>
+                    <p class="countdown-status" id="countdown-status-text">Watching sponsor offer...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-confirm-claim" class="btn btn-primary btn-block disabled" disabled>
+                    <i class="fa-solid fa-gift"></i> Claim 1,000 Coins
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- SCREEN: GAMEPLAY ARENA (Hidden by default) -->
     <div id="gameplay-screen" class="screen-backdrop hidden">
         <div class="gameplay-content glass-panel">
