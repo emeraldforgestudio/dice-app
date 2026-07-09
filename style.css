@@ -60,19 +60,21 @@ body {
 }
 
 .brand-dice {
-    font-size: 54px;
-    filter: drop-shadow(0 0 12px var(--emerald-glow));
+    font-size: 72px;
+    filter: drop-shadow(0 0 16px var(--emerald-glow));
     line-height: 1;
 }
 
 .brand-name {
-    font-size: 28px;
+    font-size: 36px;
     font-weight: 800;
-    letter-spacing: 6px;
+    letter-spacing: 8px;
+    margin-right: -8px; /* Компенсация letter-spacing для идеального центрирования */
+    text-align: center;
     background: linear-gradient(135deg, var(--white), var(--text-secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 15px rgba(0, 255, 135, 0.25);
+    text-shadow: 0 0 20px rgba(0, 255, 135, 0.25);
 }
 
 /* Glassmorphic Panel Base */
