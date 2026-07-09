@@ -10,6 +10,7 @@ let currentUser = { id: 0, username: 'Player', first_name: 'Player', balance: 0 
 let currentRoomId = null;
 let lobbySocket = null;
 let gameSocket = null;
+let activeRooms = [];
 
 // Настройка стилей для темы Telegram
 if (tg) {
@@ -171,8 +172,8 @@ async function fetchActiveRooms() {
     try {
         const res = await fetch(`${API_BASE_URL}/api/rooms`, { headers: getHeaders() });
         if (!res.ok) throw new Error();
-        const rooms = await res.json();
-        renderRooms(rooms);
+        activeRooms = await res.json();
+        renderRooms(activeRooms);
     } catch (e) {
         console.error("Failed to fetch rooms list");
     }
@@ -337,8 +338,16 @@ function connectLobbySocket() {
     
     lobbySocket.onmessage = (event) => {
         const msg = JSON.parse(event.data);
-        if (msg.type === 'room_created' || msg.type === 'room_deleted') {
-            fetchActiveRooms();
+        if (msg.type === 'room_created') {
+            // Предотвращаем дублирование и добавляем новую комнату в локальный массив
+            if (!activeRooms.some(r => r.id === msg.room.id)) {
+                activeRooms.push(msg.room);
+                renderRooms(activeRooms);
+            }
+        } else if (msg.type === 'room_deleted') {
+            // Удаляем комнату из локального массива
+            activeRooms = activeRooms.filter(r => r.id !== msg.room_id);
+            renderRooms(activeRooms);
         }
     };
     
