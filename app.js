@@ -1,7 +1,7 @@
 // --- CONFIGURATION ---
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:8000'
-    : 'https://api.YOUR_DOMAIN.com'; // Замените на домен прокси (Cloudflare) при деплое
+    : 'https://achieve-potato-layout-net.trycloudflare.com'; 
 
 // Инициализация Telegram WebApp
 const tg = window.Telegram?.WebApp;
