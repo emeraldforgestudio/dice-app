@@ -20,6 +20,7 @@ let currentRoomId = null;
 let currentRoomBet = 0;
 let lobbySocket = null;
 let gameSocket = null;
+let roomPollInterval = null;
 let activeRooms = [];
 
 // Параметры фильтрации и пагинации
@@ -594,6 +595,13 @@ function shareRoom() {
 function openGameplayScreen(roomId, isOwner, bet, result = null) {
     currentRoomId = roomId;
     currentRoomBet = bet;
+    
+    // Сбрасываем старый опрос, если он был активен
+    if (roomPollInterval) {
+        clearInterval(roomPollInterval);
+        roomPollInterval = null;
+    }
+    
     if (elements.gameRoomId) elements.gameRoomId.textContent = `Room ID: ${roomId}`;
     if (elements.gameplayScreen) elements.gameplayScreen.classList.remove('hidden');
     if (elements.matchResults) elements.matchResults.classList.add('hidden');
@@ -609,8 +617,8 @@ function openGameplayScreen(roomId, isOwner, bet, result = null) {
         if (elements.gameStatusText) elements.gameStatusText.textContent = "Waiting for an opponent to join...";
         if (elements.ownerWaitingActions) elements.ownerWaitingActions.classList.remove('hidden'); // Показываем кнопки создателя
         
-        // Подключаемся к WebSocket комнаты для отслеживания старта игры бэкендом
-        connectGameSocket(roomId);
+        // Запускаем надежный HTTP-опрос
+        startRoomPolling(roomId);
     } else {
         const ownerName = (result && result.usernames && result.usernames.owner) 
             ? result.usernames.owner 
@@ -709,54 +717,55 @@ function connectLobbySocket() {
     }
 }
 
-function connectGameSocket(roomId) {
-    try {
-        const wsUrl = API_BASE_URL.replace(/^http/, 'ws');
-        console.log(`[WS GAME] Connecting to: ${wsUrl}/api/ws/game/${roomId}`);
-        gameSocket = new WebSocket(`${wsUrl}/api/ws/game/${roomId}`);
+function startRoomPolling(roomId) {
+    if (roomPollInterval) clearInterval(roomPollInterval);
+    
+    console.log(`[POLL GAME] Started polling room status for: ${roomId}`);
+    roomPollInterval = setInterval(async () => {
+        // Проверяем, нужно ли остановить опрос (если вышли с экрана игры или результаты показаны)
+        if (currentRoomId !== roomId || 
+            !elements.gameplayScreen || 
+            elements.gameplayScreen.classList.contains('hidden') || 
+            (elements.matchResults && !elements.matchResults.classList.contains('hidden'))) {
+            
+            console.log(`[POLL GAME] Stopping polling for room: ${roomId}`);
+            clearInterval(roomPollInterval);
+            roomPollInterval = null;
+            return;
+        }
         
-        gameSocket.onopen = () => {
-            console.log("[WS GAME] Connection established successfully!");
-        };
-        
-        gameSocket.onmessage = (event) => {
-            try {
-                const msg = JSON.parse(event.data);
-                console.log("[WS GAME] Received message:", msg);
-                if (msg.type === 'ping') {
-                    return; // Игнорируем пинг
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/rooms/status/${roomId}`, {
+                headers: getHeaders()
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            
+            if (data.status === 'finished' && data.result) {
+                console.log(`[POLL GAME] Match completed for room: ${roomId}!`);
+                clearInterval(roomPollInterval);
+                roomPollInterval = null;
+                
+                const result = data.result;
+                const oppName = (result.usernames && result.usernames.opponent) 
+                    ? result.usernames.opponent 
+                    : "Opponent";
+                if (elements.namePlayerOpponent) {
+                    elements.namePlayerOpponent.textContent = oppName;
                 }
-                if (msg.type === 'game_finished') {
-                    const result = msg.result;
-                    const oppName = (result.usernames && result.usernames.opponent) 
-                        ? result.usernames.opponent 
-                        : "Opponent";
-                    if (elements.namePlayerOpponent) {
-                        elements.namePlayerOpponent.textContent = oppName;
-                    }
-                    playDiceRoll(result.rolls.owner, result.rolls.opponent, result);
-                    gameSocket.close();
-                }
-            } catch (err) {
-                console.error("[WS GAME] Error parsing message:", err);
+                playDiceRoll(result.rolls.owner, result.rolls.opponent, result);
+            } else if (data.status === 'not_found') {
+                console.log(`[POLL GAME] Room not found: ${roomId}. Exiting wait screen.`);
+                clearInterval(roomPollInterval);
+                roomPollInterval = null;
+                showToast("Room was deleted", "warning");
+                if (elements.gameplayScreen) elements.gameplayScreen.classList.add('hidden');
+                fetchActiveRooms();
             }
-        };
-        
-        gameSocket.onclose = (event) => {
-            console.log(`[WS GAME] Connection closed. Code: ${event.code}, Reason: ${event.reason}`);
-            // Переподключаемся, если комната все еще открыта и игра не завершилась
-            if (currentRoomId === roomId && elements.gameplayScreen && !elements.gameplayScreen.classList.contains('hidden') && elements.matchResults && elements.matchResults.classList.contains('hidden')) {
-                console.log("[WS GAME] Reconnecting in 2s...");
-                setTimeout(() => connectGameSocket(roomId), 2000);
-            }
-        };
-        
-        gameSocket.onerror = (err) => {
-            console.error("[WS GAME] Connection error occurred:", err);
-        };
-    } catch (e) {
-        console.error("Failed to initialize game WebSocket:", e);
-    }
+        } catch (e) {
+            console.error("[POLL GAME] Error polling room status:", e);
+        }
+    }, 3000);
 }
 
 // --- ИВЕНТ ХЕНДЛЕРЫ ---
@@ -885,6 +894,7 @@ window.joinRoom = joinRoom;
 window.confirmJoinRoom = confirmJoinRoom;
 window.confirmCancelRoom = confirmCancelRoom;
 window.confirmDeleteRoom = confirmDeleteRoom;
+window.startRoomPolling = startRoomPolling;
 window.setRoomFilter = setRoomFilter;
 window.changePage = changePage;
 window.applyFiltersAndRender = applyFiltersAndRender;
