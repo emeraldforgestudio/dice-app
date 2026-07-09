@@ -462,20 +462,20 @@ function shareRoom() {
 
 function openGameplayScreen(roomId, isOwner, bet, result = null) {
     currentRoomId = roomId;
-    elements.gameRoomId.textContent = `Room ID: ${roomId}`;
-    elements.gameplayScreen.classList.remove('hidden');
-    elements.matchResults.classList.add('hidden');
-    elements.gameStatusText.classList.remove('hidden');
+    if (elements.gameRoomId) elements.gameRoomId.textContent = `Room ID: ${roomId}`;
+    if (elements.gameplayScreen) elements.gameplayScreen.classList.remove('hidden');
+    if (elements.matchResults) elements.matchResults.classList.add('hidden');
+    if (elements.gameStatusText) elements.gameStatusText.classList.remove('hidden');
     
     // Сбрасываем 3D кости на грань "1"
-    elements.diceOwner.style.transform = 'rotateX(0deg) rotateY(0deg)';
-    elements.diceOpponent.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    if (elements.diceOwner) elements.diceOwner.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    if (elements.diceOpponent) elements.diceOpponent.style.transform = 'rotateX(0deg) rotateY(0deg)';
     
     if (isOwner) {
-        elements.namePlayerOwner.textContent = currentUser.username || currentUser.first_name;
-        elements.namePlayerOpponent.textContent = "Waiting...";
-        elements.gameStatusText.textContent = "Waiting for an opponent to join...";
-        elements.ownerWaitingActions.classList.remove('hidden'); // Показываем кнопки создателя
+        if (elements.namePlayerOwner) elements.namePlayerOwner.textContent = currentUser.username || currentUser.first_name;
+        if (elements.namePlayerOpponent) elements.namePlayerOpponent.textContent = "Waiting...";
+        if (elements.gameStatusText) elements.gameStatusText.textContent = "Waiting for an opponent to join...";
+        if (elements.ownerWaitingActions) elements.ownerWaitingActions.classList.remove('hidden'); // Показываем кнопки создателя
         
         // Подключаемся к WebSocket комнаты для отслеживания старта игры бэкендом
         connectGameSocket(roomId);
@@ -483,16 +483,16 @@ function openGameplayScreen(roomId, isOwner, bet, result = null) {
         const ownerName = (result && result.usernames && result.usernames.owner) 
             ? result.usernames.owner 
             : "Opponent";
-        elements.namePlayerOwner.textContent = ownerName;
-        elements.namePlayerOpponent.textContent = currentUser.username || currentUser.first_name;
-        elements.gameStatusText.textContent = "Rolling the dice...";
-        elements.ownerWaitingActions.classList.add('hidden'); // Скрываем кнопки создателя
+        if (elements.namePlayerOwner) elements.namePlayerOwner.textContent = ownerName;
+        if (elements.namePlayerOpponent) elements.namePlayerOpponent.textContent = currentUser.username || currentUser.first_name;
+        if (elements.gameStatusText) elements.gameStatusText.textContent = "Rolling the dice...";
+        if (elements.ownerWaitingActions) elements.ownerWaitingActions.classList.add('hidden'); // Скрываем кнопки создателя
     }
 }
 
 function playDiceRoll(ownerRoll, opponentRoll, gameResult) {
-    elements.ownerWaitingActions.classList.add('hidden'); // Скрываем кнопки создателя при броске
-    elements.gameStatusText.textContent = "🎲 Shaking the cups...";
+    if (elements.ownerWaitingActions) elements.ownerWaitingActions.classList.add('hidden'); // Скрываем кнопки создателя при броске
+    if (elements.gameStatusText) elements.gameStatusText.textContent = "🎲 Shaking the cups...";
     
     if (tg && tg.HapticFeedback) {
         // Симулируем тряску вибрацией
@@ -505,32 +505,33 @@ function playDiceRoll(ownerRoll, opponentRoll, gameResult) {
     }
     
     // Запускаем 3D анимацию броска кубиков
-    rollDice(elements.diceOwner, ownerRoll, () => {});
-    rollDice(elements.diceOpponent, opponentRoll, () => {
-        // Показ результатов после завершения вращения
-        elements.gameStatusText.classList.add('hidden');
-        showGameResults(gameResult);
-    });
+    if (elements.diceOwner) rollDice(elements.diceOwner, ownerRoll, () => {});
+    if (elements.diceOpponent) {
+        rollDice(elements.diceOpponent, opponentRoll, () => {
+            // Показ результатов после завершения вращения
+            if (elements.gameStatusText) elements.gameStatusText.classList.add('hidden');
+            showGameResults(gameResult);
+        });
+    }
 }
 
 function showGameResults(result) {
-    elements.matchResults.classList.remove('hidden');
-    const isOwner = result.winner_id === currentUser.id;
+    if (elements.matchResults) elements.matchResults.classList.remove('hidden');
     const isWinner = result.winner_id === currentUser.id;
     
     if (result.is_draw) {
-        elements.matchResults.className = "match-results-box draw";
-        elements.resultTitle.textContent = "🤝 Tie roll!";
-        elements.resultSubtitle.textContent = "All bets returned.";
+        if (elements.matchResults) elements.matchResults.className = "match-results-box draw";
+        if (elements.resultTitle) elements.resultTitle.textContent = "🤝 Tie roll!";
+        if (elements.resultSubtitle) elements.resultSubtitle.textContent = "All bets returned.";
     } else if (isWinner) {
-        elements.matchResults.className = "match-results-box victory";
-        elements.resultTitle.textContent = "🏆 Victory!";
-        elements.resultSubtitle.textContent = `+${(result.bet * 2).toLocaleString()} coins`;
+        if (elements.matchResults) elements.matchResults.className = "match-results-box victory";
+        if (elements.resultTitle) elements.resultTitle.textContent = "🏆 Victory!";
+        if (elements.resultSubtitle) elements.resultSubtitle.textContent = `+${(result.bet * 2).toLocaleString()} coins`;
         if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
     } else {
-        elements.matchResults.className = "match-results-box defeat";
-        elements.resultTitle.textContent = "🌚 Defeat";
-        elements.resultSubtitle.textContent = `-${result.bet.toLocaleString()} coins`;
+        if (elements.matchResults) elements.matchResults.className = "match-results-box defeat";
+        if (elements.resultTitle) elements.resultTitle.textContent = "🌚 Defeat";
+        if (elements.resultSubtitle) elements.resultSubtitle.textContent = `-${result.bet.toLocaleString()} coins`;
         if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
     }
     
