@@ -717,6 +717,9 @@ function connectGameSocket(roomId) {
         gameSocket.onmessage = (event) => {
             try {
                 const msg = JSON.parse(event.data);
+                if (msg.type === 'ping') {
+                    return; // Игнорируем пинг
+                }
                 if (msg.type === 'game_finished') {
                     const result = msg.result;
                     const oppName = (result.usernames && result.usernames.opponent) 
@@ -730,6 +733,14 @@ function connectGameSocket(roomId) {
                 }
             } catch (err) {
                 console.error("Error parsing game WS message:", err);
+            }
+        };
+        
+        gameSocket.onclose = () => {
+            // Переподключаемся, если комната все еще открыта и игра не завершилась
+            if (currentRoomId === roomId && elements.gameplayScreen && !elements.gameplayScreen.classList.contains('hidden') && elements.matchResults && elements.matchResults.classList.contains('hidden')) {
+                console.log("Game WS connection closed. Reconnecting in 2s...");
+                setTimeout(() => connectGameSocket(roomId), 2000);
             }
         };
         
