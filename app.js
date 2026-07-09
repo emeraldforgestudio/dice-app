@@ -76,6 +76,7 @@ const elements = {
     
     ownerWaitingActions: document.getElementById('owner-waiting-actions'),
     btnShareRoom: document.getElementById('btn-share-room'),
+    btnKeepRoomLobby: document.getElementById('btn-keep-room-lobby'),
     btnLeaveRoom: document.getElementById('btn-leave-room'),
     
     matchResults: document.getElementById('match-results'),
@@ -561,6 +562,16 @@ elements.btnConfirmClaim.onclick = () => {
 
 elements.btnShareRoom.onclick = () => {
     shareRoom();
+};
+
+elements.btnKeepRoomLobby.onclick = () => {
+    if (gameSocket) {
+        gameSocket.close();
+        gameSocket = null;
+    }
+    elements.gameplayScreen.classList.add('hidden');
+    elements.ownerWaitingActions.classList.add('hidden');
+    fetchActiveRooms();
 };
 
 elements.btnLeaveRoom.onclick = () => {
