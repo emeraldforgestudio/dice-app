@@ -1086,3 +1086,185 @@ input:checked + .slider:before {
     box-shadow: 0 4px 10px rgba(255, 63, 52, 0.2) !important;
     border-color: rgba(255, 63, 52, 0.2) !important;
 }
+
+/* --- LOBBY FILTERS & PAGINATION STYLES --- */
+.lobby-filter-bar {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.search-sort-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 8px;
+}
+
+.filter-item-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.filter-item-search .search-icon {
+    position: absolute;
+    left: 10px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.filter-item-search input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 6px 10px 6px 28px;
+    color: var(--white);
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.filter-item-search input:focus {
+    border-color: var(--green);
+}
+
+.filter-item-select select {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 6px 8px;
+    color: var(--white);
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+}
+
+.filter-toggles-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background: rgba(0, 0, 0, 0.15);
+    padding: 3px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.filter-toggle {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-toggle.active {
+    background: linear-gradient(135deg, var(--green) 0%, #10ac84 100%);
+    color: var(--black);
+    box-shadow: 0 2px 8px rgba(46, 213, 115, 0.2);
+}
+
+.bet-range-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    gap: 6px;
+}
+
+.range-label {
+    color: var(--text-muted);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.bet-range-row input {
+    width: 60px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 4px 6px;
+    color: var(--white);
+    font-size: 11px;
+    text-align: center;
+    outline: none;
+}
+
+.range-sep {
+    color: var(--text-muted);
+}
+
+.btn-apply-filters {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: auto;
+}
+
+.btn-apply-filters:active {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Pagination Styles */
+.pagination-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.btn-page {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 6px 12px;
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-page:active {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-page:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.page-info {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+}

@@ -21,6 +21,15 @@ let lobbySocket = null;
 let gameSocket = null;
 let activeRooms = [];
 
+// Параметры фильтрации и пагинации
+let currentFilterType = 'all'; // 'all', 'own', 'other'
+let currentSearchQuery = '';
+let currentSortType = 'bet-desc'; // 'bet-asc', 'bet-desc', 'newest'
+let currentBetMin = null;
+let currentBetMax = null;
+let currentPage = 1;
+const roomsPerPage = 5;
+
 // Настройка стилей для темы Telegram
 if (tg) {
     tg.ready();
@@ -89,6 +98,15 @@ const elements = {
     
     confirmModal: document.getElementById('confirm-modal'),
     btnCloseConfirmModal: document.getElementById('btn-close-confirm-modal'),
+    
+    // Селекторы фильтрации и пагинации
+    searchOwner: document.getElementById('search-owner'),
+    sortRooms: document.getElementById('sort-rooms'),
+    betMin: document.getElementById('bet-min'),
+    betMax: document.getElementById('bet-max'),
+    btnPrevPage: document.getElementById('btn-prev-page'),
+    btnNextPage: document.getElementById('btn-next-page'),
+    pageInfo: document.getElementById('page-info'),
     confirmTitle: document.getElementById('confirm-title'),
     confirmOwner: document.getElementById('confirm-owner'),
     confirmBet: document.getElementById('confirm-bet'),
@@ -277,17 +295,75 @@ async function fetchActiveRooms() {
 }
 
 function renderRooms(rooms) {
-    if (rooms.length === 0) {
+    if (!rooms) return;
+    
+    // 1. Фильтрация
+    let filtered = [...rooms];
+    
+    // Фильтр по типу комнат (все / свои / чужие)
+    if (currentFilterType === 'own') {
+        filtered = filtered.filter(r => r.owner_id === currentUser.id);
+    } else if (currentFilterType === 'other') {
+        filtered = filtered.filter(r => r.owner_id !== currentUser.id);
+    }
+    
+    // Поиск по имени создателя
+    if (currentSearchQuery) {
+        const query = currentSearchQuery.toLowerCase();
+        filtered = filtered.filter(r => {
+            const username = (r.owner_username || "").toLowerCase();
+            return username.includes(query);
+        });
+    }
+    
+    // Фильтр по диапазону ставок
+    if (currentBetMin !== null && !isNaN(currentBetMin)) {
+        filtered = filtered.filter(r => r.bet >= currentBetMin);
+    }
+    if (currentBetMax !== null && !isNaN(currentBetMax)) {
+        filtered = filtered.filter(r => r.bet <= currentBetMax);
+    }
+    
+    // 2. Сортировка
+    if (currentSortType === 'bet-asc') {
+        filtered.sort((a, b) => a.bet - b.bet);
+    } else if (currentSortType === 'bet-desc') {
+        filtered.sort((a, b) => b.bet - a.bet);
+    } else if (currentSortType === 'newest') {
+        filtered.sort((a, b) => b.id.localeCompare(a.id));
+    }
+    
+    // 3. Пагинация
+    const totalRooms = filtered.length;
+    const totalPages = Math.ceil(totalRooms / roomsPerPage) || 1;
+    
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
+    if (currentPage < 1) {
+        currentPage = 1;
+    }
+    
+    const startIndex = (currentPage - 1) * roomsPerPage;
+    const endIndex = startIndex + roomsPerPage;
+    const paginated = filtered.slice(startIndex, endIndex);
+    
+    // Обновляем кнопки пагинации
+    if (elements.btnPrevPage) elements.btnPrevPage.disabled = currentPage === 1;
+    if (elements.btnNextPage) elements.btnNextPage.disabled = currentPage === totalPages;
+    if (elements.pageInfo) elements.pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    
+    if (paginated.length === 0) {
         elements.roomsList.innerHTML = `
             <div class="no-rooms-message">
                 <i class="fa-solid fa-gamepad text-muted"></i>
-                <p>No active rooms. Create your own bet!</p>
+                <p>No matches match your criteria.</p>
             </div>
         `;
         return;
     }
     
-    elements.roomsList.innerHTML = rooms.map(room => {
+    elements.roomsList.innerHTML = paginated.map(room => {
         const isOwn = room.owner_id === currentUser.id;
         const displayName = isOwn 
             ? (room.owner_username ? `@${room.owner_username}` : "You")
@@ -410,6 +486,43 @@ function confirmCancelRoom(roomId, bet) {
             }
         };
     }
+}
+
+function setRoomFilter(filterType) {
+    currentFilterType = filterType;
+    
+    const buttons = ['all', 'own', 'other'];
+    buttons.forEach(b => {
+        const btn = document.getElementById(`btn-filter-${b}`);
+        if (btn) {
+            if (b === filterType) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+    });
+    
+    currentPage = 1;
+    renderRooms(activeRooms);
+}
+
+function changePage(direction) {
+    currentPage += direction;
+    renderRooms(activeRooms);
+}
+
+function applyFiltersAndRender() {
+    if (elements.betMin) {
+        const val = parseInt(elements.betMin.value);
+        currentBetMin = isNaN(val) ? null : val;
+    }
+    if (elements.betMax) {
+        const val = parseInt(elements.betMax.value);
+        currentBetMax = isNaN(val) ? null : val;
+    }
+    currentPage = 1;
+    renderRooms(activeRooms);
 }
 
 async function leaveRoom() {
@@ -713,10 +826,30 @@ if (elements.btnReturnLobby) {
     };
 }
 
+// Слушатели для фильтрации и сортировки
+if (elements.searchOwner) {
+    elements.searchOwner.oninput = (e) => {
+        currentSearchQuery = e.target.value;
+        currentPage = 1;
+        renderRooms(activeRooms);
+    };
+}
+
+if (elements.sortRooms) {
+    elements.sortRooms.onchange = (e) => {
+        currentSortType = e.target.value;
+        currentPage = 1;
+        renderRooms(activeRooms);
+    };
+}
+
 // Экспортируем функции для inline вызова из HTML
 window.joinRoom = joinRoom;
 window.confirmJoinRoom = confirmJoinRoom;
 window.confirmCancelRoom = confirmCancelRoom;
+window.setRoomFilter = setRoomFilter;
+window.changePage = changePage;
+window.applyFiltersAndRender = applyFiltersAndRender;
 
 // --- ИНИЦИАЛИЗАЦИЯ ПРИ ЗАПУСКЕ ---
 fetchUserProfile();

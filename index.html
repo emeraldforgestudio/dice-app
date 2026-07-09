@@ -56,6 +56,37 @@
                 <span class="online-indicator"><span class="dot pulse"></span> Live Lobby</span>
             </div>
             
+            <!-- LOBBY FILTER BAR -->
+            <div class="lobby-filter-bar">
+                <div class="filter-row search-sort-row">
+                    <div class="filter-item-search">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="search-owner" placeholder="Search by creator...">
+                    </div>
+                    <div class="filter-item-select">
+                        <select id="sort-rooms">
+                            <option value="bet-asc">Bet: Low to High 🪙↑</option>
+                            <option value="bet-desc" selected>Bet: High to Low 🪙↓</option>
+                            <option value="newest">Newest first ⏰</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="filter-row filter-toggles-row">
+                    <button class="filter-toggle active" id="btn-filter-all" onclick="setRoomFilter('all')">All</button>
+                    <button class="filter-toggle" id="btn-filter-own" onclick="setRoomFilter('own')">My Rooms</button>
+                    <button class="filter-toggle" id="btn-filter-other" onclick="setRoomFilter('other')">Foreign</button>
+                </div>
+                
+                <div class="filter-row bet-range-row">
+                    <span class="range-label">Bet Range:</span>
+                    <input type="number" id="bet-min" placeholder="Min" min="0" step="100">
+                    <span class="range-sep">-</span>
+                    <input type="number" id="bet-max" placeholder="Max" min="0" step="100">
+                    <button class="btn-apply-filters" id="btn-apply-filters" onclick="applyFiltersAndRender()">Apply</button>
+                </div>
+            </div>
+            
             <div class="rooms-list-container" id="rooms-list">
                 <!-- Rooms will be dynamically loaded here -->
                 <div class="no-rooms-message">
@@ -63,11 +94,18 @@
                     <p>Scanning for active matches...</p>
                 </div>
             </div>
+            
+            <!-- PAGINATION CONTROLS -->
+            <div class="pagination-controls" id="pagination-controls">
+                <button class="btn-page" id="btn-prev-page" onclick="changePage(-1)"><i class="fa-solid fa-chevron-left"></i> Prev</button>
+                <span class="page-info" id="page-info">Page 1 of 1</span>
+                <button class="btn-page" id="btn-next-page" onclick="changePage(1)">Next <i class="fa-solid fa-chevron-right"></i></button>
+            </div>
         </main>
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #22 (d478a01)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #23 (a605edd)</p>
         </footer>
     </div>
 
