@@ -366,46 +366,50 @@ async function joinRoom(roomId) {
 }
 
 function confirmJoinRoom(roomId, ownerUsername, bet) {
-    elements.confirmTitle.textContent = "Confirm Match Entry";
-    elements.confirmOwner.textContent = `@${maskUsername(ownerUsername)}`;
-    elements.confirmBet.textContent = `${bet.toLocaleString()} 🪙`;
-    elements.confirmMessageText.textContent = "Are you sure you want to join this room? The bet amount will be immediately deducted from your balance.";
-    elements.confirmModal.classList.remove('hidden');
+    if (elements.confirmTitle) elements.confirmTitle.textContent = "Confirm Match Entry";
+    if (elements.confirmOwner) elements.confirmOwner.textContent = `@${maskUsername(ownerUsername)}`;
+    if (elements.confirmBet) elements.confirmBet.textContent = `${bet.toLocaleString()} 🪙`;
+    if (elements.confirmMessageText) elements.confirmMessageText.textContent = "Are you sure you want to join this room? The bet amount will be immediately deducted from your balance.";
+    if (elements.confirmModal) elements.confirmModal.classList.remove('hidden');
     
-    elements.btnConfirmActionSubmit.onclick = () => {
-        elements.confirmModal.classList.add('hidden');
-        joinRoom(roomId);
-    };
+    if (elements.btnConfirmActionSubmit) {
+        elements.btnConfirmActionSubmit.onclick = () => {
+            if (elements.confirmModal) elements.confirmModal.classList.add('hidden');
+            joinRoom(roomId);
+        };
+    }
 }
 
 function confirmCancelRoom(roomId, bet) {
-    elements.confirmTitle.textContent = "Cancel Match Creation";
-    elements.confirmOwner.textContent = "You (Owner)";
-    elements.confirmBet.textContent = `${bet.toLocaleString()} 🪙`;
-    elements.confirmMessageText.textContent = "Are you sure you want to cancel this room? Your bet will be fully refunded to your balance.";
-    elements.confirmModal.classList.remove('hidden');
+    if (elements.confirmTitle) elements.confirmTitle.textContent = "Cancel Match Creation";
+    if (elements.confirmOwner) elements.confirmOwner.textContent = "You (Owner)";
+    if (elements.confirmBet) elements.confirmBet.textContent = `${bet.toLocaleString()} 🪙`;
+    if (elements.confirmMessageText) elements.confirmMessageText.textContent = "Are you sure you want to cancel this room? Your bet will be fully refunded to your balance.";
+    if (elements.confirmModal) elements.confirmModal.classList.remove('hidden');
     
-    elements.btnConfirmActionSubmit.onclick = async () => {
-        elements.confirmModal.classList.add('hidden');
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/rooms/delete/${roomId}`, {
-                method: 'POST',
-                headers: getHeaders()
-            });
-            const data = await res.json();
-            
-            if (!res.ok) {
-                showToast(data.detail || "Unable to delete room", "error");
-                return;
+    if (elements.btnConfirmActionSubmit) {
+        elements.btnConfirmActionSubmit.onclick = async () => {
+            if (elements.confirmModal) elements.confirmModal.classList.add('hidden');
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/rooms/delete/${roomId}`, {
+                    method: 'POST',
+                    headers: getHeaders()
+                });
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    showToast(data.detail || "Unable to delete room", "error");
+                    return;
+                }
+                
+                showToast("Room cancelled and bet refunded!", "success");
+                fetchUserProfile();
+                fetchActiveRooms();
+            } catch (e) {
+                showToast("Network error", "error");
             }
-            
-            showToast("Room cancelled and bet refunded!", "success");
-            fetchUserProfile();
-            fetchActiveRooms();
-        } catch (e) {
-            showToast("Network error", "error");
-        }
-    };
+        };
+    }
 }
 
 async function leaveRoom() {
@@ -537,52 +541,71 @@ function showGameResults(result) {
 // --- WEBSOCKETS СОЕДИНЕНИЯ ---
 
 function connectLobbySocket() {
-    const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = API_BASE_URL.replace(/^http/, 'ws');
-    
-    lobbySocket = new WebSocket(`${wsUrl}/api/ws/lobby`);
-    
-    lobbySocket.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-        if (msg.type === 'room_created') {
-            // Предотвращаем дублирование и добавляем новую комнату в локальный массив
-            if (!activeRooms.some(r => r.id === msg.room.id)) {
-                activeRooms.push(msg.room);
-                renderRooms(activeRooms);
+    try {
+        const wsUrl = API_BASE_URL.replace(/^http/, 'ws');
+        lobbySocket = new WebSocket(`${wsUrl}/api/ws/lobby`);
+        
+        lobbySocket.onmessage = (event) => {
+            try {
+                const msg = JSON.parse(event.data);
+                if (msg.type === 'room_created') {
+                    if (!activeRooms.some(r => r.id === msg.room.id)) {
+                        activeRooms.push(msg.room);
+                        renderRooms(activeRooms);
+                    }
+                } else if (msg.type === 'room_deleted') {
+                    activeRooms = activeRooms.filter(r => r.id !== msg.room_id);
+                    renderRooms(activeRooms);
+                }
+            } catch (err) {
+                console.error("Error parsing lobby message:", err);
             }
-        } else if (msg.type === 'room_deleted') {
-            // Удаляем комнату из локального массива
-            activeRooms = activeRooms.filter(r => r.id !== msg.room_id);
-            renderRooms(activeRooms);
-        }
-    };
-    
-    lobbySocket.onclose = () => {
-        console.log("Lobby socket closed. Reconnecting...");
-        setTimeout(connectLobbySocket, 3000);
-    };
+        };
+        
+        lobbySocket.onclose = () => {
+            console.log("Lobby socket closed. Reconnecting...");
+            setTimeout(connectLobbySocket, 3000);
+        };
+        
+        lobbySocket.onerror = (err) => {
+            console.error("Lobby WebSocket error:", err);
+        };
+    } catch (e) {
+        console.error("Failed to initialize lobby WebSocket:", e);
+        setTimeout(connectLobbySocket, 5000);
+    }
 }
 
 function connectGameSocket(roomId) {
-    const wsUrl = API_BASE_URL.replace(/^http/, 'ws');
-    
-    gameSocket = new WebSocket(`${wsUrl}/api/ws/game/${roomId}`);
-    
-    gameSocket.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-        if (msg.type === 'game_finished') {
-            // Другой игрок вошел и игра рассчитана
-            const result = msg.result;
-            const oppName = (result.usernames && result.usernames.opponent) 
-                ? result.usernames.opponent 
-                : "Opponent";
-            elements.namePlayerOpponent.textContent = oppName;
-            playDiceRoll(result.rolls.owner, result.rolls.opponent, result);
-            
-            // Закрываем WebSocket
-            gameSocket.close();
-        }
-    };
+    try {
+        const wsUrl = API_BASE_URL.replace(/^http/, 'ws');
+        gameSocket = new WebSocket(`${wsUrl}/api/ws/game/${roomId}`);
+        
+        gameSocket.onmessage = (event) => {
+            try {
+                const msg = JSON.parse(event.data);
+                if (msg.type === 'game_finished') {
+                    const result = msg.result;
+                    const oppName = (result.usernames && result.usernames.opponent) 
+                        ? result.usernames.opponent 
+                        : "Opponent";
+                    if (elements.namePlayerOpponent) {
+                        elements.namePlayerOpponent.textContent = oppName;
+                    }
+                    playDiceRoll(result.rolls.owner, result.rolls.opponent, result);
+                    gameSocket.close();
+                }
+            } catch (err) {
+                console.error("Error parsing game WS message:", err);
+            }
+        };
+        
+        gameSocket.onerror = (err) => {
+            console.error("Game WebSocket error:", err);
+        };
+    } catch (e) {
+        console.error("Failed to initialize game WebSocket:", e);
+    }
 }
 
 // --- ИВЕНТ ХЕНДЛЕРЫ ---
@@ -607,67 +630,87 @@ elements.presetBets.forEach(btn => {
 });
 
 // Кнопка подтверждения создания комнаты
-elements.btnConfirmCreate.onclick = () => {
-    const bet = parseInt(elements.inputBet.value);
-    const isPrivate = elements.checkPrivate.checked;
-    
-    if (isNaN(bet) || bet <= 0) {
-        showToast("Enter a valid bet amount", "error");
-        return;
-    }
-    
-    if (bet > currentUser.balance) {
-        showToast("Insufficient balance", "error");
-        return;
-    }
-    
-    createRoom(bet, isPrivate);
-};
+if (elements.btnConfirmCreate) {
+    elements.btnConfirmCreate.onclick = () => {
+        const bet = parseInt(elements.inputBet.value);
+        const isPrivate = elements.checkPrivate.checked;
+        
+        if (isNaN(bet) || bet <= 0) {
+            showToast("Enter a valid bet amount", "error");
+            return;
+        }
+        
+        if (bet > currentUser.balance) {
+            showToast("Insufficient balance", "error");
+            return;
+        }
+        
+        createRoom(bet, isPrivate);
+    };
+}
 
-elements.btnClaimGift.onclick = () => {
-    showAdAndCountdown();
-};
+if (elements.btnClaimGift) {
+    elements.btnClaimGift.onclick = () => {
+        showAdAndCountdown();
+    };
+}
 
-elements.btnCloseAdModal.onclick = () => {
-    if (adTimer) clearInterval(adTimer);
-    elements.adModal.classList.add('hidden');
-};
+if (elements.btnCloseAdModal) {
+    elements.btnCloseAdModal.onclick = () => {
+        if (adTimer) clearInterval(adTimer);
+        elements.adModal.classList.add('hidden');
+    };
+}
 
-elements.btnConfirmClaim.onclick = () => {
-    elements.adModal.classList.add('hidden');
-    claimDailyGift();
-};
+if (elements.btnConfirmClaim) {
+    elements.btnConfirmClaim.onclick = () => {
+        elements.adModal.classList.add('hidden');
+        claimDailyGift();
+    };
+}
 
-elements.btnShareRoom.onclick = () => {
-    shareRoom();
-};
+if (elements.btnShareRoom) {
+    elements.btnShareRoom.onclick = () => {
+        shareRoom();
+    };
+}
 
-elements.btnKeepRoomLobby.onclick = () => {
-    if (gameSocket) {
-        gameSocket.close();
-        gameSocket = null;
-    }
-    elements.gameplayScreen.classList.add('hidden');
-    elements.ownerWaitingActions.classList.add('hidden');
-    fetchActiveRooms();
-};
+if (elements.btnKeepRoomLobby) {
+    elements.btnKeepRoomLobby.onclick = () => {
+        if (gameSocket) {
+            gameSocket.close();
+            gameSocket = null;
+        }
+        elements.gameplayScreen.classList.add('hidden');
+        elements.ownerWaitingActions.classList.add('hidden');
+        fetchActiveRooms();
+    };
+}
 
-elements.btnLeaveRoom.onclick = () => {
-    leaveRoom();
-};
+if (elements.btnLeaveRoom) {
+    elements.btnLeaveRoom.onclick = () => {
+        leaveRoom();
+    };
+}
 
-elements.btnCloseConfirmModal.onclick = () => {
-    elements.confirmModal.classList.add('hidden');
-};
+if (elements.btnCloseConfirmModal) {
+    elements.btnCloseConfirmModal.onclick = () => {
+        if (elements.confirmModal) elements.confirmModal.classList.add('hidden');
+    };
+}
 
-elements.btnConfirmActionCancel.onclick = () => {
-    elements.confirmModal.classList.add('hidden');
-};
+if (elements.btnConfirmActionCancel) {
+    elements.btnConfirmActionCancel.onclick = () => {
+        if (elements.confirmModal) elements.confirmModal.classList.add('hidden');
+    };
+}
 
-elements.btnReturnLobby.onclick = () => {
-    elements.gameplayScreen.classList.add('hidden');
-    fetchActiveRooms();
-};
+if (elements.btnReturnLobby) {
+    elements.btnReturnLobby.onclick = () => {
+        elements.gameplayScreen.classList.add('hidden');
+        fetchActiveRooms();
+    };
+}
 
 // Экспортируем функции для inline вызова из HTML
 window.joinRoom = joinRoom;
