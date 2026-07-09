@@ -1004,3 +1004,26 @@ input:checked + .slider:before {
     border-color: rgba(255, 255, 255, 0.05) !important;
     box-shadow: none !important;
 }
+
+/* --- OWNER WAITING AREA STYLES --- */
+.owner-waiting-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.owner-waiting-box.hidden {
+    display: none !important;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger-red) 0%, #b33939 100%) !important;
+    box-shadow: 0 4px 15px rgba(255, 63, 52, 0.25) !important;
+    border: 1px solid rgba(255, 63, 52, 0.2) !important;
+}
+
+.btn-danger:active {
+    transform: scale(0.98);
+}

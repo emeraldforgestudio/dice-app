@@ -2,6 +2,7 @@
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:8000'
     : 'https://finest-smilies-venue-lol.trycloudflare.com'; 
+const BOT_USERNAME = 'VerdeCasinoBot'; 
 
 // Инициализация Telegram WebApp
 const tg = window.Telegram?.WebApp;
@@ -72,6 +73,11 @@ const elements = {
     diceOwner: document.getElementById('dice-owner'),
     diceOpponent: document.getElementById('dice-opponent'),
     gameStatusText: document.getElementById('game-status-text'),
+    
+    ownerWaitingActions: document.getElementById('owner-waiting-actions'),
+    btnShareRoom: document.getElementById('btn-share-room'),
+    btnLeaveRoom: document.getElementById('btn-leave-room'),
+    
     matchResults: document.getElementById('match-results'),
     resultTitle: document.getElementById('result-title'),
     resultSubtitle: document.getElementById('result-subtitle'),
@@ -329,6 +335,54 @@ async function joinRoom(roomId) {
     }
 }
 
+async function leaveRoom() {
+    if (!currentRoomId) return;
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/rooms/delete/${currentRoomId}`, {
+            method: 'POST',
+            headers: getHeaders()
+        });
+        const data = await res.json();
+        
+        if (!res.ok) {
+            showToast(data.detail || "Unable to delete room", "error");
+            return;
+        }
+        
+        showToast("Room deleted and bet refunded!", "success");
+        
+        // Закрываем сокет комнаты
+        if (gameSocket) {
+            gameSocket.close();
+            gameSocket = null;
+        }
+        
+        // Возвращаемся в лобби
+        elements.gameplayScreen.classList.add('hidden');
+        elements.ownerWaitingActions.classList.add('hidden');
+        fetchUserProfile();
+        fetchActiveRooms();
+    } catch (e) {
+        showToast("Connection error", "error");
+    }
+}
+
+function shareRoom() {
+    if (!currentRoomId) return;
+    const shareUrl = `https://t.me/share/url?url=https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}&text=🎲 Join my Dice match! Low roll wins, bets are returned on tie. Let's play! 🪙`;
+    
+    if (tg && tg.openTelegramLink) {
+        tg.openTelegramLink(shareUrl);
+    } else {
+        // Копируем в буфер обмена вне Telegram
+        navigator.clipboard.writeText(`https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`).then(() => {
+            showToast("Invite link copied to clipboard!", "success");
+        }).catch(() => {
+            showToast("Unable to copy link", "error");
+        });
+    }
+}
+
 function openGameplayScreen(roomId, isOwner, bet) {
     currentRoomId = roomId;
     elements.gameRoomId.textContent = `Room ID: ${roomId}`;
@@ -344,6 +398,7 @@ function openGameplayScreen(roomId, isOwner, bet) {
         elements.namePlayerOwner.textContent = currentUser.username || currentUser.first_name;
         elements.namePlayerOpponent.textContent = "Waiting...";
         elements.gameStatusText.textContent = "Waiting for an opponent to join...";
+        elements.ownerWaitingActions.classList.remove('hidden'); // Показываем кнопки создателя
         
         // Подключаемся к WebSocket комнаты для отслеживания старта игры бэкендом
         connectGameSocket(roomId);
@@ -351,10 +406,12 @@ function openGameplayScreen(roomId, isOwner, bet) {
         elements.namePlayerOwner.textContent = "Opponent";
         elements.namePlayerOpponent.textContent = currentUser.username || currentUser.first_name;
         elements.gameStatusText.textContent = "Rolling the dice...";
+        elements.ownerWaitingActions.classList.add('hidden'); // Скрываем кнопки создателя
     }
 }
 
 function playDiceRoll(ownerRoll, opponentRoll, gameResult) {
+    elements.ownerWaitingActions.classList.add('hidden'); // Скрываем кнопки создателя при броске
     elements.gameStatusText.textContent = "🎲 Shaking the cups...";
     
     if (tg && tg.HapticFeedback) {
@@ -500,6 +557,14 @@ elements.btnCloseAdModal.onclick = () => {
 elements.btnConfirmClaim.onclick = () => {
     elements.adModal.classList.add('hidden');
     claimDailyGift();
+};
+
+elements.btnShareRoom.onclick = () => {
+    shareRoom();
+};
+
+elements.btnLeaveRoom.onclick = () => {
+    leaveRoom();
 };
 
 elements.btnReturnLobby.onclick = () => {

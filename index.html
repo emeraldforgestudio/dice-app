@@ -198,6 +198,17 @@
             <!-- Game Status / Results Panel -->
             <div class="game-status-panel">
                 <p id="game-status-text">Waiting for opponent to connect...</p>
+                
+                <!-- Actions only for owner while waiting -->
+                <div id="owner-waiting-actions" class="owner-waiting-box hidden">
+                    <button id="btn-share-room" class="btn btn-primary btn-block">
+                        <i class="fa-solid fa-share-nodes"></i> Invite Friend
+                    </button>
+                    <button id="btn-leave-room" class="btn btn-danger btn-block">
+                        <i class="fa-solid fa-right-from-bracket"></i> Delete & Leave
+                    </button>
+                </div>
+
                 <div class="match-results-box hidden" id="match-results">
                     <h2 id="result-title">Victory!</h2>
                     <p id="result-subtitle">+1,000 coins</p>
