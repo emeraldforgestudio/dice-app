@@ -673,19 +673,51 @@ input:checked + .slider:before {
     white-space: nowrap;
 }
 
-.vs-badge {
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--danger-red);
-    text-shadow: 0 0 10px var(--danger-glow);
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--panel-border);
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
+.vs-ring-wrapper {
+    position: relative;
+    width: 80px;
+    height: 80px;
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.vs-ring-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 80px;
+    transform: rotate(-90deg);
+}
+
+.vs-ring-track {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.06);
+    stroke-width: 4;
+}
+
+.vs-ring-fill {
+    fill: none;
+    stroke: var(--danger-red);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 213.6; /* 2 * PI * 34 */
+    stroke-dashoffset: 213.6;
+    filter: drop-shadow(0 0 4px var(--danger-glow));
+    transition: stroke-dashoffset 0.1s linear;
+}
+
+.vs-badge {
+    position: relative;
+    z-index: 1;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--danger-red);
+    text-shadow: 0 0 10px var(--danger-glow);
 }
 
 /* 3D Dice styling */

@@ -718,19 +718,39 @@ function connectLobbySocket() {
 }
 
 function startRoomPolling(roomId) {
-    if (roomPollInterval) clearInterval(roomPollInterval);
+    if (roomPollInterval) {
+        clearInterval(roomPollInterval);
+        roomPollInterval = null;
+    }
     
-    console.log(`[POLL GAME] Started polling room status for: ${roomId}`);
-    roomPollInterval = setInterval(async () => {
-        // Проверяем, нужно ли остановить опрос (если вышли с экрана игры или результаты показаны)
-        if (currentRoomId !== roomId || 
-            !elements.gameplayScreen || 
-            elements.gameplayScreen.classList.contains('hidden') || 
-            (elements.matchResults && !elements.matchResults.classList.contains('hidden'))) {
-            
-            console.log(`[POLL GAME] Stopping polling for room: ${roomId}`);
+    const POLL_INTERVAL_MS = 10000; // 10 секунд на один оборот
+    const TICK_MS = 50;             // Обновление прогресса каждые 50мс
+    const CIRCUMFERENCE = 213.6;   // 2 * PI * r (r=34)
+    
+    const ringEl = document.getElementById('vs-ring-fill');
+    const wrapperEl = document.getElementById('vs-ring-wrapper');
+    
+    let elapsed = 0;
+    let isGameFinished = false;
+    
+    function stopPolling() {
+        if (roomPollInterval) {
             clearInterval(roomPollInterval);
             roomPollInterval = null;
+        }
+        // Скрываем кольцо
+        if (wrapperEl) wrapperEl.style.opacity = '0';
+    }
+    
+    async function checkRoomStatus() {
+        if (isGameFinished) return;
+        
+        // Проверяем, ещё ли мы в экране ожидания
+        if (currentRoomId !== roomId ||
+            !elements.gameplayScreen ||
+            elements.gameplayScreen.classList.contains('hidden') ||
+            (elements.matchResults && !elements.matchResults.classList.contains('hidden'))) {
+            stopPolling();
             return;
         }
         
@@ -742,30 +762,61 @@ function startRoomPolling(roomId) {
             const data = await res.json();
             
             if (data.status === 'finished' && data.result) {
-                console.log(`[POLL GAME] Match completed for room: ${roomId}!`);
-                clearInterval(roomPollInterval);
-                roomPollInterval = null;
+                isGameFinished = true;
+                stopPolling();
                 
                 const result = data.result;
-                const oppName = (result.usernames && result.usernames.opponent) 
-                    ? result.usernames.opponent 
+                const oppName = (result.usernames && result.usernames.opponent)
+                    ? result.usernames.opponent
                     : "Opponent";
                 if (elements.namePlayerOpponent) {
                     elements.namePlayerOpponent.textContent = oppName;
                 }
                 playDiceRoll(result.rolls.owner, result.rolls.opponent, result);
+                
             } else if (data.status === 'not_found') {
-                console.log(`[POLL GAME] Room not found: ${roomId}. Exiting wait screen.`);
-                clearInterval(roomPollInterval);
-                roomPollInterval = null;
+                isGameFinished = true;
+                stopPolling();
                 showToast("Room was deleted", "warning");
                 if (elements.gameplayScreen) elements.gameplayScreen.classList.add('hidden');
                 fetchActiveRooms();
             }
         } catch (e) {
-            console.error("[POLL GAME] Error polling room status:", e);
+            console.error("[POLL GAME] Error checking room status:", e);
         }
-    }, 3000);
+    }
+    
+    // Показываем кольцо плавно
+    if (wrapperEl) wrapperEl.style.opacity = '1';
+    
+    // Тик: обновляем прогресс-кольцо каждые 50мс
+    roomPollInterval = setInterval(async () => {
+        if (isGameFinished) { stopPolling(); return; }
+        
+        // Проверяем выход с экрана
+        if (currentRoomId !== roomId ||
+            !elements.gameplayScreen ||
+            elements.gameplayScreen.classList.contains('hidden') ||
+            (elements.matchResults && !elements.matchResults.classList.contains('hidden'))) {
+            stopPolling();
+            return;
+        }
+        
+        elapsed += TICK_MS;
+        
+        // Прогресс от 0 до 1 в пределах текущего 10-секундного цикла
+        const progress = (elapsed % POLL_INTERVAL_MS) / POLL_INTERVAL_MS;
+        const offset = CIRCUMFERENCE * (1 - progress);
+        if (ringEl) ringEl.style.strokeDashoffset = offset;
+        
+        // Когда достигли конца цикла — делаем запрос
+        if (elapsed % POLL_INTERVAL_MS < TICK_MS) {
+            elapsed = Math.round(elapsed / POLL_INTERVAL_MS) * POLL_INTERVAL_MS;
+            // Сбрасываем кольцо и делаем запрос
+            if (ringEl) ringEl.style.strokeDashoffset = CIRCUMFERENCE;
+            await checkRoomStatus();
+        }
+    }, TICK_MS);
 }
 
 // --- ИВЕНТ ХЕНДЛЕРЫ ---
