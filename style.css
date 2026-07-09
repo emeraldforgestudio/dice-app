@@ -60,7 +60,7 @@ body {
 }
 
 .brand-dice {
-    font-size: 72px;
+    font-size: 40px;
     filter: drop-shadow(0 0 16px var(--emerald-glow));
     line-height: 1;
 }
