@@ -1268,3 +1268,7 @@ input:checked + .slider:before {
     color: var(--text-muted);
     font-weight: 600;
 }
+
+#btn-leave-room {
+    margin-top: 18px !important;
+}

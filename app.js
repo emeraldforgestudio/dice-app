@@ -17,6 +17,7 @@ const tg = window.Telegram?.WebApp;
 let initData = '';
 let currentUser = { id: 0, username: 'Player', first_name: 'Player', balance: 0 };
 let currentRoomId = null;
+let currentRoomBet = 0;
 let lobbySocket = null;
 let gameSocket = null;
 let activeRooms = [];
@@ -488,6 +489,23 @@ function confirmCancelRoom(roomId, bet) {
     }
 }
 
+function confirmDeleteRoom() {
+    if (!currentRoomId) return;
+    
+    if (elements.confirmTitle) elements.confirmTitle.textContent = "Delete & Leave Room";
+    if (elements.confirmOwner) elements.confirmOwner.textContent = "You (Owner)";
+    if (elements.confirmBet) elements.confirmBet.textContent = `${currentRoomBet ? currentRoomBet.toLocaleString() : '0'} 🪙`;
+    if (elements.confirmMessageText) elements.confirmMessageText.textContent = "Are you sure you want to delete this room and leave? Your bet will be fully refunded to your balance.";
+    if (elements.confirmModal) elements.confirmModal.classList.remove('hidden');
+    
+    if (elements.btnConfirmActionSubmit) {
+        elements.btnConfirmActionSubmit.onclick = () => {
+            if (elements.confirmModal) elements.confirmModal.classList.add('hidden');
+            leaveRoom();
+        };
+    }
+}
+
 function setRoomFilter(filterType) {
     currentFilterType = filterType;
     
@@ -575,6 +593,7 @@ function shareRoom() {
 
 function openGameplayScreen(roomId, isOwner, bet, result = null) {
     currentRoomId = roomId;
+    currentRoomBet = bet;
     if (elements.gameRoomId) elements.gameRoomId.textContent = `Room ID: ${roomId}`;
     if (elements.gameplayScreen) elements.gameplayScreen.classList.remove('hidden');
     if (elements.matchResults) elements.matchResults.classList.add('hidden');
@@ -803,7 +822,7 @@ if (elements.btnKeepRoomLobby) {
 
 if (elements.btnLeaveRoom) {
     elements.btnLeaveRoom.onclick = () => {
-        leaveRoom();
+        confirmDeleteRoom();
     };
 }
 
@@ -847,6 +866,7 @@ if (elements.sortRooms) {
 window.joinRoom = joinRoom;
 window.confirmJoinRoom = confirmJoinRoom;
 window.confirmCancelRoom = confirmCancelRoom;
+window.confirmDeleteRoom = confirmDeleteRoom;
 window.setRoomFilter = setRoomFilter;
 window.changePage = changePage;
 window.applyFiltersAndRender = applyFiltersAndRender;
