@@ -4,6 +4,14 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
     : 'https://finest-smilies-venue-lol.trycloudflare.com'; 
 const BOT_USERNAME = 'VerdeCasinoBot'; 
 
+function maskUsername(username) {
+    if (!username) return "anonymous";
+    let clean = username.startsWith("@") ? username.slice(1) : username;
+    if (clean.length <= 1) return clean + "*";
+    if (clean.length === 2) return clean[0] + "*";
+    return clean[0] + "*".repeat(clean.length - 2) + clean[clean.length - 1];
+}
+
 // Инициализация Telegram WebApp
 const tg = window.Telegram?.WebApp;
 let initData = '';
@@ -270,17 +278,23 @@ function renderRooms(rooms) {
         return;
     }
     
-    elements.roomsList.innerHTML = rooms.map(room => `
-        <div class="room-card-item" id="room-${room.id}">
-            <div class="room-info-side">
-                <span class="room-bet-amount">${room.bet.toLocaleString()} 🪙</span>
-                <span class="room-owner-name">by @${room.owner_username}</span>
+    elements.roomsList.innerHTML = rooms.map(room => {
+        const isOwn = room.owner_id === currentUser.id;
+        const displayName = isOwn 
+            ? (room.owner_username ? `@${room.owner_username}` : "You")
+            : `@${maskUsername(room.owner_username)}`;
+        return `
+            <div class="room-card-item" id="room-${room.id}">
+                <div class="room-info-side">
+                    <span class="room-bet-amount">${room.bet.toLocaleString()} 🪙</span>
+                    <span class="room-owner-name">by ${displayName}</span>
+                </div>
+                <div class="room-action-side">
+                    <button class="btn-join" onclick="joinRoom('${room.id}')">Join Game</button>
+                </div>
             </div>
-            <div class="room-action-side">
-                <button class="btn-join" onclick="joinRoom('${room.id}')">Join Game</button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // --- ИГРОВОЙ ПРОЦЕСС ---
@@ -327,7 +341,7 @@ async function joinRoom(roomId) {
         }
         
         // Открываем экран игры для оппонента (который только что зашел)
-        openGameplayScreen(roomId, false, data.bet);
+        openGameplayScreen(roomId, false, data.bet, data);
         
         // Запускаем анимацию броска
         playDiceRoll(data.rolls.owner, data.rolls.opponent, data);
@@ -384,7 +398,7 @@ function shareRoom() {
     }
 }
 
-function openGameplayScreen(roomId, isOwner, bet) {
+function openGameplayScreen(roomId, isOwner, bet, result = null) {
     currentRoomId = roomId;
     elements.gameRoomId.textContent = `Room ID: ${roomId}`;
     elements.gameplayScreen.classList.remove('hidden');
@@ -404,7 +418,10 @@ function openGameplayScreen(roomId, isOwner, bet) {
         // Подключаемся к WebSocket комнаты для отслеживания старта игры бэкендом
         connectGameSocket(roomId);
     } else {
-        elements.namePlayerOwner.textContent = "Opponent";
+        const ownerName = (result && result.usernames && result.usernames.owner) 
+            ? result.usernames.owner 
+            : "Opponent";
+        elements.namePlayerOwner.textContent = ownerName;
         elements.namePlayerOpponent.textContent = currentUser.username || currentUser.first_name;
         elements.gameStatusText.textContent = "Rolling the dice...";
         elements.ownerWaitingActions.classList.add('hidden'); // Скрываем кнопки создателя
@@ -498,7 +515,10 @@ function connectGameSocket(roomId) {
         if (msg.type === 'game_finished') {
             // Другой игрок вошел и игра рассчитана
             const result = msg.result;
-            elements.namePlayerOpponent.textContent = "Opponent";
+            const oppName = (result.usernames && result.usernames.opponent) 
+                ? result.usernames.opponent 
+                : "Opponent";
+            elements.namePlayerOpponent.textContent = oppName;
             playDiceRoll(result.rolls.owner, result.rolls.opponent, result);
             
             // Закрываем WebSocket
