@@ -46,10 +46,11 @@ body {
 /* Branding Logo */
 .brand-logo-container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 12px;
-    padding: 16px;
+    gap: 8px;
+    padding: 24px 16px;
     background: linear-gradient(135deg, rgba(5, 196, 107, 0.05) 0%, rgba(0, 255, 135, 0.02) 100%);
     border: 1px solid rgba(0, 255, 135, 0.1);
     border-radius: 20px;
@@ -59,18 +60,15 @@ body {
 }
 
 .brand-dice {
-    font-size: 38px;
-    background: linear-gradient(135deg, var(--neon-green), var(--emerald));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 8px var(--emerald-glow));
+    font-size: 54px;
+    filter: drop-shadow(0 0 12px var(--emerald-glow));
     line-height: 1;
 }
 
 .brand-name {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 800;
-    letter-spacing: 4px;
+    letter-spacing: 6px;
     background: linear-gradient(135deg, var(--white), var(--text-secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
