@@ -142,6 +142,21 @@ async function fetchUserProfile() {
             ? `@${currentUser.username}` 
             : currentUser.first_name;
         elements.balanceDisplay.textContent = `${currentUser.balance.toLocaleString()} 🪙`;
+        
+        // Настройка аватарки пользователя
+        const userAvatarElement = document.getElementById('user-avatar');
+        if (userAvatarElement) {
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.photo_url) {
+                userAvatarElement.innerHTML = `<img src="${tg.initDataUnsafe.user.photo_url}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            } else {
+                // Если фото нет, отображаем инициал первой буквы имени пользователя
+                const name = currentUser.first_name || currentUser.username || "P";
+                userAvatarElement.textContent = name.charAt(0).toUpperCase();
+                userAvatarElement.style.fontSize = "20px";
+                userAvatarElement.style.fontWeight = "800";
+                userAvatarElement.style.color = "var(--black)";
+            }
+        }
     } catch (e) {
         showToast("Error connecting to server", "error");
         console.error(e);
