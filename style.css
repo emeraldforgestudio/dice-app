@@ -1027,3 +1027,62 @@ input:checked + .slider:before {
 .btn-danger:active {
     transform: scale(0.98);
 }
+
+/* --- CONFIRMATION MODAL & CANCEL BUTTON STYLES --- */
+.confirm-modal-content {
+    max-width: 360px;
+    width: 90%;
+}
+
+.confirm-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 10px 0;
+}
+
+.confirm-info-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.confirm-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.confirm-label {
+    color: var(--text-muted);
+}
+
+.confirm-value {
+    color: var(--white);
+    font-weight: 700;
+}
+
+.confirm-message {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.4;
+}
+
+.confirm-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.room-action-side .btn-cancel-lobby {
+    background: linear-gradient(135deg, var(--danger-red) 0%, #b33939 100%) !important;
+    color: var(--white) !important;
+    box-shadow: 0 4px 10px rgba(255, 63, 52, 0.2) !important;
+    border-color: rgba(255, 63, 52, 0.2) !important;
+}

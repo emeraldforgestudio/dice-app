@@ -87,6 +87,15 @@ const elements = {
     btnKeepRoomLobby: document.getElementById('btn-keep-room-lobby'),
     btnLeaveRoom: document.getElementById('btn-leave-room'),
     
+    confirmModal: document.getElementById('confirm-modal'),
+    btnCloseConfirmModal: document.getElementById('btn-close-confirm-modal'),
+    confirmTitle: document.getElementById('confirm-title'),
+    confirmOwner: document.getElementById('confirm-owner'),
+    confirmBet: document.getElementById('confirm-bet'),
+    confirmMessageText: document.getElementById('confirm-message-text'),
+    btnConfirmActionCancel: document.getElementById('btn-confirm-action-cancel'),
+    btnConfirmActionSubmit: document.getElementById('btn-confirm-action-submit'),
+    
     matchResults: document.getElementById('match-results'),
     resultTitle: document.getElementById('result-title'),
     resultSubtitle: document.getElementById('result-subtitle'),
@@ -283,6 +292,12 @@ function renderRooms(rooms) {
         const displayName = isOwn 
             ? (room.owner_username ? `@${room.owner_username}` : "You")
             : `@${maskUsername(room.owner_username)}`;
+            
+        // Если комната принадлежит текущему пользователю, показываем кнопку Cancel
+        const actionButton = isOwn
+            ? `<button class="btn-join btn-cancel-lobby" onclick="confirmCancelRoom('${room.id}', ${room.bet})">Cancel</button>`
+            : `<button class="btn-join" onclick="confirmJoinRoom('${room.id}', '${room.owner_username}', ${room.bet})">Join Game</button>`;
+            
         return `
             <div class="room-card-item" id="room-${room.id}">
                 <div class="room-info-side">
@@ -290,7 +305,7 @@ function renderRooms(rooms) {
                     <span class="room-owner-name">by ${displayName}</span>
                 </div>
                 <div class="room-action-side">
-                    <button class="btn-join" onclick="joinRoom('${room.id}')">Join Game</button>
+                    ${actionButton}
                 </div>
             </div>
         `;
@@ -348,6 +363,49 @@ async function joinRoom(roomId) {
     } catch (e) {
         showToast("Connection failed", "error");
     }
+}
+
+function confirmJoinRoom(roomId, ownerUsername, bet) {
+    elements.confirmTitle.textContent = "Confirm Match Entry";
+    elements.confirmOwner.textContent = `@${maskUsername(ownerUsername)}`;
+    elements.confirmBet.textContent = `${bet.toLocaleString()} 🪙`;
+    elements.confirmMessageText.textContent = "Are you sure you want to join this room? The bet amount will be immediately deducted from your balance.";
+    elements.confirmModal.classList.remove('hidden');
+    
+    elements.btnConfirmActionSubmit.onclick = () => {
+        elements.confirmModal.classList.add('hidden');
+        joinRoom(roomId);
+    };
+}
+
+function confirmCancelRoom(roomId, bet) {
+    elements.confirmTitle.textContent = "Cancel Match Creation";
+    elements.confirmOwner.textContent = "You (Owner)";
+    elements.confirmBet.textContent = `${bet.toLocaleString()} 🪙`;
+    elements.confirmMessageText.textContent = "Are you sure you want to cancel this room? Your bet will be fully refunded to your balance.";
+    elements.confirmModal.classList.remove('hidden');
+    
+    elements.btnConfirmActionSubmit.onclick = async () => {
+        elements.confirmModal.classList.add('hidden');
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/rooms/delete/${roomId}`, {
+                method: 'POST',
+                headers: getHeaders()
+            });
+            const data = await res.json();
+            
+            if (!res.ok) {
+                showToast(data.detail || "Unable to delete room", "error");
+                return;
+            }
+            
+            showToast("Room cancelled and bet refunded!", "success");
+            fetchUserProfile();
+            fetchActiveRooms();
+        } catch (e) {
+            showToast("Network error", "error");
+        }
+    };
 }
 
 async function leaveRoom() {
@@ -598,13 +656,23 @@ elements.btnLeaveRoom.onclick = () => {
     leaveRoom();
 };
 
+elements.btnCloseConfirmModal.onclick = () => {
+    elements.confirmModal.classList.add('hidden');
+};
+
+elements.btnConfirmActionCancel.onclick = () => {
+    elements.confirmModal.classList.add('hidden');
+};
+
 elements.btnReturnLobby.onclick = () => {
     elements.gameplayScreen.classList.add('hidden');
     fetchActiveRooms();
 };
 
-// Экспортируем функцию для inline вызова из HTML
+// Экспортируем функции для inline вызова из HTML
 window.joinRoom = joinRoom;
+window.confirmJoinRoom = confirmJoinRoom;
+window.confirmCancelRoom = confirmCancelRoom;
 
 // --- ИНИЦИАЛИЗАЦИЯ ПРИ ЗАПУСКЕ ---
 fetchUserProfile();

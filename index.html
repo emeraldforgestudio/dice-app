@@ -143,6 +143,31 @@
                 </button>
             </div>
         </div>
+    <!-- MODAL: ACTION CONFIRMATION -->
+    <div id="confirm-modal" class="modal-backdrop hidden">
+        <div class="modal-content glass-panel confirm-modal-content">
+            <div class="modal-header">
+                <h3 id="confirm-title">Confirm Action</h3>
+                <button class="btn-close-modal" id="btn-close-confirm-modal"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="modal-body confirm-body">
+                <div class="confirm-info-box">
+                    <div class="confirm-item">
+                        <span class="confirm-label">Room Creator:</span>
+                        <span class="confirm-value" id="confirm-owner">@Player</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Bet Amount:</span>
+                        <span class="confirm-value text-green" id="confirm-bet">1,000 🪙</span>
+                    </div>
+                </div>
+                <p class="confirm-message" id="confirm-message-text">Are you sure you want to proceed?</p>
+            </div>
+            <div class="modal-footer confirm-buttons">
+                <button id="btn-confirm-action-cancel" class="btn btn-secondary">No, Back</button>
+                <button id="btn-confirm-action-submit" class="btn btn-primary">Yes, Proceed</button>
+            </div>
+        </div>
     </div>
 
     <!-- SCREEN: GAMEPLAY ARENA (Hidden by default) -->
