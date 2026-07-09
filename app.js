@@ -712,11 +712,17 @@ function connectLobbySocket() {
 function connectGameSocket(roomId) {
     try {
         const wsUrl = API_BASE_URL.replace(/^http/, 'ws');
+        console.log(`[WS GAME] Connecting to: ${wsUrl}/api/ws/game/${roomId}`);
         gameSocket = new WebSocket(`${wsUrl}/api/ws/game/${roomId}`);
+        
+        gameSocket.onopen = () => {
+            console.log("[WS GAME] Connection established successfully!");
+        };
         
         gameSocket.onmessage = (event) => {
             try {
                 const msg = JSON.parse(event.data);
+                console.log("[WS GAME] Received message:", msg);
                 if (msg.type === 'ping') {
                     return; // Игнорируем пинг
                 }
@@ -732,20 +738,21 @@ function connectGameSocket(roomId) {
                     gameSocket.close();
                 }
             } catch (err) {
-                console.error("Error parsing game WS message:", err);
+                console.error("[WS GAME] Error parsing message:", err);
             }
         };
         
-        gameSocket.onclose = () => {
+        gameSocket.onclose = (event) => {
+            console.log(`[WS GAME] Connection closed. Code: ${event.code}, Reason: ${event.reason}`);
             // Переподключаемся, если комната все еще открыта и игра не завершилась
             if (currentRoomId === roomId && elements.gameplayScreen && !elements.gameplayScreen.classList.contains('hidden') && elements.matchResults && elements.matchResults.classList.contains('hidden')) {
-                console.log("Game WS connection closed. Reconnecting in 2s...");
+                console.log("[WS GAME] Reconnecting in 2s...");
                 setTimeout(() => connectGameSocket(roomId), 2000);
             }
         };
         
         gameSocket.onerror = (err) => {
-            console.error("Game WebSocket error:", err);
+            console.error("[WS GAME] Connection error occurred:", err);
         };
     } catch (e) {
         console.error("Failed to initialize game WebSocket:", e);
