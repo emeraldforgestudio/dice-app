@@ -986,8 +986,8 @@ function startRoomPolling(roomId) {
         // Базовый поворот (стартовая точка четверти): 0, 90, 180, 270 градусов
         const baseAngleDeg = quarterIndex * 90;
         
-        // Добавочный поворот пробежки в пределах четверти (от 0 до 90 градусов)
-        const runAngleDeg = subProgress * 90;
+        // Добавочный поворот пробежки: за один пробег проходит 360 (полный круг) + 90 (четверть вперед) = 450 градусов
+        const runAngleDeg = subProgress * 450;
         
         // Итоговый угол поворота SVG элемента в градусах (с учетом начального сдвига на -90 градусов)
         const totalAngle = -90 + baseAngleDeg + runAngleDeg;
