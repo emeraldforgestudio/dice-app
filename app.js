@@ -130,6 +130,8 @@ const elements = {
     userAvatar: document.getElementById('user-avatar'),
     gameAvatarOwner: document.getElementById('game-avatar-owner'),
     gameAvatarOpponent: document.getElementById('game-avatar-opponent'),
+    btnToggleFilters: document.getElementById('btn-toggle-filters'),
+    expandableFiltersPanel: document.getElementById('expandable-filters-panel'),
 };
 
 // --- УВЕДОМЛЕНИЯ ---
@@ -1097,6 +1099,15 @@ if (elements.sortRooms) {
         currentSortType = e.target.value;
         currentPage = 1;
         renderRooms(activeRooms);
+    };
+}
+
+if (elements.btnToggleFilters) {
+    elements.btnToggleFilters.onclick = () => {
+        if (elements.expandableFiltersPanel) {
+            const isHidden = elements.expandableFiltersPanel.classList.toggle('hidden');
+            elements.btnToggleFilters.classList.toggle('active', !isHidden);
+        }
     };
 }
 

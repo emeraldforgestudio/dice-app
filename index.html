@@ -72,11 +72,10 @@
             
             <!-- LOBBY FILTER BAR -->
             <div class="lobby-filter-bar">
-                <div class="filter-row search-sort-row">
-                    <div class="filter-item-search">
-                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                        <input type="text" id="search-owner" placeholder="Search by creator...">
-                    </div>
+                <div class="filter-top-row">
+                    <button class="btn-filter-trigger" id="btn-toggle-filters">
+                        <i class="fa-solid fa-filter"></i> Filters
+                    </button>
                     <div class="filter-item-select">
                         <select id="sort-rooms">
                             <option value="bet-asc">Bet: Low to High 🪙↑</option>
@@ -86,18 +85,28 @@
                     </div>
                 </div>
                 
-                <div class="filter-row filter-toggles-row">
-                    <button class="filter-toggle active" id="btn-filter-all" onclick="setRoomFilter('all')">All</button>
-                    <button class="filter-toggle" id="btn-filter-own" onclick="setRoomFilter('own')">My Rooms</button>
-                    <button class="filter-toggle" id="btn-filter-other" onclick="setRoomFilter('other')">Foreign</button>
-                </div>
-                
-                <div class="filter-row bet-range-row">
-                    <span class="range-label">Bet Range:</span>
-                    <input type="number" id="bet-min" placeholder="Min" min="0" step="100">
-                    <span class="range-sep">-</span>
-                    <input type="number" id="bet-max" placeholder="Max" min="0" step="100">
-                    <button class="btn-apply-filters" id="btn-apply-filters" onclick="applyFiltersAndRender()">Apply</button>
+                <!-- Expandable Filters Section -->
+                <div class="expandable-filters hidden" id="expandable-filters-panel">
+                    <div class="filter-row search-row">
+                        <div class="filter-item-search">
+                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            <input type="text" id="search-owner" placeholder="Search by creator...">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-row filter-toggles-row">
+                        <button class="filter-toggle active" id="btn-filter-all" onclick="setRoomFilter('all')">All</button>
+                        <button class="filter-toggle" id="btn-filter-own" onclick="setRoomFilter('own')">My Rooms</button>
+                        <button class="filter-toggle" id="btn-filter-other" onclick="setRoomFilter('other')">Foreign</button>
+                    </div>
+                    
+                    <div class="filter-row bet-range-row">
+                        <span class="range-label">Bet Range:</span>
+                        <input type="number" id="bet-min" placeholder="Min" min="0" step="100">
+                        <span class="range-sep">-</span>
+                        <input type="number" id="bet-max" placeholder="Max" min="0" step="100">
+                        <button class="btn-apply-filters" id="btn-apply-filters" onclick="applyFiltersAndRender()">Apply</button>
+                    </div>
                 </div>
             </div>
             
@@ -119,7 +128,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #35 (38d3a88)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #36 (4edeadb)</p>
         </footer>
     </div>
 
