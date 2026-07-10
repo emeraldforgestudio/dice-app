@@ -1318,10 +1318,10 @@ input:checked + .slider:before {
 
 .bet-range-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     font-size: 11px;
-    gap: 6px;
+    gap: 8px;
+    width: 100%;
 }
 
 .range-label {
@@ -1331,37 +1331,46 @@ input:checked + .slider:before {
 }
 
 .bet-range-row input {
-    width: 60px;
+    flex: 1; /* Растягивает поля ввода на доступную ширину */
+    min-width: 50px;
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 6px;
-    padding: 4px 6px;
+    padding: 6px 8px;
     color: var(--white);
-    font-size: 11px;
+    font-size: 12px;
     text-align: center;
     outline: none;
+    transition: border-color 0.2s;
+}
+
+.bet-range-row input:focus {
+    border-color: var(--green);
 }
 
 .range-sep {
     color: var(--text-muted);
+    flex-shrink: 0;
 }
 
 .btn-apply-filters {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex: 1.2; /* Кнопка чуть шире, чем инпуты, заполняет свободное место */
+    background: linear-gradient(135deg, var(--green) 0%, #10ac84 100%);
+    border: 1px solid rgba(46, 213, 115, 0.2);
     color: var(--white);
-    padding: 4px 10px;
-    font-size: 11px;
+    padding: 6px 12px;
+    font-size: 12px;
     font-weight: 700;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s;
-    margin-left: auto;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(46, 213, 115, 0.15);
 }
 
 .btn-apply-filters:active {
-    transform: scale(0.95);
-    background: rgba(255, 255, 255, 0.15);
+    transform: scale(0.97);
+    background: #10ac84;
 }
 
 /* Pagination Styles */
