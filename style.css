@@ -692,23 +692,29 @@ input:checked + .slider:before {
     width: 80px;
     height: 80px;
     transform: rotate(-90deg);
+    animation: vs-ring-spin 10s linear infinite; /* Медленное красивое вращение основы */
+}
+
+@keyframes vs-ring-spin {
+    from { transform: rotate(-90deg); }
+    to { transform: rotate(270deg); }
 }
 
 .vs-ring-track {
     fill: none;
-    stroke: rgba(255, 255, 255, 0.06);
+    stroke: rgba(46, 213, 115, 0.08); /* Полупрозрачный зеленый трек */
     stroke-width: 4;
 }
 
 .vs-ring-fill {
     fill: none;
-    stroke: var(--danger-red);
+    stroke: var(--neon-green); /* Насыщенный зеленый цвет */
     stroke-width: 4;
     stroke-linecap: round;
     stroke-dasharray: 213.6; /* 2 * PI * 34 */
     stroke-dashoffset: 213.6;
-    filter: drop-shadow(0 0 4px var(--danger-glow));
-    transition: stroke-dashoffset 0.1s linear;
+    filter: drop-shadow(0 0 6px rgba(0, 255, 135, 0.6)); /* Зеленое неоновое свечение */
+    transition: stroke-dashoffset 0.05s linear;
 }
 
 .vs-badge {
@@ -716,8 +722,20 @@ input:checked + .slider:before {
     z-index: 1;
     font-size: 16px;
     font-weight: 800;
-    color: var(--danger-red);
-    text-shadow: 0 0 10px var(--danger-glow);
+    color: var(--neon-green); /* Текст VS тоже зеленый */
+    text-shadow: 0 0 10px rgba(0, 255, 135, 0.5);
+    animation: vs-badge-pulse 2s ease-in-out infinite; /* Эффектная пульсация */
+}
+
+@keyframes vs-badge-pulse {
+    0%, 100% {
+        transform: scale(1);
+        text-shadow: 0 0 10px rgba(0, 255, 135, 0.5);
+    }
+    50% {
+        transform: scale(1.1);
+        text-shadow: 0 0 18px rgba(0, 255, 135, 0.9);
+    }
 }
 
 /* 3D Dice styling */
