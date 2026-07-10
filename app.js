@@ -694,6 +694,12 @@ function openGameplayScreen(roomId, isOwner, bet, result = null) {
     if (elements.matchResults) elements.matchResults.classList.add('hidden');
     if (elements.gameStatusText) elements.gameStatusText.classList.remove('hidden');
     
+    // Скрываем короны при входе
+    const crownOwner = document.getElementById('crown-owner');
+    const crownOpponent = document.getElementById('crown-opponent');
+    if (crownOwner) crownOwner.classList.add('hidden');
+    if (crownOpponent) crownOpponent.classList.add('hidden');
+
     // Сбрасываем 3D кости на грань "1"
     if (elements.diceOwner) elements.diceOwner.style.transform = 'rotateX(0deg) rotateY(0deg)';
     if (elements.diceOpponent) elements.diceOpponent.style.transform = 'rotateX(0deg) rotateY(0deg)';
@@ -783,20 +789,36 @@ function showGameResults(result) {
     if (elements.matchResults) elements.matchResults.classList.remove('hidden');
     const isWinner = result.winner_id === currentUser.id;
     
+    // Определяем победителя и показываем корону над нужным аватаром
+    const crownOwner = document.getElementById('crown-owner');
+    const crownOpponent = document.getElementById('crown-opponent');
+    if (crownOwner) crownOwner.classList.add('hidden');
+    if (crownOpponent) crownOpponent.classList.add('hidden');
+    
     if (result.is_draw) {
         if (elements.matchResults) elements.matchResults.className = "match-results-box draw";
         if (elements.resultTitle) elements.resultTitle.textContent = "🤝 Tie roll!";
         if (elements.resultSubtitle) elements.resultSubtitle.textContent = "All bets returned.";
-    } else if (isWinner) {
-        if (elements.matchResults) elements.matchResults.className = "match-results-box victory";
-        if (elements.resultTitle) elements.resultTitle.textContent = "🏆 Victory!";
-        if (elements.resultSubtitle) elements.resultSubtitle.textContent = `+${(result.bet * 2).toLocaleString()} coins`;
-        if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
     } else {
-        if (elements.matchResults) elements.matchResults.className = "match-results-box defeat";
-        if (elements.resultTitle) elements.resultTitle.textContent = "🌚 Defeat";
-        if (elements.resultSubtitle) elements.resultSubtitle.textContent = `-${result.bet.toLocaleString()} coins`;
-        if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+        // У кого сумма очков кубика меньше, тот победил (по правилам игры)
+        const ownerWon = result.rolls.owner < result.rolls.opponent;
+        if (ownerWon) {
+            if (crownOwner) crownOwner.classList.remove('hidden');
+        } else {
+            if (crownOpponent) crownOpponent.classList.remove('hidden');
+        }
+
+        if (isWinner) {
+            if (elements.matchResults) elements.matchResults.className = "match-results-box victory";
+            if (elements.resultTitle) elements.resultTitle.textContent = "🏆 Victory!";
+            if (elements.resultSubtitle) elements.resultSubtitle.textContent = `+${(result.bet * 2).toLocaleString()} coins`;
+            if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        } else {
+            if (elements.matchResults) elements.matchResults.className = "match-results-box defeat";
+            if (elements.resultTitle) elements.resultTitle.textContent = "🌚 Defeat";
+            if (elements.resultSubtitle) elements.resultSubtitle.textContent = `-${result.bet.toLocaleString()} coins`;
+            if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+        }
     }
     
     // Обновляем профиль с новым балансом
