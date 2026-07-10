@@ -823,13 +823,40 @@ function showGameResults(result) {
             if (crownOpponent) crownOpponent.classList.remove('hidden');
         }
 
+        // Спавним вылетающие монетки в сторону победителя
+        const spawnCoins = (toLeft) => {
+            const container = document.getElementById('vs-ring-wrapper');
+            if (!container) return;
+            
+            // Генерируем 5 монеток с небольшими задержками
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const coin = document.createElement('div');
+                    coin.className = `flying-coin ${toLeft ? 'coin-to-left' : 'coin-to-right'}`;
+                    coin.textContent = "🪙";
+                    
+                    // Небольшой случайный разброс по высоте
+                    const randomY = (Math.random() * 20 - 10);
+                    coin.style.top = `calc(50% - 12px + ${randomY}px)`;
+                    coin.style.left = `calc(50% - 12px)`;
+                    
+                    container.appendChild(coin);
+                    
+                    // Удаляем после окончания анимации
+                    setTimeout(() => coin.remove(), 1000);
+                }, i * 80); // Каскадный вылет
+            }
+        };
+
         if (elements.vsBadgeText) {
             if (ownerWon) {
                 elements.vsBadgeText.textContent = "◀";
                 elements.vsBadgeText.className = isWinner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
+                spawnCoins(true); // Владелец слева
             } else {
                 elements.vsBadgeText.textContent = "▶";
                 elements.vsBadgeText.className = isWinner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
+                spawnCoins(false); // Оппонент справа
             }
         }
 

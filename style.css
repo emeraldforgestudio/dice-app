@@ -1647,3 +1647,57 @@ input:checked + .slider:before {
     0% { transform: scale(1) rotate(0); }
     100% { transform: scale(1.15) rotate(5deg); }
 }
+
+/* Flying Coins Animation */
+.flying-coin {
+    position: absolute;
+    font-size: 24px;
+    z-index: 100;
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.7));
+}
+
+.coin-to-left {
+    animation: fly-left 1.0s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.coin-to-right {
+    animation: fly-right 1.0s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes fly-left {
+    0% {
+        transform: translate(0, 0) scale(0.5) rotate(0deg);
+        opacity: 0;
+    }
+    15% {
+        opacity: 1;
+        transform: translate(-30px, -45px) scale(1.4) rotate(90deg);
+    }
+    50% {
+        transform: translate(-80px, -60px) scale(1.1) rotate(180deg);
+    }
+    100% {
+        transform: translate(-130px, 0px) scale(0.8) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@keyframes fly-right {
+    0% {
+        transform: translate(0, 0) scale(0.5) rotate(0deg);
+        opacity: 0;
+    }
+    15% {
+        opacity: 1;
+        transform: translate(30px, -45px) scale(1.4) rotate(-90deg);
+    }
+    50% {
+        transform: translate(80px, -60px) scale(1.1) rotate(-180deg);
+    }
+    100% {
+        transform: translate(130px, 0px) scale(0.8) rotate(-360deg);
+        opacity: 0;
+    }
+}
