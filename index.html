@@ -25,8 +25,11 @@
         <!-- HEADER PROFILE SECTION -->
         <header class="glass-panel profile-card">
             <div class="user-info">
-                <div class="avatar-placeholder" id="user-avatar">
-                    <i class="fa-solid fa-user-ninja"></i>
+                <div class="avatar-wrapper">
+                    <div class="avatar-placeholder" id="user-avatar">
+                        <i class="fa-solid fa-user-ninja"></i>
+                    </div>
+                    <span class="notif-bell hidden" id="notif-bell">🔔</span>
                 </div>
                 <div class="user-details">
                     <h2 id="username-display">Loading...</h2>
@@ -38,6 +41,17 @@
                 <span class="balance-value" id="balance-display">0 🪙</span>
             </div>
         </header>
+
+        <!-- NOTIFICATIONS PANEL -->
+        <div class="notif-panel hidden" id="notif-panel">
+            <div class="notif-panel-header">
+                <span>🔔 Match History</span>
+                <button class="notif-close-btn" id="notif-close-btn"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="notif-list" id="notif-list">
+                <div class="notif-empty">No games yet</div>
+            </div>
+        </div>
 
         <!-- ACTION BUTTONS -->
         <div class="action-grid">
@@ -105,7 +119,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #31 (dfd16d9)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #32 (a45ea0b)</p>
         </footer>
     </div>
 

@@ -122,9 +122,94 @@ const elements = {
     btnReturnLobby: document.getElementById('btn-return-lobby'),
     
     toastContainer: document.getElementById('toast-container')
+    // Notifications
+    notifBell: document.getElementById('notif-bell'),
+    notifPanel: document.getElementById('notif-panel'),
+    notifList: document.getElementById('notif-list'),
+    notifCloseBtn: document.getElementById('notif-close-btn'),
+    userAvatar: document.getElementById('user-avatar'),
 };
 
-// --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ (УВЕДОМЛЕНИЯ) ---
+// --- УВЕДОМЛЕНИЯ ---
+
+function timeAgo(ts) {
+    const diff = Math.floor(Date.now() / 1000) - ts;
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
+}
+
+async function fetchNotifications() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/notifications`, { headers: getHeaders() });
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        // Показываем/прячем колокольчик
+        if (elements.notifBell) {
+            if (data.unread > 0) {
+                elements.notifBell.classList.remove('hidden');
+            } else {
+                elements.notifBell.classList.add('hidden');
+            }
+        }
+        
+        // Рендерим список
+        renderNotifications(data.notifications);
+    } catch (e) {
+        // silent fail
+    }
+}
+
+function renderNotifications(list) {
+    if (!elements.notifList) return;
+    if (!list || list.length === 0) {
+        elements.notifList.innerHTML = '<div class="notif-empty">No games yet</div>';
+        return;
+    }
+    elements.notifList.innerHTML = list.map(n => {
+        let icon, titleClass, titleText, sub;
+        if (n.is_draw) {
+            icon = '🤝'; titleClass = 'draw'; titleText = 'Tie';
+            sub = `Bet returned — ${n.bet.toLocaleString()} 🪙 &nbsp;|&nbsp; 🎲 ${n.my_roll} vs ${n.opp_roll}`;
+        } else if (n.won) {
+            icon = '🏆'; titleClass = 'win'; titleText = 'Victory!';
+            sub = `+${(n.bet * 2).toLocaleString()} 🪙 &nbsp;|&nbsp; 🎲 ${n.my_roll} vs ${n.opp_roll}`;
+        } else {
+            icon = '💀'; titleClass = 'lose'; titleText = 'Defeat';
+            sub = `-${n.bet.toLocaleString()} 🪙 &nbsp;|&nbsp; 🎲 ${n.my_roll} vs ${n.opp_roll}`;
+        }
+        return `
+            <div class="notif-item">
+                <div class="notif-icon">${icon}</div>
+                <div class="notif-body">
+                    <div class="notif-title ${titleClass}">${titleText}</div>
+                    <div class="notif-sub">${sub}</div>
+                </div>
+                <div class="notif-time">${timeAgo(n.ts)}</div>
+            </div>`;
+    }).join('');
+}
+
+async function openNotifications() {
+    if (!elements.notifPanel) return;
+    elements.notifPanel.classList.remove('hidden');
+    
+    // Сразу скрываем колокольчик и сбрасываем счётчик на сервере
+    if (elements.notifBell) elements.notifBell.classList.add('hidden');
+    try {
+        await fetch(`${API_BASE_URL}/api/notifications/read`, { method: 'POST', headers: getHeaders() });
+        // Обновляем список
+        await fetchNotifications();
+    } catch (e) {}
+}
+
+function closeNotifications() {
+    if (elements.notifPanel) elements.notifPanel.classList.add('hidden');
+}
+
+// --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ (ТОСТЫ) ---
 function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
@@ -954,3 +1039,20 @@ window.applyFiltersAndRender = applyFiltersAndRender;
 fetchUserProfile();
 fetchActiveRooms();
 connectLobbySocket();
+fetchNotifications();
+
+// Клик по аватарке — открыть/закрыть уведомления
+if (elements.userAvatar) {
+    elements.userAvatar.onclick = () => {
+        if (elements.notifPanel && elements.notifPanel.classList.contains('hidden')) {
+            openNotifications();
+        } else {
+            closeNotifications();
+        }
+    };
+}
+
+// Кнопка закрытия панели уведомлений
+if (elements.notifCloseBtn) {
+    elements.notifCloseBtn.onclick = () => closeNotifications();
+}
