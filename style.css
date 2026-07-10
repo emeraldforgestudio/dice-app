@@ -1604,3 +1604,46 @@ input:checked + .slider:before {
         transform: translateX(-50%) translateY(-4px) rotate(-12deg);
     }
 }
+
+/* Winner Arrow Indicators in VS Badge */
+.vs-badge.win-arrows,
+.vs-badge.lose-arrows,
+.vs-badge.draw-arrows {
+    animation: none; /* Отключаем обычную пульсацию VS */
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.vs-badge.win-arrows {
+    color: var(--neon-green);
+    text-shadow: 0 0 12px rgba(0, 255, 135, 0.8);
+    animation: arrow-bounce-win 0.8s ease-in-out infinite alternate;
+}
+
+.vs-badge.lose-arrows {
+    color: var(--danger-red);
+    text-shadow: 0 0 12px rgba(255, 63, 52, 0.8);
+    animation: arrow-bounce-lose 0.8s ease-in-out infinite alternate;
+}
+
+.vs-badge.draw-arrows {
+    color: #f9ca24;
+    text-shadow: 0 0 12px rgba(249, 202, 36, 0.8);
+    font-size: 20px;
+    animation: arrow-bounce-draw 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes arrow-bounce-win {
+    from { transform: scale(1); filter: brightness(1); }
+    to { transform: scale(1.2); filter: brightness(1.2); }
+}
+
+@keyframes arrow-bounce-lose {
+    from { transform: scale(1); filter: brightness(1); }
+    to { transform: scale(1.1); filter: brightness(1.2); }
+}
+
+@keyframes arrow-bounce-draw {
+    0% { transform: scale(1) rotate(0); }
+    100% { transform: scale(1.15) rotate(5deg); }
+}

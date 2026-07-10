@@ -133,6 +133,7 @@ const elements = {
     btnToggleFilters: document.getElementById('btn-toggle-filters'),
     expandableFiltersPanel: document.getElementById('expandable-filters-panel'),
     vsRingSvg: document.getElementById('vs-ring-svg'),
+    vsBadgeText: document.getElementById('vs-badge-text'),
 };
 
 // --- УВЕДОМЛЕНИЯ ---
@@ -697,6 +698,12 @@ function openGameplayScreen(roomId, isOwner, bet, result = null) {
     if (elements.matchResults) elements.matchResults.classList.add('hidden');
     if (elements.gameStatusText) elements.gameStatusText.classList.remove('hidden');
     
+    // Сбрасываем текст VS-баджа
+    if (elements.vsBadgeText) {
+        elements.vsBadgeText.textContent = "VS";
+        elements.vsBadgeText.className = "vs-badge";
+    }
+
     // Скрываем короны при входе
     const crownOwner = document.getElementById('crown-owner');
     const crownOpponent = document.getElementById('crown-opponent');
@@ -802,6 +809,11 @@ function showGameResults(result) {
         if (elements.matchResults) elements.matchResults.className = "match-results-box draw";
         if (elements.resultTitle) elements.resultTitle.textContent = "🤝 Tie roll!";
         if (elements.resultSubtitle) elements.resultSubtitle.textContent = "All bets returned.";
+        
+        if (elements.vsBadgeText) {
+            elements.vsBadgeText.textContent = "🤝";
+            elements.vsBadgeText.className = "vs-badge draw-arrows";
+        }
     } else {
         // У кого сумма очков кубика меньше, тот победил (по правилам игры)
         const ownerWon = result.rolls.owner < result.rolls.opponent;
@@ -809,6 +821,16 @@ function showGameResults(result) {
             if (crownOwner) crownOwner.classList.remove('hidden');
         } else {
             if (crownOpponent) crownOpponent.classList.remove('hidden');
+        }
+
+        if (elements.vsBadgeText) {
+            if (ownerWon) {
+                elements.vsBadgeText.textContent = "◀";
+                elements.vsBadgeText.className = isWinner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
+            } else {
+                elements.vsBadgeText.textContent = "▶";
+                elements.vsBadgeText.className = isWinner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
+            }
         }
 
         if (isWinner) {
