@@ -787,13 +787,15 @@ input:checked + .slider:before {
     position: absolute;
     width: 50px;
     height: 50px;
-    background: rgba(5, 12, 8, 0.85);
+    background: #050c08; /* Полностью непрозрачный темный фон */
     border: 1.5px solid var(--neon-green);
     border-radius: 10px;
     box-shadow: inset 0 0 8px rgba(0, 255, 135, 0.25), 0 0 8px rgba(0, 255, 135, 0.25);
     display: flex;
     justify-content: center;
     align-items: center;
+    backface-visibility: hidden; /* Скрывает оборотную сторону грани в 3D */
+    -webkit-backface-visibility: hidden;
 }
 
 /* Face positions in 3D */
