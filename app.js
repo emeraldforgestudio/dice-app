@@ -238,6 +238,25 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
+function handleApiResponse(res, data, defaultErrorMsg = "An error occurred") {
+    if (res.ok) return true;
+    
+    const errorMsg = data && data.detail ? data.detail : defaultErrorMsg;
+    
+    // Если статус 429 (Too Many Requests), показываем нативный Telegram Alert
+    if (res.status === 429) {
+        if (tg && tg.showAlert) {
+            tg.showAlert(errorMsg);
+        } else {
+            alert(errorMsg);
+        }
+    } else {
+        // Обычные ошибки показываем тостом
+        showToast(errorMsg, "error");
+    }
+    return false;
+}
+
 // --- УПРАВЛЕНИЕ АНИМАЦИЕЙ 3D КУБИКОВ ---
 // Маппинг значений кубика на соответствующие 3D углы поворота
 const diceRotations = {
@@ -277,9 +296,13 @@ function rollDice(diceElement, targetValue, callback) {
 async function fetchUserProfile() {
     try {
         const res = await fetch(`${API_BASE_URL}/api/user`, { headers: getHeaders() });
-        if (!res.ok) throw new Error("Failed to load profile");
+        const data = await res.json();
         
-        currentUser = await res.json();
+        if (!handleApiResponse(res, data, "Failed to load profile")) {
+            return;
+        }
+        
+        currentUser = data;
         elements.usernameDisplay.textContent = currentUser.username 
             ? `@${currentUser.username}` 
             : currentUser.first_name;
@@ -364,8 +387,7 @@ async function claimDailyGift() {
         });
         const data = await res.json();
         
-        if (!res.ok) {
-            showToast(data.detail || "Cannot claim gift", "error");
+        if (!handleApiResponse(res, data, "Cannot claim gift")) {
             return;
         }
         
@@ -492,8 +514,7 @@ async function createRoom(bet, isPrivate) {
         });
         const data = await res.json();
         
-        if (!res.ok) {
-            showToast(data.detail || "Failed to create room", "error");
+        if (!handleApiResponse(res, data, "Failed to create room")) {
             return;
         }
         
@@ -519,8 +540,7 @@ async function joinRoom(roomId) {
         });
         const data = await res.json();
         
-        if (!res.ok) {
-            showToast(data.detail || "Unable to join room", "error");
+        if (!handleApiResponse(res, data, "Unable to join room")) {
             return;
         }
         
@@ -566,8 +586,7 @@ function confirmCancelRoom(roomId, bet) {
                 });
                 const data = await res.json();
                 
-                if (!res.ok) {
-                    showToast(data.detail || "Unable to delete room", "error");
+                if (!handleApiResponse(res, data, "Unable to delete room")) {
                     return;
                 }
                 
@@ -644,8 +663,7 @@ async function leaveRoom() {
         });
         const data = await res.json();
         
-        if (!res.ok) {
-            showToast(data.detail || "Unable to delete room", "error");
+        if (!handleApiResponse(res, data, "Unable to delete room")) {
             return;
         }
         
