@@ -692,15 +692,6 @@ input:checked + .slider:before {
     width: 80px;
     height: 80px;
     transform: rotate(-90deg);
-    /* Сложное маятниковое вращение: делает резкий круг вперед, плавно откатывается назад */
-    animation: vs-ring-hypno-spin 8s cubic-bezier(0.68, -0.6, 0.32, 1.6) infinite;
-}
-
-@keyframes vs-ring-hypno-spin {
-    0% { transform: rotate(-90deg); }
-    40% { transform: rotate(290deg); }
-    70% { transform: rotate(180deg); }
-    100% { transform: rotate(270deg); }
 }
 
 .vs-ring-track {

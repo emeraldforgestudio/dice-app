@@ -132,6 +132,7 @@ const elements = {
     gameAvatarOpponent: document.getElementById('game-avatar-opponent'),
     btnToggleFilters: document.getElementById('btn-toggle-filters'),
     expandableFiltersPanel: document.getElementById('expandable-filters-panel'),
+    vsRingSvg: document.getElementById('vs-ring-svg'),
 };
 
 // --- УВЕДОМЛЕНИЯ ---
@@ -966,16 +967,46 @@ function startRoomPolling(roomId) {
         
         elapsed += TICK_MS;
         
-        // Прогресс от 0 до 1 в пределах текущего 10-секундного цикла
-        const progress = (elapsed % POLL_INTERVAL_MS) / POLL_INTERVAL_MS;
-        const offset = CIRCUMFERENCE * (1 - progress);
-        if (ringEl) ringEl.style.strokeDashoffset = offset;
+        // Общий прогресс 10-секундного цикла от 0 до 1
+        const totalProgress = (elapsed % POLL_INTERVAL_MS) / POLL_INTERVAL_MS;
         
-        // Когда достигли конца цикла — делаем запрос
+        // Номер текущей четверти (0, 1, 2, 3) за 10-секундный интервал
+        const quarterIndex = Math.floor(totalProgress * 4);
+        
+        // Прогресс внутри текущей 2.5-секундной пробежки (от 0 до 1)
+        const subProgress = (totalProgress * 4) % 1;
+        
+        // Максимальная длина "червя" на пике (середина пути) - четверть окружности (25% от 213.6 = 53.4)
+        const maxWormLength = CIRCUMFERENCE * 0.25;
+        
+        // Длина червя динамическая: 0 на старте, растет до maxWormLength в центре (0.5), сжимается до 0 в конце (1.0)
+        // Используем синус для мягкого изменения ширины
+        const currentLength = maxWormLength * Math.sin(subProgress * Math.PI);
+        
+        // Базовый поворот (стартовая точка четверти): 0, 90, 180, 270 градусов
+        const baseAngleDeg = quarterIndex * 90;
+        
+        // Добавочный поворот пробежки в пределах четверти (от 0 до 90 градусов)
+        const runAngleDeg = subProgress * 90;
+        
+        // Итоговый угол поворота SVG элемента в градусах (с учетом начального сдвига на -90 градусов)
+        const totalAngle = -90 + baseAngleDeg + runAngleDeg;
+        
+        // Устанавливаем динамическую длину линии и смещение через dasharray
+        if (ringEl) {
+            // Линия длиной currentLength, остальная часть окружности пустая
+            ringEl.style.strokeDasharray = `${currentLength} ${CIRCUMFERENCE - currentLength}`;
+            // Устанавливаем смещение равным 0, так как мы вращаем сам SVG контейнер для перемещения
+            ringEl.style.strokeDashoffset = '0';
+        }
+        
+        if (elements.vsRingSvg) {
+            elements.vsRingSvg.style.transform = `rotate(${totalAngle}deg)`;
+        }
+        
+        // Когда достигли конца 10-секундного цикла — делаем запрос
         if (elapsed % POLL_INTERVAL_MS < TICK_MS) {
             elapsed = Math.round(elapsed / POLL_INTERVAL_MS) * POLL_INTERVAL_MS;
-            // Сбрасываем кольцо и делаем запрос
-            if (ringEl) ringEl.style.strokeDashoffset = CIRCUMFERENCE;
             await checkRoomStatus();
         }
     }, TICK_MS);
