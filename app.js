@@ -770,6 +770,10 @@ function openGameplayScreen(roomId, isOwner, bet, result = null) {
         if (elements.gameStatusText) elements.gameStatusText.textContent = "Rolling the dice...";
         if (elements.ownerWaitingActions) elements.ownerWaitingActions.classList.add('hidden'); // Скрываем кнопки создателя
     }
+    
+    // Гарантируем, что обертка VS-кольца видима (в CSS по умолчанию opacity: 0)
+    const vsWrapper = document.getElementById('vs-ring-wrapper');
+    if (vsWrapper) vsWrapper.style.opacity = '1';
 }
 
 function playDiceRoll(ownerRoll, opponentRoll, gameResult) {
