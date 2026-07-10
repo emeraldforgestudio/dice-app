@@ -861,11 +861,15 @@ function showGameResults(result) {
             if (elements.vsBadgeText) {
                 if (ownerWon) {
                     elements.vsBadgeText.textContent = "◀";
-                    elements.vsBadgeText.className = isWinner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
+                    // Если создатель комнаты победил, и мы им являемся - зеленая стрелка, иначе красная
+                    const weAreOwner = (result.owner_id === currentUser.id);
+                    elements.vsBadgeText.className = weAreOwner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
                     spawnCoins(true);
                 } else {
                     elements.vsBadgeText.textContent = "▶";
-                    elements.vsBadgeText.className = isWinner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
+                    // Если соперник победил, и мы им являемся - зеленая стрелка, иначе красная
+                    const weAreOwner = (result.owner_id === currentUser.id);
+                    elements.vsBadgeText.className = !weAreOwner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
                     spawnCoins(false);
                 }
             }
