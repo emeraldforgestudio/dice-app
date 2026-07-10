@@ -128,6 +128,8 @@ const elements = {
     notifList: document.getElementById('notif-list'),
     notifCloseBtn: document.getElementById('notif-close-btn'),
     userAvatar: document.getElementById('user-avatar'),
+    gameAvatarOwner: document.getElementById('game-avatar-owner'),
+    gameAvatarOpponent: document.getElementById('game-avatar-opponent'),
 };
 
 // --- УВЕДОМЛЕНИЯ ---
@@ -696,9 +698,40 @@ function openGameplayScreen(roomId, isOwner, bet, result = null) {
     if (elements.diceOwner) elements.diceOwner.style.transform = 'rotateX(0deg) rotateY(0deg)';
     if (elements.diceOpponent) elements.diceOpponent.style.transform = 'rotateX(0deg) rotateY(0deg)';
     
+    // Функция установки аватара в игровой карточке
+    const setGameAvatar = (element, isMe, username, firstName) => {
+        if (!element) return;
+        if (isMe && tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.photo_url) {
+            element.innerHTML = `<img src="${tg.initDataUnsafe.user.photo_url}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            element.style.background = "none";
+            element.style.border = "none";
+        } else {
+            // Плейсхолдер с инициалом
+            const name = firstName || username || "P";
+            element.innerHTML = `<span>${name.charAt(0).toUpperCase()}</span>`;
+            element.style.background = "var(--panel-bg)";
+            element.style.border = "1px solid var(--panel-border)";
+            element.style.fontSize = "20px";
+            element.style.fontWeight = "800";
+            element.style.color = "var(--white)";
+            element.style.display = "flex";
+            element.style.alignItems = "center";
+            element.style.justifyContent = "center";
+        }
+    };
+
     if (isOwner) {
         if (elements.namePlayerOwner) elements.namePlayerOwner.textContent = currentUser.username || currentUser.first_name;
         if (elements.namePlayerOpponent) elements.namePlayerOpponent.textContent = "Waiting...";
+        setGameAvatar(elements.gameAvatarOwner, true, currentUser.username, currentUser.first_name);
+        
+        // Сбрасываем аватарку оппонента на дефолтную иконку
+        if (elements.gameAvatarOpponent) {
+            elements.gameAvatarOpponent.innerHTML = `<i class="fa-solid fa-user-ninja"></i>`;
+            elements.gameAvatarOpponent.style.background = "";
+            elements.gameAvatarOpponent.style.border = "";
+        }
+        
         if (elements.gameStatusText) elements.gameStatusText.textContent = "Waiting for an opponent to join...";
         if (elements.ownerWaitingActions) elements.ownerWaitingActions.classList.remove('hidden'); // Показываем кнопки создателя
         
@@ -710,6 +743,12 @@ function openGameplayScreen(roomId, isOwner, bet, result = null) {
             : "Opponent";
         if (elements.namePlayerOwner) elements.namePlayerOwner.textContent = ownerName;
         if (elements.namePlayerOpponent) elements.namePlayerOpponent.textContent = currentUser.username || currentUser.first_name;
+        
+        setGameAvatar(elements.gameAvatarOpponent, true, currentUser.username, currentUser.first_name);
+        
+        // Аватарка владельца комнаты (плейсхолдер с первой буквой имени)
+        setGameAvatar(elements.gameAvatarOwner, false, ownerName, ownerName);
+        
         if (elements.gameStatusText) elements.gameStatusText.textContent = "Rolling the dice...";
         if (elements.ownerWaitingActions) elements.ownerWaitingActions.classList.add('hidden'); // Скрываем кнопки создателя
     }
@@ -857,6 +896,20 @@ function startRoomPolling(roomId) {
                 if (elements.namePlayerOpponent) {
                     elements.namePlayerOpponent.textContent = oppName;
                 }
+                
+                // Обновляем аватарку соперника (так как он только что зашел и игра рассчиталась)
+                if (elements.gameAvatarOpponent) {
+                    elements.gameAvatarOpponent.innerHTML = `<span>${oppName.charAt(0).toUpperCase()}</span>`;
+                    elements.gameAvatarOpponent.style.background = "var(--panel-bg)";
+                    elements.gameAvatarOpponent.style.border = "1px solid var(--panel-border)";
+                    elements.gameAvatarOpponent.style.fontSize = "20px";
+                    elements.gameAvatarOpponent.style.fontWeight = "800";
+                    elements.gameAvatarOpponent.style.color = "var(--white)";
+                    elements.gameAvatarOpponent.style.display = "flex";
+                    elements.gameAvatarOpponent.style.alignItems = "center";
+                    elements.gameAvatarOpponent.style.justifyContent = "center";
+                }
+                
                 playDiceRoll(result.rolls.owner, result.rolls.opponent, result);
                 
             } else if (data.status === 'not_found') {
