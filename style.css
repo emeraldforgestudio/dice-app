@@ -692,25 +692,33 @@ input:checked + .slider:before {
     width: 80px;
     height: 80px;
     transform: rotate(-90deg);
-    animation: vs-ring-dynamic-spin 10s cubic-bezier(0.4, 0, 0.2, 1) infinite; /* Динамическое вращение с ускорением/замедлением */
+    /* Сложное маятниковое вращение: делает резкий круг вперед, плавно откатывается назад */
+    animation: vs-ring-hypno-spin 8s cubic-bezier(0.68, -0.6, 0.32, 1.6) infinite;
 }
 
-@keyframes vs-ring-dynamic-spin {
+@keyframes vs-ring-hypno-spin {
     0% { transform: rotate(-90deg); }
-    50% { transform: rotate(180deg); } /* Мягкое смещение скорости в середине цикла */
+    40% { transform: rotate(290deg); }
+    70% { transform: rotate(180deg); }
     100% { transform: rotate(270deg); }
 }
 
 .vs-ring-track {
     fill: none;
-    stroke: rgba(46, 213, 115, 0.06);
+    stroke: rgba(46, 213, 115, 0.05);
     stroke-width: 4;
-    animation: vs-track-glow 3s ease-in-out infinite alternate; /* Медленное дыхание подложки */
+    animation: vs-track-breathe 4s ease-in-out infinite alternate;
 }
 
-@keyframes vs-track-glow {
-    0% { stroke: rgba(46, 213, 115, 0.04); }
-    100% { stroke: rgba(46, 213, 115, 0.12); }
+@keyframes vs-track-breathe {
+    0% {
+        stroke: rgba(46, 213, 115, 0.03);
+        stroke-width: 3.5;
+    }
+    100% {
+        stroke: rgba(46, 213, 115, 0.15);
+        stroke-width: 5;
+    }
 }
 
 .vs-ring-fill {
@@ -720,19 +728,19 @@ input:checked + .slider:before {
     stroke-linecap: round;
     stroke-dasharray: 213.6;
     stroke-dashoffset: 213.6;
-    filter: drop-shadow(0 0 6px rgba(0, 255, 135, 0.5));
-    transition: stroke-dashoffset 0.05s linear;
-    animation: vs-fill-pulse 2.5s ease-in-out infinite alternate; /* Переливающееся свечение самого прогресса */
+    filter: drop-shadow(0 0 6px rgba(0, 255, 135, 0.6));
+    transition: stroke-dashoffset 0.08s cubic-bezier(0.25, 0.8, 0.25, 1);
+    animation: vs-fill-glow-pulse 2s ease-in-out infinite alternate;
 }
 
-@keyframes vs-fill-pulse {
+@keyframes vs-fill-glow-pulse {
     0% {
-        filter: drop-shadow(0 0 4px rgba(0, 255, 135, 0.4));
+        filter: drop-shadow(0 0 3px rgba(0, 255, 135, 0.4)) drop-shadow(0 0 8px rgba(0, 255, 135, 0.2));
         stroke-width: 3.8;
     }
     100% {
-        filter: drop-shadow(0 0 10px rgba(0, 255, 135, 0.9));
-        stroke-width: 4.4; /* Едва заметное изменение толщины для эффекта дыхания */
+        filter: drop-shadow(0 0 8px rgba(0, 255, 135, 0.8)) drop-shadow(0 0 15px rgba(0, 255, 135, 0.4));
+        stroke-width: 4.6;
     }
 }
 
@@ -740,24 +748,27 @@ input:checked + .slider:before {
     position: relative;
     z-index: 1;
     font-size: 16px;
-    font-weight: 800;
+    font-weight: 900;
     color: var(--neon-green);
     text-shadow: 0 0 10px rgba(0, 255, 135, 0.5);
-    animation: vs-badge-hypnotic 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite; /* Гипнотическое дыхание текста */
+    animation: vs-badge-magic 3s ease-in-out infinite;
 }
 
-@keyframes vs-badge-hypnotic {
+@keyframes vs-badge-magic {
     0%, 100% {
         transform: scale(1) rotate(0deg);
-        text-shadow: 0 0 10px rgba(0, 255, 135, 0.5);
+        text-shadow: 0 0 8px rgba(0, 255, 135, 0.5);
+        opacity: 0.9;
     }
-    33% {
-        transform: scale(1.08) rotate(3deg);
-        text-shadow: 0 0 16px rgba(0, 255, 135, 0.8);
+    30% {
+        transform: scale(1.15) rotate(8deg);
+        text-shadow: 0 0 20px rgba(0, 255, 135, 1), 0 0 30px rgba(0, 255, 135, 0.4);
+        opacity: 1;
     }
-    66% {
-        transform: scale(0.95) rotate(-3deg);
-        text-shadow: 0 0 8px rgba(0, 255, 135, 0.3);
+    65% {
+        transform: scale(0.9) rotate(-8deg);
+        text-shadow: 0 0 6px rgba(0, 255, 135, 0.3);
+        opacity: 0.7;
     }
 }
 
