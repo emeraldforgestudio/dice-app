@@ -698,11 +698,13 @@ function openGameplayScreen(roomId, isOwner, bet, result = null) {
     if (elements.matchResults) elements.matchResults.classList.add('hidden');
     if (elements.gameStatusText) elements.gameStatusText.classList.remove('hidden');
     
-    // Сбрасываем текст VS-баджа
+    // Сбрасываем текст VS-баджа и видимость SVG кольца
     if (elements.vsBadgeText) {
         elements.vsBadgeText.textContent = "VS";
         elements.vsBadgeText.className = "vs-badge";
     }
+    const ringSvg = document.getElementById('vs-ring-svg');
+    if (ringSvg) ringSvg.style.opacity = '1';
 
     // Скрываем короны при входе
     const crownOwner = document.getElementById('crown-owner');
@@ -944,8 +946,9 @@ function startRoomPolling(roomId) {
             clearInterval(roomPollInterval);
             roomPollInterval = null;
         }
-        // Скрываем кольцо
-        if (wrapperEl) wrapperEl.style.opacity = '0';
+        // Скрываем только SVG кольцо, оставляя badge и монетки видимыми
+        const ringSvg = document.getElementById('vs-ring-svg');
+        if (ringSvg) ringSvg.style.opacity = '0';
     }
     
     async function checkRoomStatus() {
@@ -1007,7 +1010,8 @@ function startRoomPolling(roomId) {
     }
     
     // Показываем кольцо плавно
-    if (wrapperEl) wrapperEl.style.opacity = '1';
+    const ringSvg = document.getElementById('vs-ring-svg');
+    if (ringSvg) ringSvg.style.opacity = '1';
     
     // Тик: обновляем прогресс-кольцо каждые 50мс
     roomPollInterval = setInterval(async () => {
