@@ -796,85 +796,93 @@ function playDiceRoll(ownerRoll, opponentRoll, gameResult) {
 }
 
 function showGameResults(result) {
-    if (elements.matchResults) elements.matchResults.classList.remove('hidden');
-    const isWinner = result.winner_id === currentUser.id;
-    
-    // Определяем победителя и показываем корону над нужным аватаром
-    const crownOwner = document.getElementById('crown-owner');
-    const crownOpponent = document.getElementById('crown-opponent');
-    if (crownOwner) crownOwner.classList.add('hidden');
-    if (crownOpponent) crownOpponent.classList.add('hidden');
-    
-    if (result.is_draw) {
-        if (elements.matchResults) elements.matchResults.className = "match-results-box draw";
-        if (elements.resultTitle) elements.resultTitle.textContent = "🤝 Tie roll!";
-        if (elements.resultSubtitle) elements.resultSubtitle.textContent = "All bets returned.";
+    try {
+        if (!result) {
+            console.error("No game result provided to showGameResults");
+            return;
+        }
         
-        if (elements.vsBadgeText) {
-            elements.vsBadgeText.textContent = "🤝";
-            elements.vsBadgeText.className = "vs-badge draw-arrows";
-        }
-    } else {
-        // У кого сумма очков кубика меньше, тот победил (по правилам игры)
-        const ownerWon = result.rolls.owner < result.rolls.opponent;
-        if (ownerWon) {
-            if (crownOwner) crownOwner.classList.remove('hidden');
-        } else {
-            if (crownOpponent) crownOpponent.classList.remove('hidden');
-        }
-
-        // Спавним вылетающие монетки в сторону победителя
-        const spawnCoins = (toLeft) => {
-            const container = document.getElementById('vs-ring-wrapper');
-            if (!container) return;
+        if (elements.matchResults) elements.matchResults.classList.remove('hidden');
+        const isWinner = result.winner_id === currentUser.id;
+        
+        // Определяем победителя и показываем корону над нужным аватаром
+        const crownOwner = document.getElementById('crown-owner');
+        const crownOpponent = document.getElementById('crown-opponent');
+        if (crownOwner) crownOwner.classList.add('hidden');
+        if (crownOpponent) crownOpponent.classList.add('hidden');
+        
+        if (result.is_draw) {
+            if (elements.matchResults) elements.matchResults.className = "match-results-box draw";
+            if (elements.resultTitle) elements.resultTitle.textContent = "🤝 Tie roll!";
+            if (elements.resultSubtitle) elements.resultSubtitle.textContent = "All bets returned.";
             
-            // Генерируем 5 монеток с небольшими задержками
-            for (let i = 0; i < 5; i++) {
-                setTimeout(() => {
-                    const coin = document.createElement('div');
-                    coin.className = `flying-coin ${toLeft ? 'coin-to-left' : 'coin-to-right'}`;
-                    coin.textContent = "🪙";
-                    
-                    // Небольшой случайный разброс по высоте
-                    const randomY = (Math.random() * 20 - 10);
-                    coin.style.top = `calc(50% - 12px + ${randomY}px)`;
-                    coin.style.left = `calc(50% - 12px)`;
-                    
-                    container.appendChild(coin);
-                    
-                    // Удаляем после окончания анимации
-                    setTimeout(() => coin.remove(), 1000);
-                }, i * 80); // Каскадный вылет
+            if (elements.vsBadgeText) {
+                elements.vsBadgeText.textContent = "🤝";
+                elements.vsBadgeText.className = "vs-badge draw-arrows";
             }
-        };
-
-        if (elements.vsBadgeText) {
-            if (ownerWon) {
-                elements.vsBadgeText.textContent = "◀";
-                elements.vsBadgeText.className = isWinner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
-                spawnCoins(true); // Владелец слева
-            } else {
-                elements.vsBadgeText.textContent = "▶";
-                elements.vsBadgeText.className = isWinner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
-                spawnCoins(false); // Оппонент справа
-            }
-        }
-
-        if (isWinner) {
-            if (elements.matchResults) elements.matchResults.className = "match-results-box victory";
-            if (elements.resultTitle) elements.resultTitle.textContent = "🏆 Victory!";
-            if (elements.resultSubtitle) elements.resultSubtitle.textContent = `+${(result.bet * 2).toLocaleString()} coins`;
-            if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         } else {
-            if (elements.matchResults) elements.matchResults.className = "match-results-box defeat";
-            if (elements.resultTitle) elements.resultTitle.textContent = "🌚 Defeat";
-            if (elements.resultSubtitle) elements.resultSubtitle.textContent = `-${result.bet.toLocaleString()} coins`;
-            if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+            // Защита от undefined в rolls
+            const rolls = result.rolls || { owner: 1, opponent: 1 };
+            const ownerWon = Number(rolls.owner) < Number(rolls.opponent);
+            
+            if (ownerWon) {
+                if (crownOwner) crownOwner.classList.remove('hidden');
+            } else {
+                if (crownOpponent) crownOpponent.classList.remove('hidden');
+            }
+
+            // Спавним вылетающие монетки в сторону победителя
+            const spawnCoins = (toLeft) => {
+                const container = document.getElementById('vs-ring-wrapper');
+                if (!container) return;
+                
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        const coin = document.createElement('div');
+                        coin.className = `flying-coin ${toLeft ? 'coin-to-left' : 'coin-to-right'}`;
+                        coin.textContent = "🪙";
+                        
+                        const randomY = (Math.random() * 20 - 10);
+                        coin.style.top = `calc(50% - 12px + ${randomY}px)`;
+                        coin.style.left = `calc(50% - 12px)`;
+                        
+                        container.appendChild(coin);
+                        setTimeout(() => coin.remove(), 1000);
+                    }, i * 80);
+                }
+            };
+
+            if (elements.vsBadgeText) {
+                if (ownerWon) {
+                    elements.vsBadgeText.textContent = "◀";
+                    elements.vsBadgeText.className = isWinner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
+                    spawnCoins(true);
+                } else {
+                    elements.vsBadgeText.textContent = "▶";
+                    elements.vsBadgeText.className = isWinner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
+                    spawnCoins(false);
+                }
+            }
+
+            if (isWinner) {
+                if (elements.matchResults) elements.matchResults.className = "match-results-box victory";
+                if (elements.resultTitle) elements.resultTitle.textContent = "🏆 Victory!";
+                if (elements.resultSubtitle) elements.resultSubtitle.textContent = `+${(result.bet * 2).toLocaleString()} coins`;
+                if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            } else {
+                if (elements.matchResults) elements.matchResults.className = "match-results-box defeat";
+                if (elements.resultTitle) elements.resultTitle.textContent = "🌚 Defeat";
+                if (elements.resultSubtitle) elements.resultSubtitle.textContent = `-${result.bet.toLocaleString()} coins`;
+                if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+            }
         }
+        
+        // Обновляем профиль с новым балансом
+        fetchUserProfile();
+    } catch (err) {
+        showToast("Error rendering results: " + err.message, "error");
+        console.error("Error in showGameResults:", err);
     }
-    
-    // Обновляем профиль с новым балансом
-    fetchUserProfile();
 }
 
 // --- WEBSOCKETS СОЕДИНЕНИЯ ---
