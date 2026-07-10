@@ -121,7 +121,7 @@ const elements = {
     resultSubtitle: document.getElementById('result-subtitle'),
     btnReturnLobby: document.getElementById('btn-return-lobby'),
     
-    toastContainer: document.getElementById('toast-container')
+    toastContainer: document.getElementById('toast-container'),
     // Notifications
     notifBell: document.getElementById('notif-bell'),
     notifPanel: document.getElementById('notif-panel'),
