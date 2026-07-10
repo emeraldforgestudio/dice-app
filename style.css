@@ -977,10 +977,27 @@ input:checked + .slider:before {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 12px 0 0 0;
-    font-size: 32px;
+    padding: 8px 0 0 0;
+}
+
+.ad-contact-btn {
+    background: transparent;
+    border: 1px solid var(--neon-green);
     color: var(--neon-green);
-    text-shadow: 0 0 15px var(--emerald-glow);
+    box-shadow: 0 0 10px rgba(0, 255, 135, 0.1);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+}
+
+.ad-contact-btn:hover {
+    background: rgba(0, 255, 135, 0.05);
+    box-shadow: 0 0 15px var(--emerald-glow);
 }
 
 /* Circular countdown */
