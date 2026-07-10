@@ -1474,7 +1474,7 @@ input:checked + .slider:before {
 .notif-bell {
     position: absolute;
     top: -6px;
-    right: -6px;
+    left: -6px;
     font-size: 13px;
     line-height: 1;
     animation: bell-blink 2.5s ease-in-out infinite;
