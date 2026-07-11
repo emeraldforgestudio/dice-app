@@ -1293,6 +1293,22 @@ fetchActiveRooms();
 connectLobbySocket();
 fetchNotifications();
 
+// Фоновое обновление лобби раз в 10 секунд (баланс, колокольчик уведомлений, комнаты)
+setInterval(async () => {
+    // Делаем фоновые запросы только когда игрок находится на экране лобби (экран игры скрыт)
+    if (elements.gameplayScreen && elements.gameplayScreen.classList.contains('hidden')) {
+        try {
+            await Promise.all([
+                fetchUserProfile(),
+                fetchActiveRooms(),
+                fetchNotifications()
+            ]);
+        } catch (e) {
+            console.error("Background lobby update failed:", e);
+        }
+    }
+}, 10000);
+
 // Клик по аватарке — открыть/закрыть уведомления
 if (elements.userAvatar) {
     elements.userAvatar.onclick = () => {
