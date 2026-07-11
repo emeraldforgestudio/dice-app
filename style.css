@@ -341,6 +341,30 @@ body {
     background: rgba(255, 255, 255, 0.03);
 }
 
+/* Private Room Styling */
+.private-room-card {
+    background: rgba(147, 51, 234, 0.03);
+    border-color: rgba(147, 51, 234, 0.2);
+}
+
+.private-room-card:hover {
+    background: rgba(147, 51, 234, 0.06);
+}
+
+.private-badge {
+    background: rgba(147, 51, 234, 0.15);
+    color: #c084fc;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid rgba(147, 51, 234, 0.25);
+}
+
 .room-info-side {
     display: flex;
     flex-direction: column;

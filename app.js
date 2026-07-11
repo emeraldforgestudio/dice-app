@@ -489,10 +489,18 @@ function renderRooms(rooms) {
             ? `<button class="btn-join btn-cancel-lobby" onclick="confirmCancelRoom('${room.id}', ${room.bet})">Cancel</button>`
             : `<button class="btn-join" onclick="confirmJoinRoom('${room.id}', '${room.owner_username}', ${room.bet})">Join Game</button>`;
             
+        const isPrivate = room.is_private === true;
+        const privateBadge = isPrivate 
+            ? `<span class="private-badge"><i class="fa-solid fa-eye-slash"></i> Hidden</span>`
+            : '';
+            
         return `
-            <div class="room-card-item" id="room-${room.id}">
+            <div class="room-card-item ${isPrivate ? 'private-room-card' : ''}" id="room-${room.id}">
                 <div class="room-info-side">
-                    <span class="room-bet-amount">${room.bet.toLocaleString()} 🪙</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="room-bet-amount">${room.bet.toLocaleString()} 🪙</span>
+                        ${privateBadge}
+                    </div>
                     <span class="room-owner-name">by ${displayName}</span>
                 </div>
                 <div class="room-action-side">
