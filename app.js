@@ -1359,6 +1359,22 @@ setInterval(async () => {
     }
 }, 10000);
 
+// Эффект красивого блика (shimmer) для кнопки Daily Bonus раз в 10 секунд
+if (elements.btnClaimGift) {
+    // Запускаем первый раз через 3 секунды после старта, чтобы привлечь внимание
+    setTimeout(() => {
+        elements.btnClaimGift.classList.add('shimmer-glow');
+        setTimeout(() => elements.btnClaimGift.classList.remove('shimmer-glow'), 1400);
+    }, 3000);
+
+    setInterval(() => {
+        elements.btnClaimGift.classList.add('shimmer-glow');
+        setTimeout(() => {
+            elements.btnClaimGift.classList.remove('shimmer-glow');
+        }, 1400);
+    }, 10000);
+}
+
 // Клик по аватарке — открыть/закрыть уведомления
 if (elements.userAvatar) {
     elements.userAvatar.onclick = () => {
