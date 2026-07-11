@@ -1122,23 +1122,36 @@ function startRoomPolling(roomId) {
 // Управление модальным окном
 elements.btnCreateRoom.onclick = () => {
     elements.createRoomModal.classList.remove('hidden');
-    elements.inputBet.focus();
+    // elements.inputBet.focus(); // Убрано автооткрытие клавиатуры со старта
     updateRoomLimitDisplay();
 };
 
 // Предотвращаем потерю фокуса с поля ввода (и скрытие клавиатуры на смартфонах) при тапах вне интерактивных элементов
 if (elements.createRoomModal) {
     const preventFocusLoss = (e) => {
-        // Если тап пришелся на поле ввода или кнопки, разрешаем стандартное поведение
+        // Если тап на пресетную кнопку ставки и поле ввода уже в фокусе (клавиатура открыта)
+        if (e.target.closest('.btn-preset')) {
+            if (document.activeElement === elements.inputBet) {
+                e.preventDefault(); // Предотвращаем потерю фокуса и скрытие клавиатуры
+                
+                // Вручную применяем пресет
+                const btn = e.target.closest('.btn-preset');
+                elements.presetBets.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                elements.inputBet.value = btn.dataset.val;
+            }
+            return;
+        }
+
+        // Если тап пришелся на поле ввода или другие интерактивные кнопки, разрешаем стандартное поведение
         if (e.target === elements.inputBet || 
-            e.target.closest('.btn-preset') || 
             e.target.closest('#btn-confirm-create') || 
             e.target.closest('#btn-close-create-modal') ||
             e.target.closest('.custom-checkbox-container')) {
             return;
         }
         
-        // Предотвращаем уход фокуса
+        // Предотвращаем уход фокуса при тапах на пустое место модалки
         if (document.activeElement === elements.inputBet) {
             e.preventDefault();
         }
