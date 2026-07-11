@@ -1561,7 +1561,9 @@ function renderLeaderboard(data) {
                 const league = getLeagueForRank(e.rank);
                 const meta   = LEAGUES[league];
                 const isMe   = e.user_id === myId;
-                const name   = e.username ? `@${e.username}` : (e.first_name || 'Player');
+                const rawName = e.username ? `@${e.username}` : (e.first_name || 'Player');
+                const maskedName = e.username ? `@${maskUsername(e.username)}` : maskUsername(e.first_name || 'Player');
+                const name   = isMe ? rawName : maskedName;
                 const initial = (e.first_name || e.username || 'P').charAt(0).toUpperCase();
                 const avCls  = ['gold-av','silver-av','bronze-av'][e.rank - 1];
                 const prize  = PRIZES[e.rank] ? `🎁 ${PRIZES[e.rank]} 🪙` : '';
@@ -1592,7 +1594,9 @@ function renderLeaderboard(data) {
                 const league = getLeagueForRank(e.rank);
                 const meta   = LEAGUES[league];
                 const isMe   = e.user_id === myId;
-                const name   = e.username ? `@${e.username}` : (e.first_name || 'Player');
+                const rawName = e.username ? `@${e.username}` : (e.first_name || 'Player');
+                const maskedName = e.username ? `@${maskUsername(e.username)}` : maskUsername(e.first_name || 'Player');
+                const name   = isMe ? rawName : maskedName;
                 const initial = (e.first_name || e.username || 'P').charAt(0).toUpperCase();
 
                 return `
