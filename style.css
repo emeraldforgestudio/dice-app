@@ -1644,12 +1644,26 @@ input:checked + .slider:before {
     animation: crown-bounce 1s ease-in-out infinite alternate;
 }
 
+#crown-opponent {
+    transform: translateX(-50%) rotate(12deg);
+    animation: crown-bounce-right 1s ease-in-out infinite alternate;
+}
+
 @keyframes crown-bounce {
     from {
         transform: translateX(-50%) translateY(0) rotate(-12deg);
     }
     to {
         transform: translateX(-50%) translateY(-4px) rotate(-12deg);
+    }
+}
+
+@keyframes crown-bounce-right {
+    from {
+        transform: translateX(-50%) translateY(0) rotate(12deg);
+    }
+    to {
+        transform: translateX(-50%) translateY(-4px) rotate(12deg);
     }
 }
 
