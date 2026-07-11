@@ -845,7 +845,7 @@ function showGameResults(result) {
         }
         
         if (elements.matchResults) elements.matchResults.classList.remove('hidden');
-        const isWinner = result.winner_id === currentUser.id;
+        const isWinner = Number(result.winner_id) === Number(currentUser.id);
         
         // Определяем победителя и показываем корону над нужным аватаром
         const crownOwner = document.getElementById('crown-owner');
@@ -898,13 +898,13 @@ function showGameResults(result) {
                 if (ownerWon) {
                     elements.vsBadgeText.textContent = "👈";
                     // Если создатель комнаты победил, и мы им являемся - зеленая стрелка, иначе красная
-                    const weAreOwner = (result.owner_id === currentUser.id);
+                    const weAreOwner = Number(result.owner_id) === Number(currentUser.id);
                     elements.vsBadgeText.className = weAreOwner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
                     spawnCoins(true);
                 } else {
                     elements.vsBadgeText.textContent = "👉";
                     // Если соперник победил, и мы им являемся - зеленая стрелка, иначе красная
-                    const weAreOwner = (result.owner_id === currentUser.id);
+                    const weAreOwner = Number(result.owner_id) === Number(currentUser.id);
                     elements.vsBadgeText.className = !weAreOwner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
                     spawnCoins(false);
                 }
