@@ -148,7 +148,7 @@ function timeAgo(ts) {
 
 async function fetchNotifications() {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/notifications`, { headers: getHeaders() });
+        const res = await fetch(`${API_BASE_URL}/api/notifications?t=${Date.now()}`, { headers: getHeaders() });
         if (!res.ok) return;
         const data = await res.json();
         
@@ -295,7 +295,7 @@ function rollDice(diceElement, targetValue, callback) {
 
 async function fetchUserProfile() {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/user`, { headers: getHeaders() });
+        const res = await fetch(`${API_BASE_URL}/api/user?t=${Date.now()}`, { headers: getHeaders() });
         const data = await res.json();
         
         if (!handleApiResponse(res, data, "Failed to load profile")) {
@@ -400,7 +400,7 @@ async function claimDailyGift() {
 
 async function fetchActiveRooms() {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/rooms`, { headers: getHeaders() });
+        const res = await fetch(`${API_BASE_URL}/api/rooms?t=${Date.now()}`, { headers: getHeaders() });
         if (!res.ok) throw new Error();
         activeRooms = await res.json();
         renderRooms(activeRooms);
