@@ -1363,14 +1363,14 @@ setInterval(async () => {
 if (elements.btnClaimGift) {
     // Запускаем первый раз через 3 секунды после старта, если кулдауна нет
     setTimeout(() => {
-        if (currentUser && currentUser.bonus_cooldown === 0) {
+        if (currentUser && !currentUser.bonus_cooldown) {
             elements.btnClaimGift.classList.add('shimmer-glow');
             setTimeout(() => elements.btnClaimGift.classList.remove('shimmer-glow'), 1400);
         }
     }, 3000);
 
     setInterval(() => {
-        if (currentUser && currentUser.bonus_cooldown === 0) {
+        if (currentUser && !currentUser.bonus_cooldown) {
             elements.btnClaimGift.classList.add('shimmer-glow');
             setTimeout(() => {
                 elements.btnClaimGift.classList.remove('shimmer-glow');
