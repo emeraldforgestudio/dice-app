@@ -262,8 +262,8 @@ function handleApiResponse(res, data, defaultErrorMsg = "An error occurred") {
 const diceRotations = {
     1: { x: 0, y: 0 },
     2: { x: 90, y: 0 },
-    3: { x: 0, y: 90 },
-    4: { x: 0, y: -90 },
+    3: { x: 0, y: -90 },
+    4: { x: 0, y: 90 },
     5: { x: -90, y: 0 },
     6: { x: 180, y: 0 }
 };
