@@ -1566,13 +1566,12 @@ function renderLeaderboard(data) {
                 const name   = isMe ? rawName : maskedName;
                 const initial = (e.first_name || e.username || 'P').charAt(0).toUpperCase();
                 const avCls  = ['gold-av','silver-av','bronze-av'][e.rank - 1];
-                const prize  = PRIZES[e.rank] ? `🎁 ${PRIZES[e.rank]} 🪙` : '';
+                const prize  = PRIZES[e.rank] ? `${PRIZES[e.rank]} 🎁` : '';
 
                 return `
                 <div class="lb-podium-card place-${e.rank}${isMe ? ' is-me' : ''}">
-                    <span class="lb-podium-rank">${['🥇','🥈','🥉'][e.rank-1]}</span>
+                    <span class="lb-podium-rank">${['👑','🥈','🥉'][e.rank-1]}</span>
                     <div class="lb-podium-avatar ${avCls}">
-                        <span class="lb-podium-crown">${meta.crown}</span>
                         ${initial}
                     </div>
                     <span class="lb-podium-name">${isMe ? '⭐ You' : name}</span>
