@@ -18,6 +18,7 @@ let initData = '';
 let currentUser = { id: 0, username: 'Player', first_name: 'Player', balance: 0 };
 let currentRoomId = null;
 let currentRoomBet = 0;
+let weAreRoomOwner = false;
 let lobbySocket = null;
 let gameSocket = null;
 let roomPollInterval = null;
@@ -713,6 +714,7 @@ function shareRoom() {
 function openGameplayScreen(roomId, isOwner, bet, result = null) {
     currentRoomId = roomId;
     currentRoomBet = bet;
+    weAreRoomOwner = isOwner;
     
     // Сбрасываем старый опрос, если он был активен
     if (roomPollInterval) {
@@ -895,17 +897,13 @@ function showGameResults(result) {
             };
 
             if (elements.vsBadgeText) {
+                // Если мы победили — палец зеленый, если проиграли — красный, независимо от роли
+                elements.vsBadgeText.className = isWinner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
                 if (ownerWon) {
                     elements.vsBadgeText.textContent = "👈";
-                    // Если создатель комнаты победил, и мы им являемся - зеленая стрелка, иначе красная
-                    const weAreOwner = Number(result.owner_id) === Number(currentUser.id);
-                    elements.vsBadgeText.className = weAreOwner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
                     spawnCoins(true);
                 } else {
                     elements.vsBadgeText.textContent = "👉";
-                    // Если соперник победил, и мы им являемся - зеленая стрелка, иначе красная
-                    const weAreOwner = Number(result.owner_id) === Number(currentUser.id);
-                    elements.vsBadgeText.className = !weAreOwner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
                     spawnCoins(false);
                 }
             }
