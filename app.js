@@ -1126,6 +1126,27 @@ elements.btnCreateRoom.onclick = () => {
     updateRoomLimitDisplay();
 };
 
+// Предотвращаем потерю фокуса с поля ввода (и скрытие клавиатуры на смартфонах) при тапах вне интерактивных элементов
+if (elements.createRoomModal) {
+    const preventFocusLoss = (e) => {
+        // Если тап пришелся на поле ввода или кнопки, разрешаем стандартное поведение
+        if (e.target === elements.inputBet || 
+            e.target.closest('.btn-preset') || 
+            e.target.closest('#btn-confirm-create') || 
+            e.target.closest('#btn-close-create-modal') ||
+            e.target.closest('.custom-checkbox-container')) {
+            return;
+        }
+        
+        // Предотвращаем уход фокуса
+        if (document.activeElement === elements.inputBet) {
+            e.preventDefault();
+        }
+    };
+    elements.createRoomModal.addEventListener('mousedown', preventFocusLoss);
+    elements.createRoomModal.addEventListener('touchstart', preventFocusLoss, { passive: false });
+}
+
 async function updateRoomLimitDisplay() {
     const limitInfoEl = document.getElementById('room-limit-info');
     const confirmBtn = document.getElementById('btn-confirm-create');
