@@ -731,7 +731,6 @@ function openGameplayScreen(roomId, isOwner, bet, result = null) {
         elements.vsBadgeText.className = "vs-badge";
     }
     const ringSvg = document.getElementById('vs-ring-svg');
-    if (ringSvg) ringSvg.style.opacity = '1';
 
     // Скрываем короны при входе
     const crownOwner = document.getElementById('crown-owner');
@@ -766,6 +765,7 @@ function openGameplayScreen(roomId, isOwner, bet, result = null) {
     };
 
     if (isOwner) {
+        if (ringSvg) ringSvg.style.opacity = '1';
         if (elements.namePlayerOwner) elements.namePlayerOwner.textContent = currentUser.username || currentUser.first_name;
         if (elements.namePlayerOpponent) elements.namePlayerOpponent.textContent = "Waiting...";
         setGameAvatar(elements.gameAvatarOwner, true, currentUser.username, currentUser.first_name);
@@ -783,6 +783,7 @@ function openGameplayScreen(roomId, isOwner, bet, result = null) {
         // Запускаем надежный HTTP-опрос
         startRoomPolling(roomId);
     } else {
+        if (ringSvg) ringSvg.style.opacity = '0';
         const ownerName = (result && result.usernames && result.usernames.owner) 
             ? result.usernames.owner 
             : "Opponent";
@@ -850,7 +851,7 @@ function showGameResults(result) {
             if (elements.resultSubtitle) elements.resultSubtitle.textContent = "All bets returned.";
             
             if (elements.vsBadgeText) {
-                elements.vsBadgeText.textContent = "🤝";
+                elements.vsBadgeText.textContent = "🤷";
                 elements.vsBadgeText.className = "vs-badge draw-arrows";
             }
         } else {
@@ -887,13 +888,13 @@ function showGameResults(result) {
 
             if (elements.vsBadgeText) {
                 if (ownerWon) {
-                    elements.vsBadgeText.textContent = "◀";
+                    elements.vsBadgeText.textContent = "👈";
                     // Если создатель комнаты победил, и мы им являемся - зеленая стрелка, иначе красная
                     const weAreOwner = (result.owner_id === currentUser.id);
                     elements.vsBadgeText.className = weAreOwner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
                     spawnCoins(true);
                 } else {
-                    elements.vsBadgeText.textContent = "▶";
+                    elements.vsBadgeText.textContent = "👉";
                     // Если соперник победил, и мы им являемся - зеленая стрелка, иначе красная
                     const weAreOwner = (result.owner_id === currentUser.id);
                     elements.vsBadgeText.className = !weAreOwner ? "vs-badge win-arrows" : "vs-badge lose-arrows";
