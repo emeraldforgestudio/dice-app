@@ -1438,3 +1438,230 @@ if (elements.userAvatar) {
 if (elements.notifCloseBtn) {
     elements.notifCloseBtn.onclick = () => closeNotifications();
 }
+
+// =============================================
+// LEADERBOARD MODULE
+// =============================================
+
+let lbCountdownTimer = null;
+let leaderboardData = null; // cached leaderboard from last fetch
+
+// League metadata
+const LEAGUES = {
+    gold:   { label: '👑 Golden League',   cls: 'league-gold',   crown: '👑', crownCls: 'crown-gold'   },
+    silver: { label: '🥈 Silver League',   cls: 'league-silver', crown: '🥈', crownCls: 'crown-silver' },
+    bronze: { label: '🥉 Bronze League',   cls: 'league-bronze', crown: '🥉', crownCls: 'crown-bronze' },
+    rookie: { label: '⬜ Rookie League',   cls: 'league-rookie', crown: '⬜', crownCls: 'crown-rookie' },
+};
+
+function getLeagueForRank(rank) {
+    if (rank === 1) return 'gold';
+    if (rank === 2) return 'silver';
+    if (rank === 3) return 'bronze';
+    return 'rookie';
+}
+
+// Prize per rank
+const PRIZES = { 1: '10,000', 2: '5,000', 3: '2,000' };
+
+/**
+ * Fetch leaderboard data from backend
+ */
+async function fetchLeaderboard() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/leaderboard?t=${Date.now()}`, { headers: getHeaders() });
+        if (!res.ok) throw new Error('leaderboard fetch failed');
+        leaderboardData = await res.json();
+        return leaderboardData;
+    } catch (e) {
+        console.error('Leaderboard fetch error:', e);
+        return null;
+    }
+}
+
+/**
+ * Open leaderboard screen
+ */
+async function openLeaderboard() {
+    const screen = document.getElementById('leaderboard-screen');
+    if (!screen) return;
+
+    if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+
+    screen.classList.remove('hidden');
+
+    // Show skeleton
+    const podium = document.getElementById('lb-podium');
+    const list   = document.getElementById('lb-list');
+    if (podium) podium.innerHTML = '<div class="lb-empty"><i class="fa-solid fa-spinner fa-spin"></i>Loading...</div>';
+    if (list)   list.innerHTML   = '';
+
+    // Start countdown
+    startLbCountdown();
+
+    // Fetch and render
+    const data = await fetchLeaderboard();
+    if (data) renderLeaderboard(data);
+}
+
+/**
+ * Close leaderboard screen
+ */
+function closeLeaderboard() {
+    const screen = document.getElementById('leaderboard-screen');
+    if (screen) screen.classList.add('hidden');
+    if (lbCountdownTimer) { clearInterval(lbCountdownTimer); lbCountdownTimer = null; }
+}
+
+/**
+ * Countdown to next midnight CET (UTC+1)
+ */
+function startLbCountdown() {
+    if (lbCountdownTimer) clearInterval(lbCountdownTimer);
+
+    function update() {
+        const now = new Date();
+        // CET offset: UTC+1 (CET) / UTC+2 (CEST). Use fixed UTC+1 per task spec.
+        const CET_OFFSET_MS = 1 * 60 * 60 * 1000;
+        const nowCET = new Date(now.getTime() + CET_OFFSET_MS - now.getTimezoneOffset() * 60000);
+
+        const midnight = new Date(nowCET);
+        midnight.setHours(24, 0, 0, 0);
+        const diffMs = midnight - nowCET;
+
+        const h = Math.floor(diffMs / 3600000);
+        const m = Math.floor((diffMs % 3600000) / 60000);
+        const s = Math.floor((diffMs % 60000) / 1000);
+
+        const pad = n => String(n).padStart(2, '0');
+        const el = document.getElementById('lb-countdown');
+        if (el) el.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+    }
+
+    update();
+    lbCountdownTimer = setInterval(update, 1000);
+}
+
+/**
+ * Render leaderboard
+ */
+function renderLeaderboard(data) {
+    const entries   = data.entries || [];   // [{ rank, user_id, username, first_name, won_today }]
+    const myEntry   = data.my_entry;        // { rank, won_today } or null
+    const myId      = currentUser.id;
+
+    // ---- Podium (top 3) ----
+    const podiumEl = document.getElementById('lb-podium');
+    if (podiumEl) {
+        const top3 = entries.filter(e => e.rank <= 3);
+        if (top3.length === 0) {
+            podiumEl.innerHTML = `<div class="lb-empty"><i class="fa-solid fa-trophy"></i>No games played today yet</div>`;
+        } else {
+            podiumEl.innerHTML = top3.map(e => {
+                const league = getLeagueForRank(e.rank);
+                const meta   = LEAGUES[league];
+                const isMe   = e.user_id === myId;
+                const name   = e.username ? `@${e.username}` : (e.first_name || 'Player');
+                const initial = (e.first_name || e.username || 'P').charAt(0).toUpperCase();
+                const avCls  = ['gold-av','silver-av','bronze-av'][e.rank - 1];
+                const prize  = PRIZES[e.rank] ? `🎁 ${PRIZES[e.rank]} 🪙` : '';
+
+                return `
+                <div class="lb-podium-card place-${e.rank}${isMe ? ' is-me' : ''}">
+                    <span class="lb-podium-rank">${['🥇','🥈','🥉'][e.rank-1]}</span>
+                    <div class="lb-podium-avatar ${avCls}">
+                        <span class="lb-podium-crown">${meta.crown}</span>
+                        ${initial}
+                    </div>
+                    <span class="lb-podium-name">${isMe ? '⭐ You' : name}</span>
+                    <span class="lb-podium-score">${e.won_today.toLocaleString()} 🪙</span>
+                    ${prize ? `<span class="lb-podium-prize">${prize}</span>` : ''}
+                </div>`;
+            }).join('');
+        }
+    }
+
+    // ---- List (4-10) ----
+    const listEl = document.getElementById('lb-list');
+    if (listEl) {
+        const rest = entries.filter(e => e.rank > 3);
+        if (rest.length === 0) {
+            listEl.innerHTML = '';
+        } else {
+            listEl.innerHTML = rest.map(e => {
+                const league = getLeagueForRank(e.rank);
+                const meta   = LEAGUES[league];
+                const isMe   = e.user_id === myId;
+                const name   = e.username ? `@${e.username}` : (e.first_name || 'Player');
+                const initial = (e.first_name || e.username || 'P').charAt(0).toUpperCase();
+
+                return `
+                <div class="lb-list-item${isMe ? ' is-me' : ''}">
+                    <span class="lb-list-rank">${e.rank}</span>
+                    <div class="lb-list-avatar">${initial}</div>
+                    <div class="lb-list-info">
+                        <div class="lb-list-name">${isMe ? '⭐ ' + name : name}</div>
+                        <div class="lb-list-league">${meta.label}</div>
+                    </div>
+                    <span class="lb-list-score">${e.won_today.toLocaleString()} 🪙</span>
+                </div>`;
+            }).join('');
+        }
+    }
+
+    // ---- My position (if not in top 10) ----
+    const myPosEl = document.getElementById('lb-my-position');
+    if (myPosEl) {
+        if (myEntry && myEntry.rank > 10) {
+            const league = getLeagueForRank(myEntry.rank);
+            const meta   = LEAGUES[league];
+            myPosEl.classList.remove('hidden');
+            myPosEl.innerHTML = `
+                <span class="lb-my-rank">#${myEntry.rank}</span>
+                <div class="lb-my-info">
+                    <div class="lb-my-name">⭐ You</div>
+                    <div class="lb-my-sub">${meta.label}</div>
+                </div>
+                <span class="lb-my-score">${(myEntry.won_today || 0).toLocaleString()} 🪙</span>
+            `;
+        } else {
+            myPosEl.classList.add('hidden');
+        }
+    }
+}
+
+/**
+ * Update league badge in profile header
+ */
+function updateLeagueBadge(leagueKey) {
+    const badge = document.getElementById('league-badge');
+    if (!badge) return;
+    if (!leagueKey || leagueKey === 'none') {
+        badge.className = 'league-badge';
+        badge.textContent = '';
+        return;
+    }
+    const meta = LEAGUES[leagueKey] || LEAGUES.rookie;
+    badge.className = `league-badge ${meta.cls}`;
+    badge.textContent = meta.label;
+}
+
+/**
+ * Fetch current user's league and update badge
+ */
+async function fetchAndUpdateLeague() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/leaderboard/my-league?t=${Date.now()}`, { headers: getHeaders() });
+        if (!res.ok) return;
+        const data = await res.json();
+        updateLeagueBadge(data.league || 'rookie');
+    } catch (e) {
+        // silent
+    }
+}
+
+// Initialize leaderboard on app load
+(async () => {
+    await fetchAndUpdateLeague();
+})();
+

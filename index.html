@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="style.css?v=85">
+    <link rel="stylesheet" href="style.css?v=86">
 </head>
 <body>
     <div id="app-container">
@@ -34,6 +34,7 @@
                 <div class="user-details">
                     <h2 id="username-display">Loading...</h2>
                     <span class="user-rank"><i class="fa-solid fa-crown text-gold"></i> Dice Champion</span>
+                    <span class="league-badge" id="league-badge" onclick="openLeaderboard()"></span>
                 </div>
             </div>
             <div class="balance-container">
@@ -128,7 +129,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #85 (25a2fde)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #86 (ba09a6e)</p>
         </footer>
     </div>
 
@@ -239,6 +240,52 @@
                 <button id="btn-confirm-action-cancel" class="btn btn-secondary">No, Back</button>
                 <button id="btn-confirm-action-submit" class="btn btn-primary">Yes, Proceed</button>
             </div>
+        </div>
+    </div>
+
+    <!-- SCREEN: LEADERBOARD (Hidden by default) -->
+    <div id="leaderboard-screen" class="screen-backdrop hidden">
+        <div class="leaderboard-content glass-panel">
+            <!-- Coin Hero Header -->
+            <div class="lb-coin-hero">
+                <div class="lb-sun-rays"></div>
+                <div class="lb-sun-rays-inner"></div>
+                <div class="lb-coin-glow"></div>
+                <span class="lb-coin-emoji">🪙</span>
+                <div class="lb-title-block">
+                    <h2 class="lb-title">Leaderboard</h2>
+                    <p class="lb-subtitle">Daily Champions</p>
+                </div>
+            </div>
+
+
+            <!-- Reset Timer -->
+            <div class="lb-timer-bar">
+                <i class="fa-solid fa-clock"></i>
+                <span>Resets in: </span>
+                <span id="lb-countdown" class="lb-countdown-val">--:--:--</span>
+            </div>
+
+            <!-- Top 3 Podium -->
+            <div class="lb-podium" id="lb-podium">
+                <!-- Rendered by JS -->
+            </div>
+
+            <!-- Full List (4-10) -->
+            <div class="lb-list" id="lb-list">
+                <!-- Rendered by JS -->
+            </div>
+
+            <!-- My Position -->
+            <div class="lb-my-position glass-panel hidden" id="lb-my-position">
+                <!-- Rendered by JS -->
+            </div>
+
+
+            <!-- Close Button -->
+            <button class="btn btn-secondary btn-block lb-close-btn" onclick="closeLeaderboard()">
+                <i class="fa-solid fa-arrow-left"></i> Back to Lobby
+            </button>
         </div>
     </div>
 
@@ -353,6 +400,6 @@
     <!-- CUSTOM TOASTS -->
     <div id="toast-container" class="toast-container"></div>
 
-    <script src="app.js?v=85"></script>
+    <script src="app.js?v=86"></script>
 </body>
 </html>
