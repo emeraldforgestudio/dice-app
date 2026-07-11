@@ -1618,7 +1618,7 @@ input:checked + .slider:before {
     left: -6px;
     font-size: 13px;
     line-height: 1;
-    animation: bell-blink 2.5s ease-in-out infinite;
+    animation: bell-blink 7.5s ease-in-out infinite;
     pointer-events: none;
     z-index: 10;
 }
