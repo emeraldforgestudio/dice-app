@@ -15,7 +15,7 @@ function maskUsername(username) {
 // Инициализация Telegram WebApp
 const tg = window.Telegram?.WebApp;
 let initData = '';
-let currentUser = { id: 0, username: 'Player', first_name: 'Player', balance: 0 };
+let currentUser = { id: 0, username: 'Player', first_name: 'Player', balance: 0, bonus_cooldown: null };
 let currentRoomId = null;
 let currentRoomBet = 0;
 let weAreRoomOwner = false;
@@ -1359,19 +1359,23 @@ setInterval(async () => {
     }
 }, 10000);
 
-// Эффект красивого блика (shimmer) для кнопки Daily Bonus раз в 10 секунд
+// Эффект красивого блика (shimmer) для кнопки Daily Bonus раз в 10 секунд (только когда бонус доступен)
 if (elements.btnClaimGift) {
-    // Запускаем первый раз через 3 секунды после старта, чтобы привлечь внимание
+    // Запускаем первый раз через 3 секунды после старта, если кулдауна нет
     setTimeout(() => {
-        elements.btnClaimGift.classList.add('shimmer-glow');
-        setTimeout(() => elements.btnClaimGift.classList.remove('shimmer-glow'), 1400);
+        if (currentUser && currentUser.bonus_cooldown === 0) {
+            elements.btnClaimGift.classList.add('shimmer-glow');
+            setTimeout(() => elements.btnClaimGift.classList.remove('shimmer-glow'), 1400);
+        }
     }, 3000);
 
     setInterval(() => {
-        elements.btnClaimGift.classList.add('shimmer-glow');
-        setTimeout(() => {
-            elements.btnClaimGift.classList.remove('shimmer-glow');
-        }, 1400);
+        if (currentUser && currentUser.bonus_cooldown === 0) {
+            elements.btnClaimGift.classList.add('shimmer-glow');
+            setTimeout(() => {
+                elements.btnClaimGift.classList.remove('shimmer-glow');
+            }, 1400);
+        }
     }, 10000);
 }
 
