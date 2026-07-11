@@ -518,7 +518,8 @@ async function createRoom(bet, isPrivate) {
             return;
         }
         
-        showToast("Room created successfully!", "success");
+        const roomsLeftText = data.rooms_left !== undefined ? ` (${data.rooms_left} rooms left)` : "";
+        showToast(`Room created successfully!${roomsLeftText}`, "success");
         elements.createRoomModal.classList.add('hidden');
         fetchUserProfile();
         
