@@ -704,12 +704,12 @@ async function leaveRoom() {
 
 function tgInvite() {
     if (!currentRoomId) return;
-    const shareUrl = `https://t.me/share/url?url=https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}&text=🎲 Join my Dice match! Low roll wins, bets are returned on tie. Let's play! 🪙`;
+    const shareUrl = `https://t.me/share/url?url=https://t.me/${BOT_USERNAME}/app?startapp=join_${currentRoomId}&text=🎲 Join my Dice match! Low roll wins, bets are returned on tie. Let's play! 🪙`;
     
     if (tg && tg.openTelegramLink) {
         tg.openTelegramLink(shareUrl);
     } else {
-        navigator.clipboard.writeText(`https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`).then(() => {
+        navigator.clipboard.writeText(`https://t.me/${BOT_USERNAME}/app?startapp=join_${currentRoomId}`).then(() => {
             showToast("Invite link copied to clipboard!", "success");
         }).catch(() => {
             showToast("Unable to copy link", "error");
@@ -719,7 +719,7 @@ function tgInvite() {
 
 function systemShare() {
     if (!currentRoomId) return;
-    const url = `https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`;
+    const url = `https://t.me/${BOT_USERNAME}/app?startapp=join_${currentRoomId}`;
     const text = `🎲 Join my room in Dice Arena and let's roll! Low roll wins. 🪙`;
     
     if (navigator.share) {
@@ -1370,6 +1370,19 @@ fetchUserProfile();
 fetchActiveRooms();
 connectLobbySocket();
 fetchNotifications();
+
+// Автоматический вход в комнату дуэли по ссылке (Deep Linking)
+if (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
+    const startParam = tg.initDataUnsafe.start_param;
+    if (startParam.startsWith('join_')) {
+        const roomId = startParam.split('join_')[1];
+        // Заходим автоматически через 1.2 секунды после инициализации
+        setTimeout(() => {
+            console.log("Auto-joining room from start_param:", roomId);
+            joinRoom(roomId);
+        }, 1200);
+    }
+}
 
 // Фоновое обновление лобби раз в 10 секунд (баланс, колокольчик уведомлений, комнаты)
 setInterval(async () => {
