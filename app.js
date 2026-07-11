@@ -721,6 +721,14 @@ function openGameplayScreen(roomId, isOwner, bet, result = null) {
     }
     
     if (elements.gameRoomId) elements.gameRoomId.textContent = `Room ID: ${roomId}`;
+    
+    // Обновляем общую сумму банка на кону (Total Pot)
+    const potElement = document.getElementById('game-pot-amount');
+    if (potElement) {
+        const potAmount = bet * 2;
+        potElement.textContent = `${potAmount.toLocaleString()} 🪙`;
+    }
+    
     if (elements.gameplayScreen) elements.gameplayScreen.classList.remove('hidden');
     if (elements.matchResults) elements.matchResults.classList.add('hidden');
     if (elements.gameStatusText) elements.gameStatusText.classList.remove('hidden');

@@ -676,6 +676,45 @@ input:checked + .slider:before {
     border-radius: 6px;
 }
 
+.game-arena-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-top: -4px;
+}
+
+.game-pot-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pot-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.pot-value {
+    font-size: 14px;
+    color: #eab308;
+    font-weight: 800;
+}
+
+.game-rule-text {
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.35);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
 .players-versus {
     display: grid;
     grid-template-columns: 1fr auto 1fr;

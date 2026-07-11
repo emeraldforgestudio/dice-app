@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="style.css?v=68">
+    <link rel="stylesheet" href="style.css?v=70">
 </head>
 <body>
     <div id="app-container">
@@ -128,7 +128,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #69 (dbada32)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #70 (6c05dcb)</p>
         </footer>
     </div>
 
@@ -250,6 +250,16 @@
                 <span class="room-id-tag" id="game-room-id">ID: unknown</span>
             </div>
             
+            <div class="game-arena-info">
+                <div class="game-pot-container">
+                    <span class="pot-label">Total Pot:</span>
+                    <span class="pot-value" id="game-pot-amount">0 🪙</span>
+                </div>
+                <div class="game-rule-text">
+                    Lowest roll wins • Winner takes all
+                </div>
+            </div>
+            
             <div class="players-versus">
                 <!-- Player A -->
                 <div class="player-card" id="card-player-owner">
@@ -333,6 +343,6 @@
     <!-- CUSTOM TOASTS -->
     <div id="toast-container" class="toast-container"></div>
 
-    <script src="app.js?v=69"></script>
+    <script src="app.js?v=70"></script>
 </body>
 </html>
