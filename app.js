@@ -309,6 +309,12 @@ async function fetchUserProfile() {
             : currentUser.first_name;
         elements.balanceDisplay.textContent = `${currentUser.balance.toLocaleString()} 🪙`;
         
+        // Обновляем баланс в результатах матча, если элемент существует
+        const matchBalEl = document.getElementById('match-new-balance');
+        if (matchBalEl) {
+            matchBalEl.textContent = `${currentUser.balance.toLocaleString()} 🪙`;
+        }
+        
         // Настройка аватарки пользователя
         const userAvatarElement = document.getElementById('user-avatar');
         if (userAvatarElement) {
@@ -845,6 +851,9 @@ function showGameResults(result) {
             console.error("No game result provided to showGameResults");
             return;
         }
+        
+        // Принудительно обновляем профиль для получения свежего баланса после матча
+        fetchUserProfile();
         
         if (elements.matchResults) elements.matchResults.classList.remove('hidden');
         const isWinner = Number(result.winner_id) === Number(currentUser.id);

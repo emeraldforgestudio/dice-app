@@ -128,7 +128,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #77 (d0c6fc1)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #78 (a44f081)</p>
         </footer>
     </div>
 
@@ -332,6 +332,11 @@
                 </div>
 
                 <div class="match-results-box hidden" id="match-results">
+                    <!-- Блок нового баланса (показывается в конце игры) -->
+                    <div class="game-pot-container match-balance-container" style="margin: 0 auto 16px auto; width: max-content;">
+                        <span class="pot-label">Your Balance:</span>
+                        <span class="pot-value" id="match-new-balance">0 🪙</span>
+                    </div>
                     <h2 id="result-title">Victory!</h2>
                     <p id="result-subtitle">+1,000 coins</p>
                     <button class="btn btn-secondary btn-block" id="btn-return-lobby">Back to Lobby</button>
@@ -343,6 +348,6 @@
     <!-- CUSTOM TOASTS -->
     <div id="toast-container" class="toast-container"></div>
 
-    <script src="app.js?v=75"></script>
+    <script src="app.js?v=76"></script>
 </body>
 </html>
