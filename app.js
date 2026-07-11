@@ -95,7 +95,8 @@ const elements = {
     gameStatusText: document.getElementById('game-status-text'),
     
     ownerWaitingActions: document.getElementById('owner-waiting-actions'),
-    btnShareRoom: document.getElementById('btn-share-room'),
+    btnSystemShare: document.getElementById('btn-system-share'),
+    btnTgInvite: document.getElementById('btn-tg-invite'),
     btnKeepRoomLobby: document.getElementById('btn-keep-room-lobby'),
     btnLeaveRoom: document.getElementById('btn-leave-room'),
     
@@ -701,15 +702,36 @@ async function leaveRoom() {
     }
 }
 
-function shareRoom() {
+function tgInvite() {
     if (!currentRoomId) return;
     const shareUrl = `https://t.me/share/url?url=https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}&text=🎲 Join my Dice match! Low roll wins, bets are returned on tie. Let's play! 🪙`;
     
     if (tg && tg.openTelegramLink) {
         tg.openTelegramLink(shareUrl);
     } else {
-        // Копируем в буфер обмена вне Telegram
         navigator.clipboard.writeText(`https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`).then(() => {
+            showToast("Invite link copied to clipboard!", "success");
+        }).catch(() => {
+            showToast("Unable to copy link", "error");
+        });
+    }
+}
+
+function systemShare() {
+    if (!currentRoomId) return;
+    const url = `https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`;
+    const text = `🎲 Join my room in Dice Arena and let's roll! Low roll wins. 🪙`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'Dice Arena Match',
+            text: text,
+            url: url
+        }).catch((err) => {
+            console.log("Share failed or cancelled:", err);
+        });
+    } else {
+        navigator.clipboard.writeText(url).then(() => {
             showToast("Invite link copied to clipboard!", "success");
         }).catch(() => {
             showToast("Unable to copy link", "error");
@@ -1258,9 +1280,15 @@ if (elements.btnConfirmClaim) {
     };
 }
 
-if (elements.btnShareRoom) {
-    elements.btnShareRoom.onclick = () => {
-        shareRoom();
+if (elements.btnSystemShare) {
+    elements.btnSystemShare.onclick = () => {
+        systemShare();
+    };
+}
+
+if (elements.btnTgInvite) {
+    elements.btnTgInvite.onclick = () => {
+        tgInvite();
     };
 }
 
