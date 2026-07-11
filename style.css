@@ -739,7 +739,6 @@ input:checked + .slider:before {
 
 .avatar-owner {
     background: linear-gradient(45deg, var(--emerald), var(--neon-green));
-    box-shadow: 0 0 15px var(--emerald-glow);
 }
 
 .avatar-opponent {
