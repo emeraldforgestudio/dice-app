@@ -539,6 +539,28 @@ body {
     color: var(--text-secondary);
 }
 
+.room-limit-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 16px;
+    font-size: 12px;
+}
+
+.room-limit-container .limit-label {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.room-limit-container .limit-value {
+    color: var(--white);
+    font-weight: 700;
+}
+
 /* Toggle Switch */
 .switch {
     position: relative;
@@ -915,7 +937,7 @@ input:checked + .slider:before {
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 2000;
+    z-index: 4000; /* Перекрывает любые модальные окна (3000) */
     display: flex;
     flex-direction: column;
     gap: 8px;

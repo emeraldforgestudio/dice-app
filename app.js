@@ -1106,7 +1106,46 @@ function startRoomPolling(roomId) {
 elements.btnCreateRoom.onclick = () => {
     elements.createRoomModal.classList.remove('hidden');
     elements.inputBet.focus();
+    updateRoomLimitDisplay();
 };
+
+async function updateRoomLimitDisplay() {
+    const limitInfoEl = document.getElementById('room-limit-info');
+    const confirmBtn = document.getElementById('btn-confirm-create');
+    if (!limitInfoEl) return;
+    
+    limitInfoEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Checking limit...`;
+    
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/rooms/my`, { headers: getHeaders() });
+        const data = await res.json();
+        
+        if (res.ok) {
+            const count = data.length;
+            const left = 20 - count;
+            
+            if (count >= 20) {
+                limitInfoEl.innerHTML = `<span style="color: #ff3b30; font-weight: 700;">${count} / 20 (Limit Exceeded)</span>`;
+                if (confirmBtn) {
+                    confirmBtn.disabled = true;
+                    confirmBtn.textContent = "Limit Exceeded (20/20)";
+                    confirmBtn.style.opacity = "0.5";
+                }
+            } else {
+                limitInfoEl.innerHTML = `<span style="color: var(--neon-green); font-weight: 700;">${count} / 20</span> (Available: <strong>${left}</strong>)`;
+                if (confirmBtn) {
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = "Confirm Bet";
+                    confirmBtn.style.opacity = "1";
+                }
+            }
+        } else {
+            limitInfoEl.textContent = "Error checking limit";
+        }
+    } catch (e) {
+        limitInfoEl.textContent = "Error checking limit";
+    }
+}
 
 elements.btnCloseCreateModal.onclick = () => {
     elements.createRoomModal.classList.add('hidden');
