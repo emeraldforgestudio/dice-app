@@ -1448,10 +1448,10 @@ let leaderboardData = null; // cached leaderboard from last fetch
 
 // League metadata
 const LEAGUES = {
-    gold:   { label: '👑 Golden League',   cls: 'league-gold',   crown: '👑', crownCls: 'crown-gold'   },
-    silver: { label: '🥈 Silver League',   cls: 'league-silver', crown: '🥈', crownCls: 'crown-silver' },
-    bronze: { label: '🥉 Bronze League',   cls: 'league-bronze', crown: '🥉', crownCls: 'crown-bronze' },
-    rookie: { label: '⬜ Rookie League',   cls: 'league-rookie', crown: '⬜', crownCls: 'crown-rookie' },
+    gold:   { label: 'Golden League',   cls: 'league-gold',   crown: '👑', crownCls: 'crown-gold'   },
+    silver: { label: 'Silver League',   cls: 'league-silver', crown: '🥈', crownCls: 'crown-silver' },
+    bronze: { label: 'Bronze League',   cls: 'league-bronze', crown: '🥉', crownCls: 'crown-bronze' },
+    rookie: { label: 'Rookie League',   cls: 'league-rookie', crown: '⬜', crownCls: 'crown-rookie' },
 };
 
 function getLeagueForRank(rank) {
@@ -1636,14 +1636,16 @@ function renderLeaderboard(data) {
 function updateLeagueBadge(leagueKey) {
     const badge = document.getElementById('league-badge');
     if (!badge) return;
-    if (!leagueKey || leagueKey === 'none') {
-        badge.className = 'league-badge';
-        badge.textContent = '';
-        return;
+    
+    // Default to 'rookie' if not in Gold/Silver/Bronze/Rookie
+    let key = leagueKey;
+    if (!key || key === 'none' || !LEAGUES[key]) {
+        key = 'rookie';
     }
-    const meta = LEAGUES[leagueKey] || LEAGUES.rookie;
+    
+    const meta = LEAGUES[key];
     badge.className = `league-badge ${meta.cls}`;
-    badge.textContent = meta.label;
+    badge.innerHTML = `<i class="fa-solid fa-crown league-badge-crown"></i> ${meta.label}`;
 }
 
 /**
@@ -1652,11 +1654,14 @@ function updateLeagueBadge(leagueKey) {
 async function fetchAndUpdateLeague() {
     try {
         const res = await fetch(`${API_BASE_URL}/api/leaderboard/my-league?t=${Date.now()}`, { headers: getHeaders() });
-        if (!res.ok) return;
+        if (!res.ok) {
+            updateLeagueBadge('rookie');
+            return;
+        }
         const data = await res.json();
         updateLeagueBadge(data.league || 'rookie');
     } catch (e) {
-        // silent
+        updateLeagueBadge('rookie');
     }
 }
 

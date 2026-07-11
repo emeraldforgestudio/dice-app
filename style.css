@@ -2211,3 +2211,19 @@ input:checked + .slider:before {
     color: var(--text-muted);
 }
 
+/* League Badge Crown Styling & Glows */
+.league-badge-crown {
+    font-size: 10px;
+    transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+.league-badge.league-gold .league-badge-crown {
+    text-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+}
+.league-badge.league-silver .league-badge-crown {
+    text-shadow: 0 0 6px rgba(208, 208, 208, 0.4);
+}
+.league-badge.league-bronze .league-badge-crown {
+    text-shadow: 0 0 6px rgba(232, 169, 107, 0.4);
+}
+
+
