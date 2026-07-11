@@ -1674,15 +1674,19 @@ input:checked + .slider:before {
 .winner-crown {
     position: absolute;
     top: -18px;
-    left: 50%;
-    transform: translateX(-50%) rotate(-12deg);
     font-size: 26px;
     z-index: 10;
     filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
+}
+
+#crown-owner {
+    left: 30%;
+    transform: translateX(-50%) rotate(-12deg);
     animation: crown-bounce 1s ease-in-out infinite alternate;
 }
 
 #crown-opponent {
+    left: 70%;
     transform: translateX(-50%) rotate(12deg);
     animation: crown-bounce-right 1s ease-in-out infinite alternate;
 }
