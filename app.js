@@ -758,6 +758,7 @@ async function leaveRoom() {
         fetchActiveRooms();
         fetchNotifications();
         fetchAndUpdateLeague();
+        initClaimBonusShimmer();
     } catch (e) {
         showToast("Connection error", "error");
     }
@@ -1365,6 +1366,7 @@ if (elements.btnKeepRoomLobby) {
         fetchUserProfile();
         fetchNotifications();
         fetchAndUpdateLeague();
+        initClaimBonusShimmer();
     };
 }
 
@@ -1393,6 +1395,7 @@ if (elements.btnReturnLobby) {
         fetchUserProfile();
         fetchNotifications();
         fetchAndUpdateLeague();
+        initClaimBonusShimmer();
     };
 }
 
@@ -1437,6 +1440,9 @@ fetchUserProfile();
 fetchActiveRooms();
 connectLobbySocket();
 fetchNotifications();
+if (elements.btnClaimGift) {
+    initClaimBonusShimmer();
+}
 
 // Автоматический вход в комнату дуэли по ссылке (Deep Linking)
 if (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
@@ -1468,24 +1474,33 @@ setInterval(async () => {
     }
 }, 10000);
 
-// Эффект красивого блика (shimmer) для кнопки Daily Bonus раз в 10 секунд (только когда бонус доступен)
-if (elements.btnClaimGift) {
-    // Запускаем первый раз через 3 секунды после старта, если кулдауна нет
-    setTimeout(() => {
-        if (currentUser && !currentUser.bonus_cooldown) {
-            elements.btnClaimGift.classList.add('shimmer-glow');
-            setTimeout(() => elements.btnClaimGift.classList.remove('shimmer-glow'), 1400);
-        }
-    }, 3000);
+// Эффект красивого блика (shimmer) для кнопки Daily Bonus
+let claimBonusShimmerInterval = null;
 
-    setInterval(() => {
-        if (currentUser && !currentUser.bonus_cooldown) {
-            elements.btnClaimGift.classList.add('shimmer-glow');
-            setTimeout(() => {
+function triggerClaimBonusShimmer() {
+    if (elements.btnClaimGift && currentUser && !currentUser.bonus_cooldown) {
+        elements.btnClaimGift.classList.add('shimmer-glow');
+        setTimeout(() => {
+            if (elements.btnClaimGift) {
                 elements.btnClaimGift.classList.remove('shimmer-glow');
-            }, 1400);
-        }
-    }, 10000);
+            }
+        }, 1400);
+    }
+}
+
+function initClaimBonusShimmer() {
+    if (claimBonusShimmerInterval) {
+        clearInterval(claimBonusShimmerInterval);
+    }
+    // Первый раз через 2 секунды после входа в лобби
+    setTimeout(() => {
+        triggerClaimBonusShimmer();
+    }, 2000);
+
+    // Далее проигрываем каждые 8 секунд
+    claimBonusShimmerInterval = setInterval(() => {
+        triggerClaimBonusShimmer();
+    }, 8000);
 }
 
 // Клик по аватарке — открыть/закрыть уведомления
