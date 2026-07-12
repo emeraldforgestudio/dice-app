@@ -23,6 +23,7 @@ let lobbySocket = null;
 let gameSocket = null;
 let roomPollInterval = null;
 let activeRooms = [];
+let lastRenderedRoomsHash = "";
 
 // Параметры фильтрации и пагинации
 let currentFilterType = 'other'; // 'all', 'own', 'other'
@@ -500,6 +501,13 @@ function renderRooms(rooms) {
     if (elements.btnPrevPage) elements.btnPrevPage.disabled = currentPage === 1;
     if (elements.btnNextPage) elements.btnNextPage.disabled = currentPage === totalPages;
     if (elements.pageInfo) elements.pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+
+    // Проверяем, изменился ли контент комнат на текущей странице, чтобы избежать лишней перерисовки DOM
+    const renderHash = paginated.map(r => `${r.id}:${r.bet}:${r.owner_username}:${r.is_private}`).join('|');
+    if (renderHash === lastRenderedRoomsHash) {
+        return;
+    }
+    lastRenderedRoomsHash = renderHash;
     
     if (paginated.length === 0) {
         elements.roomsList.innerHTML = `
@@ -1489,6 +1497,7 @@ if (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
 
 // Фоновое обновление лобби раз в 10 секунд (баланс, колокольчик уведомлений, комнаты)
 setInterval(async () => {
+    if (document.hidden) return; // Пропускаем обновление, если приложение свёрнуто
     // Делаем фоновые запросы только когда игрок находится на экране лобби (экран игры скрыт)
     if (elements.gameplayScreen && elements.gameplayScreen.classList.contains('hidden')) {
         try {
