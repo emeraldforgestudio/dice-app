@@ -130,6 +130,7 @@ const elements = {
     notifList: document.getElementById('notif-list'),
     notifCloseBtn: document.getElementById('notif-close-btn'),
     userAvatar: document.getElementById('user-avatar'),
+    userAvatarWrapper: document.getElementById('user-avatar-wrapper'),
     gameAvatarOwner: document.getElementById('game-avatar-owner'),
     gameAvatarOpponent: document.getElementById('game-avatar-opponent'),
     btnToggleFilters: document.getElementById('btn-toggle-filters'),
@@ -1504,8 +1505,8 @@ function initClaimBonusShimmer() {
 }
 
 // Клик по аватарке — открыть/закрыть уведомления
-if (elements.userAvatar) {
-    elements.userAvatar.onclick = () => {
+if (elements.userAvatarWrapper) {
+    elements.userAvatarWrapper.onclick = () => {
         if (elements.notifPanel && elements.notifPanel.classList.contains('hidden')) {
             openNotifications();
         } else {

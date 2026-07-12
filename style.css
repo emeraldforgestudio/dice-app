@@ -247,7 +247,7 @@ body {
     content: '';
     position: absolute;
     top: 0;
-    left: -150%;
+    left: 0;
     width: 60%;
     height: 100%;
     background: linear-gradient(
@@ -258,9 +258,10 @@ body {
         rgba(255, 255, 255, 0.2) 70%,
         rgba(255, 255, 255, 0) 100%
     );
-    transform: skewX(-20deg);
+    transform: translateX(-250%) skewX(-20deg);
     pointer-events: none;
     z-index: 5;
+    will-change: transform;
 }
 
 #btn-claim-gift.shimmer-glow::after {
@@ -269,10 +270,10 @@ body {
 
 @keyframes button-shimmer {
     0% {
-        left: -150%;
+        transform: translateX(-250%) skewX(-20deg);
     }
     100% {
-        left: 150%;
+        transform: translateX(450%) skewX(-20deg);
     }
 }
 
