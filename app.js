@@ -26,7 +26,7 @@ let activeRooms = [];
 let lastRenderedRoomsHash = "";
 
 // Параметры фильтрации и пагинации
-let currentFilterType = 'other'; // 'all', 'own', 'other'
+let currentFilterType = 'all'; // 'all', 'own', 'other'
 let currentSearchQuery = '';
 let currentSortType = 'bet-desc'; // 'bet-asc', 'bet-desc', 'newest'
 let currentBetMin = null;
