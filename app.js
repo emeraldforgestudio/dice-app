@@ -156,7 +156,8 @@ async function fetchNotifications() {
         
         // Показываем/прячем колокольчик
         if (elements.notifBell) {
-            if (data.unread > 0) {
+            const hasNotifications = data.notifications && data.notifications.length > 0;
+            if (data.unread > 0 && hasNotifications) {
                 elements.notifBell.classList.remove('hidden');
             } else {
                 elements.notifBell.classList.add('hidden');
@@ -561,6 +562,17 @@ async function joinRoom(roomId) {
         const data = await res.json();
         
         if (!handleApiResponse(res, data, "Unable to join room")) {
+            // Восстанавливаем карточку комнаты при ошибке входа
+            const roomEl = document.getElementById(`room-${roomId}`);
+            if (roomEl) {
+                roomEl.style.opacity = '';
+                roomEl.style.pointerEvents = '';
+                const btn = roomEl.querySelector('.btn-join');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Join Game';
+                }
+            }
             return;
         }
         
@@ -571,6 +583,17 @@ async function joinRoom(roomId) {
         playDiceRoll(data.rolls.owner, data.rolls.opponent, data);
     } catch (e) {
         showToast("Connection failed", "error");
+        // Восстанавливаем карточку комнаты при ошибке соединения
+        const roomEl = document.getElementById(`room-${roomId}`);
+        if (roomEl) {
+            roomEl.style.opacity = '';
+            roomEl.style.pointerEvents = '';
+            const btn = roomEl.querySelector('.btn-join');
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Join Game';
+            }
+        }
     }
 }
 
@@ -584,6 +607,19 @@ function confirmJoinRoom(roomId, ownerUsername, bet) {
     if (elements.btnConfirmActionSubmit) {
         elements.btnConfirmActionSubmit.onclick = () => {
             if (elements.confirmModal) elements.confirmModal.classList.add('hidden');
+            
+            // Визуально отключаем карточку комнаты немедленно
+            const roomEl = document.getElementById(`room-${roomId}`);
+            if (roomEl) {
+                roomEl.style.opacity = '0.5';
+                roomEl.style.pointerEvents = 'none';
+                const btn = roomEl.querySelector('.btn-join');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = 'Joining...';
+                }
+            }
+            
             joinRoom(roomId);
         };
     }
