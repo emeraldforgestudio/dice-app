@@ -444,7 +444,9 @@ body {
 
 .room-action-side .btn-join {
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: 4px;
+    border-top-left-radius: 14px 10px;
+    border-bottom-right-radius: 14px 10px;
     font-size: 12px;
     font-weight: 600;
     background: linear-gradient(135deg, var(--neon-green) 0%, var(--emerald) 100%);
