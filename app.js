@@ -767,7 +767,6 @@ async function leaveRoom() {
         fetchActiveRooms();
         fetchNotifications();
         fetchAndUpdateLeague();
-        initClaimBonusShimmer();
     } catch (e) {
         showToast("Connection error", "error");
     }
@@ -1375,7 +1374,6 @@ if (elements.btnKeepRoomLobby) {
         fetchUserProfile();
         fetchNotifications();
         fetchAndUpdateLeague();
-        initClaimBonusShimmer();
     };
 }
 
@@ -1404,7 +1402,6 @@ if (elements.btnReturnLobby) {
         fetchUserProfile();
         fetchNotifications();
         fetchAndUpdateLeague();
-        initClaimBonusShimmer();
     };
 }
 
@@ -1434,9 +1431,7 @@ if (elements.btnToggleFilters) {
     };
 }
 
-// Эффект красивого блика (shimmer) для кнопки Daily Bonus
-let claimBonusShimmerInterval = null;
-
+// Эффект красивого блика (shimmer) для кнопки Daily Bonus (однократный запуск при старте)
 function triggerClaimBonusShimmer() {
     if (elements.btnClaimGift && currentUser && !currentUser.bonus_cooldown) {
         elements.btnClaimGift.classList.add('shimmer-glow');
@@ -1446,21 +1441,6 @@ function triggerClaimBonusShimmer() {
             }
         }, 1400);
     }
-}
-
-function initClaimBonusShimmer() {
-    if (claimBonusShimmerInterval) {
-        clearInterval(claimBonusShimmerInterval);
-    }
-    // Первый раз через 2 секунды после входа в лобби
-    setTimeout(() => {
-        triggerClaimBonusShimmer();
-    }, 2000);
-
-    // Далее проигрываем каждые 8 секунд
-    claimBonusShimmerInterval = setInterval(() => {
-        triggerClaimBonusShimmer();
-    }, 8000);
 }
 
 // Экспортируем функции для inline вызова из HTML
@@ -1479,7 +1459,9 @@ fetchActiveRooms();
 connectLobbySocket();
 fetchNotifications();
 if (elements.btnClaimGift) {
-    initClaimBonusShimmer();
+    setTimeout(() => {
+        triggerClaimBonusShimmer();
+    }, 3000);
 }
 
 // Автоматический вход в комнату дуэли по ссылке (Deep Linking)
