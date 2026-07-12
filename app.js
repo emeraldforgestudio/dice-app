@@ -756,6 +756,8 @@ async function leaveRoom() {
         elements.ownerWaitingActions.classList.add('hidden');
         fetchUserProfile();
         fetchActiveRooms();
+        fetchNotifications();
+        fetchAndUpdateLeague();
     } catch (e) {
         showToast("Connection error", "error");
     }
@@ -1360,6 +1362,9 @@ if (elements.btnKeepRoomLobby) {
         elements.gameplayScreen.classList.add('hidden');
         elements.ownerWaitingActions.classList.add('hidden');
         fetchActiveRooms();
+        fetchUserProfile();
+        fetchNotifications();
+        fetchAndUpdateLeague();
     };
 }
 
@@ -1385,6 +1390,9 @@ if (elements.btnReturnLobby) {
     elements.btnReturnLobby.onclick = () => {
         elements.gameplayScreen.classList.add('hidden');
         fetchActiveRooms();
+        fetchUserProfile();
+        fetchNotifications();
+        fetchAndUpdateLeague();
     };
 }
 
