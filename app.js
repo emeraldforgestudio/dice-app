@@ -1496,12 +1496,18 @@ async function openLeaderboard() {
     if (podium) podium.innerHTML = '<div class="lb-empty"><i class="fa-solid fa-spinner fa-spin"></i>Loading...</div>';
     if (list)   list.innerHTML   = '';
 
-    // Start countdown
-    startLbCountdown();
+    // Start countdown with fallback (midnight CET) while data loads
+    startLbCountdown(null);
 
     // Fetch and render
     const data = await fetchLeaderboard();
-    if (data) renderLeaderboard(data);
+    if (data) {
+        renderLeaderboard(data);
+        // Restart countdown with accurate next_reset_ts from server
+        if (data.next_reset_ts) {
+            startLbCountdown(data.next_reset_ts);
+        }
+    }
 }
 
 /**
@@ -1514,28 +1520,39 @@ function closeLeaderboard() {
 }
 
 /**
- * Countdown to next midnight CET (UTC+1)
+ * Countdown to next reset.
+ * @param {number|null} targetTs  - Unix timestamp (seconds) of next reset.
+ *                                   If null/undefined, falls back to next midnight CET.
  */
-function startLbCountdown() {
+function startLbCountdown(targetTs) {
     if (lbCountdownTimer) clearInterval(lbCountdownTimer);
 
-    function update() {
+    function getTargetMs() {
+        if (targetTs) {
+            return targetTs * 1000; // convert seconds → ms
+        }
+        // fallback: next midnight CET (UTC+1, fixed)
         const now = new Date();
-        // CET offset: UTC+1 (CET) / UTC+2 (CEST). Use fixed UTC+1 per task spec.
         const CET_OFFSET_MS = 1 * 60 * 60 * 1000;
         const nowCET = new Date(now.getTime() + CET_OFFSET_MS - now.getTimezoneOffset() * 60000);
-
         const midnight = new Date(nowCET);
         midnight.setHours(24, 0, 0, 0);
-        const diffMs = midnight - nowCET;
+        return midnight.getTime() + now.getTimezoneOffset() * 60000 - CET_OFFSET_MS;
+    }
 
+    function update() {
+        const diffMs = getTargetMs() - Date.now();
+        const el = document.getElementById('lb-countdown');
+        if (!el) return;
+        if (diffMs <= 0) {
+            el.textContent = '00:00:00';
+            return;
+        }
         const h = Math.floor(diffMs / 3600000);
         const m = Math.floor((diffMs % 3600000) / 60000);
         const s = Math.floor((diffMs % 60000) / 1000);
-
         const pad = n => String(n).padStart(2, '0');
-        const el = document.getElementById('lb-countdown');
-        if (el) el.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+        el.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
     }
 
     update();
