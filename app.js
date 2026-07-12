@@ -763,10 +763,7 @@ async function leaveRoom() {
         // Возвращаемся в лобби
         elements.gameplayScreen.classList.add('hidden');
         elements.ownerWaitingActions.classList.add('hidden');
-        fetchUserProfile();
-        fetchActiveRooms();
-        fetchNotifications();
-        fetchAndUpdateLeague();
+        syncLobbyData();
     } catch (e) {
         showToast("Connection error", "error");
     }
@@ -1370,10 +1367,7 @@ if (elements.btnKeepRoomLobby) {
         }
         elements.gameplayScreen.classList.add('hidden');
         elements.ownerWaitingActions.classList.add('hidden');
-        fetchActiveRooms();
-        fetchUserProfile();
-        fetchNotifications();
-        fetchAndUpdateLeague();
+        syncLobbyData();
     };
 }
 
@@ -1398,10 +1392,7 @@ if (elements.btnConfirmActionCancel) {
 if (elements.btnReturnLobby) {
     elements.btnReturnLobby.onclick = () => {
         elements.gameplayScreen.classList.add('hidden');
-        fetchActiveRooms();
-        fetchUserProfile();
-        fetchNotifications();
-        fetchAndUpdateLeague();
+        syncLobbyData();
     };
 }
 
@@ -1454,10 +1445,8 @@ window.changePage = changePage;
 window.applyFiltersAndRender = applyFiltersAndRender;
 
 // --- ИНИЦИАЛИЗАЦИЯ ПРИ ЗАПУСКЕ ---
-fetchUserProfile();
-fetchActiveRooms();
+syncLobbyData();
 connectLobbySocket();
-fetchNotifications();
 if (elements.btnClaimGift) {
     setTimeout(() => {
         triggerClaimBonusShimmer();
@@ -1477,21 +1466,12 @@ if (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
     }
 }
 
-// Фоновое обновление лобби раз в 10 секунд (баланс, колокольчик уведомлений, комнаты)
+// Фоновое обновление лобби раз в 10 секунд (синхронизация)
 setInterval(async () => {
     if (document.hidden) return; // Пропускаем обновление, если приложение свёрнуто
     // Делаем фоновые запросы только когда игрок находится на экране лобби (экран игры скрыт)
     if (elements.gameplayScreen && elements.gameplayScreen.classList.contains('hidden')) {
-        try {
-            await Promise.all([
-                fetchUserProfile(),
-                fetchActiveRooms(),
-                fetchNotifications(),
-                fetchAndUpdateLeague()
-            ]);
-        } catch (e) {
-            console.error("Background lobby update failed:", e);
-        }
+        await syncLobbyData();
     }
 }, 10000);
 
@@ -1759,8 +1739,88 @@ async function fetchAndUpdateLeague() {
     }
 }
 
-// Initialize leaderboard on app load
-(async () => {
-    await fetchAndUpdateLeague();
-})();
+// Initialize leaderboard on app load is now part of syncLobbyData
+async function syncLobbyData() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/lobby/sync?t=${Date.now()}`, { headers: getHeaders() });
+        if (!res.ok) {
+            // Fallback if sync fails
+            await Promise.all([
+                fetchUserProfile(),
+                fetchActiveRooms(),
+                fetchNotifications(),
+                fetchAndUpdateLeague()
+            ]);
+            return;
+        }
+        const data = await res.json();
+        
+        // 1. Profile
+        if (data.profile) {
+            currentUser = data.profile;
+            if (currentUser.bot_username) {
+                BOT_USERNAME = currentUser.bot_username;
+            }
+            elements.usernameDisplay.textContent = currentUser.username 
+                ? `@${currentUser.username}` 
+                : currentUser.first_name;
+            elements.balanceDisplay.textContent = `${currentUser.balance.toLocaleString()} 🪙`;
+            
+            const matchBalEl = document.getElementById('match-new-balance');
+            if (matchBalEl) {
+                matchBalEl.textContent = `${currentUser.balance.toLocaleString()} 🪙`;
+            }
+            
+            const userAvatarElement = document.getElementById('user-avatar');
+            if (userAvatarElement) {
+                if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.photo_url) {
+                    userAvatarElement.innerHTML = `<img src="${tg.initDataUnsafe.user.photo_url}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                } else {
+                    const name = currentUser.first_name || currentUser.username || "P";
+                    userAvatarElement.textContent = name.charAt(0).toUpperCase();
+                    userAvatarElement.style.fontSize = "20px";
+                    userAvatarElement.style.fontWeight = "800";
+                    userAvatarElement.style.color = "var(--black)";
+                }
+            }
+        }
+        
+        // 2. Rooms
+        if (data.rooms) {
+            activeRooms = data.rooms;
+            renderRooms(activeRooms);
+        }
+        
+        // 3. Notifications
+        if (data.notifications) {
+            const notifData = data.notifications;
+            if (elements.notifBell) {
+                const hasNotifications = notifData.notifications && notifData.notifications.length > 0;
+                if (notifData.unread > 0 && hasNotifications) {
+                    elements.notifBell.classList.remove('hidden');
+                } else {
+                    elements.notifBell.classList.add('hidden');
+                }
+            }
+            renderNotifications(notifData.notifications);
+        }
+        
+        // 4. League
+        if (data.league) {
+            updateLeagueBadge(data.league || 'rookie');
+        }
+    } catch (e) {
+        console.error("Lobby sync failed, falling back", e);
+        try {
+            await Promise.all([
+                fetchUserProfile(),
+                fetchActiveRooms(),
+                fetchNotifications(),
+                fetchAndUpdateLeague()
+            ]);
+        } catch (err) {
+            console.error("Fallback failed", err);
+        }
+    }
+}
 
