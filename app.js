@@ -178,16 +178,26 @@ function renderNotifications(list) {
         return;
     }
     elements.notifList.innerHTML = list.map(n => {
-        let icon, titleClass, titleText, sub;
-        if (n.is_draw) {
-            icon = '🤝'; titleClass = 'draw'; titleText = 'Tie';
-            sub = `Bet returned — ${n.bet.toLocaleString()} 🪙 &nbsp;|&nbsp; 🎲 ${n.my_roll} vs ${n.opp_roll}`;
-        } else if (n.won) {
-            icon = '🏆'; titleClass = 'win'; titleText = 'Victory!';
-            sub = `+${(n.bet * 2).toLocaleString()} 🪙 &nbsp;|&nbsp; 🎲 ${n.my_roll} vs ${n.opp_roll}`;
-        } else {
-            icon = '💀'; titleClass = 'lose'; titleText = 'Defeat';
-            sub = `-${n.bet.toLocaleString()} 🪙 &nbsp;|&nbsp; 🎲 ${n.my_roll} vs ${n.opp_roll}`;
+        let icon = '🔔', titleClass = '', titleText = 'Notification', sub = '';
+        try {
+            if (n.type === 'league_prize') {
+                icon = '🏆'; 
+                titleClass = 'win'; 
+                titleText = `League Prize!`;
+                sub = `Rank #${n.rank} &nbsp;|&nbsp; +${(n.prize || 0).toLocaleString()} 🪙`;
+            } else if (n.is_draw) {
+                icon = '🤝'; titleClass = 'draw'; titleText = 'Tie';
+                sub = `Bet returned — ${(n.bet || 0).toLocaleString()} 🪙 &nbsp;|&nbsp; 🎲 ${n.my_roll || 0} vs ${n.opp_roll || 0}`;
+            } else if (n.won) {
+                icon = '🏆'; titleClass = 'win'; titleText = 'Victory!';
+                sub = `+${((n.bet || 0) * 2).toLocaleString()} 🪙 &nbsp;|&nbsp; 🎲 ${n.my_roll || 0} vs ${n.opp_roll || 0}`;
+            } else {
+                icon = '💀'; titleClass = 'lose'; titleText = 'Defeat';
+                sub = `-${(n.bet || 0).toLocaleString()} 🪙 &nbsp;|&nbsp; 🎲 ${n.my_roll || 0} vs ${n.opp_roll || 0}`;
+            }
+        } catch (err) {
+            console.error("Failed to render notification:", err, n);
+            sub = "Game notification";
         }
         return `
             <div class="notif-item">
