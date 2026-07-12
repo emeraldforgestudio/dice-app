@@ -1426,6 +1426,35 @@ if (elements.btnToggleFilters) {
     };
 }
 
+// Эффект красивого блика (shimmer) для кнопки Daily Bonus
+let claimBonusShimmerInterval = null;
+
+function triggerClaimBonusShimmer() {
+    if (elements.btnClaimGift && currentUser && !currentUser.bonus_cooldown) {
+        elements.btnClaimGift.classList.add('shimmer-glow');
+        setTimeout(() => {
+            if (elements.btnClaimGift) {
+                elements.btnClaimGift.classList.remove('shimmer-glow');
+            }
+        }, 1400);
+    }
+}
+
+function initClaimBonusShimmer() {
+    if (claimBonusShimmerInterval) {
+        clearInterval(claimBonusShimmerInterval);
+    }
+    // Первый раз через 2 секунды после входа в лобби
+    setTimeout(() => {
+        triggerClaimBonusShimmer();
+    }, 2000);
+
+    // Далее проигрываем каждые 8 секунд
+    claimBonusShimmerInterval = setInterval(() => {
+        triggerClaimBonusShimmer();
+    }, 8000);
+}
+
 // Экспортируем функции для inline вызова из HTML
 window.joinRoom = joinRoom;
 window.confirmJoinRoom = confirmJoinRoom;
@@ -1475,34 +1504,7 @@ setInterval(async () => {
     }
 }, 10000);
 
-// Эффект красивого блика (shimmer) для кнопки Daily Bonus
-let claimBonusShimmerInterval = null;
 
-function triggerClaimBonusShimmer() {
-    if (elements.btnClaimGift && currentUser && !currentUser.bonus_cooldown) {
-        elements.btnClaimGift.classList.add('shimmer-glow');
-        setTimeout(() => {
-            if (elements.btnClaimGift) {
-                elements.btnClaimGift.classList.remove('shimmer-glow');
-            }
-        }, 1400);
-    }
-}
-
-function initClaimBonusShimmer() {
-    if (claimBonusShimmerInterval) {
-        clearInterval(claimBonusShimmerInterval);
-    }
-    // Первый раз через 2 секунды после входа в лобби
-    setTimeout(() => {
-        triggerClaimBonusShimmer();
-    }, 2000);
-
-    // Далее проигрываем каждые 8 секунд
-    claimBonusShimmerInterval = setInterval(() => {
-        triggerClaimBonusShimmer();
-    }, 8000);
-}
 
 // Клик по аватарке — открыть/закрыть уведомления
 if (elements.userAvatarWrapper) {
