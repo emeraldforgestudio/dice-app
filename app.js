@@ -1451,7 +1451,8 @@ setInterval(async () => {
             await Promise.all([
                 fetchUserProfile(),
                 fetchActiveRooms(),
-                fetchNotifications()
+                fetchNotifications(),
+                fetchAndUpdateLeague()
             ]);
         } catch (e) {
             console.error("Background lobby update failed:", e);
