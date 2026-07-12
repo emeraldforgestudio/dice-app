@@ -186,15 +186,15 @@ function renderNotifications(list) {
                 titleText = `League Prize!`;
                 sub = `Rank #${n.rank} &nbsp;|&nbsp; +${(n.prize || 0).toLocaleString()} 🪙`;
             } else if (n.type === 'room_created') {
-                icon = '➕'; 
-                titleClass = 'draw'; 
+                icon = `<i class="fa-solid fa-plus" style="color: var(--emerald); font-size: 15px;"></i>`; 
+                titleClass = 'green'; 
                 titleText = `Room Created`;
                 sub = `Room ID: <code>${n.room_id}</code> &nbsp;|&nbsp; Bet: ${(n.bet || 0).toLocaleString()} 🪙`;
             } else if (n.type === 'room_deleted') {
-                icon = '❌'; 
-                titleClass = 'lose'; 
+                icon = `<i class="fa-solid fa-xmark" style="color: var(--danger-red); font-size: 15px;"></i>`; 
+                titleClass = 'orange'; 
                 titleText = `Room Cancelled`;
-                sub = `Room ID: <code>${n.room_id}</code> &nbsp;|&nbsp; Refunded: ${(n.bet || 0).toLocaleString()} 🪙`;
+                sub = `Room ID: <code>${n.room_id}</code> &nbsp;|&nbsp; ${(n.bet || 0).toLocaleString()} 🪙`;
             } else if (n.is_draw) {
                 icon = '🤝'; titleClass = 'draw'; titleText = 'Tie';
                 sub = `Bet returned — ${(n.bet || 0).toLocaleString()} 🪙 &nbsp;|&nbsp; 🎲 ${n.my_roll || 0} vs ${n.opp_roll || 0}`;

@@ -1701,6 +1701,8 @@ input:checked + .slider:before {
 .notif-title.win  { color: var(--green); }
 .notif-title.lose { color: var(--danger-red); }
 .notif-title.draw { color: #f9ca24; }
+.notif-title.green { color: var(--emerald); }
+.notif-title.orange { color: #ff9f43; }
 
 .notif-sub {
     color: var(--text-muted);
