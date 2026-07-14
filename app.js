@@ -1853,7 +1853,7 @@ const TUTORIAL_STEPS = [
         icon: '🏠',
         title: 'Active Matches Lobby',
         desc: 'This is the live lobby. It shows all open game rooms waiting for an opponent. The list updates in real time via WebSocket — you\'ll always see the freshest rooms.',
-        targetId: '.lobby-panel',
+        targetId: '.lobby-header',
         position: 'bottom'
     },
     {
