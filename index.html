@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="style.css?v=127">
+    <link rel="stylesheet" href="style.css?v=133">
 </head>
 <body>
     <div id="app-container">
@@ -66,7 +66,10 @@
         <!-- ACTIVE LOBBY SECTION -->
         <main class="glass-panel lobby-panel">
             <div class="lobby-header">
-                <h3><i class="fa-solid fa-gamepad text-green"></i> Active Matches</h3>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <h3><i class="fa-solid fa-gamepad text-green"></i> Active Matches</h3>
+                    <button id="btn-tutorial-help" class="btn-help-indicator" title="Show Tutorial" style="background: none; border: none; color: var(--neon-green); font-size: 14.5px; font-weight: 700; cursor: pointer; padding: 0 4px; font-family: inherit; transition: opacity 0.2s;">[?]</button>
+                </div>
                 <span class="online-indicator"><span class="dot pulse"></span> Live Lobby</span>
             </div>
             
@@ -128,7 +131,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #124 (a61c270)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #125 (9a00dcd)</p>
         </footer>
     </div>
 
@@ -406,16 +409,15 @@
             <div class="welcome-card glass-panel">
                 <div class="welcome-trophy">🏆</div>
                 <h2 class="welcome-title">Welcome to Verde Dice!</h2>
-                <p class="welcome-text" style="margin-bottom: 8px;">
-                    Play 1v1 dice battles with friends or strangers.
-                </p>
+
                 <div class="welcome-feature-box" style="margin: 4px 0 12px 0; background: rgba(0, 255, 135, 0.06); border: 1px dashed rgba(0, 255, 135, 0.2); border-radius: 12px; padding: 10px; text-align: center; width: 100%;">
-                    <span style="font-size: 13px; color: var(--neon-green); font-weight: 700; display: block; margin-bottom: 2px;">⚡ Native Dice Roll Feature</span>
-                    <span style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">Rolls are sent dynamically inside the Telegram chat by the bot, guaranteeing provably fair and tamper-proof outcomes.</span>
+                    <span style="font-size: 13px; color: var(--neon-green); font-weight: 700; display: block; margin-bottom: 2px;">⚡ Play 1v1 with friends or strangers. </span>
+                    <span style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">Rolls are generated dynamically inside the Telegram chat by the bot, guaranteeing fair and tamper-proof outcomes.</span>
                 </div>
                 <p class="welcome-text">
-                    A welcome bonus of <span class="welcome-highlight">1,000 🪙</span> has been credited to your balance!
+                    A starter bonus of <span class="welcome-highlight">15,000 🪙</span> has already been credited to your balance, enjoy!
                 </p>
+                <br>
                 <p class="welcome-subtext">Want a quick tour before you start?</p>
                 <button id="btn-start-tutorial" class="btn btn-primary btn-block welcome-btn-tutorial">
                     <i class="fa-solid fa-graduation-cap"></i> Start Quick Tutorial
@@ -447,6 +449,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=127"></script>
+    <script src="app.js?v=133"></script>
 </body>
 </html>

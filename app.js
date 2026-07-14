@@ -2013,6 +2013,7 @@ function showWelcomeModal() {
         if (stopConfetti) stopConfetti();
         closeWelcomeModal();
         markWelcomeSeen();
+        showHelpIndicatorHint();
     };
 
     if (btnStart) {
@@ -2044,6 +2045,43 @@ function closeWelcomeModal() {
         modal.style.animation = 'welcomeFadeIn 0.3s ease reverse forwards';
         setTimeout(() => { modal.classList.add('hidden'); modal.style.animation = ''; }, 300);
     }
+}
+
+// Hint popup that targets the [?] button after skipping tutorial
+function showHelpIndicatorHint() {
+    const overlay = document.getElementById('tutorial-overlay');
+    const tooltip = document.getElementById('tutorial-tooltip');
+    const helpBtn = document.getElementById('btn-tutorial-help');
+    if (!overlay || !tooltip || !helpBtn) return;
+
+    // Reset overlay elements
+    const badgeEl    = document.getElementById('tutorial-step-badge');
+    const iconEl     = document.getElementById('tutorial-icon');
+    const titleEl    = document.getElementById('tutorial-title');
+    const descEl     = document.getElementById('tutorial-desc');
+    const nextBtnEl  = document.getElementById('tutorial-btn-next');
+    const exitBtnEl  = document.getElementById('tutorial-btn-exit');
+
+    overlay.classList.remove('hidden');
+
+    if (!spotlightEl) {
+        spotlightEl = document.createElement('div');
+        spotlightEl.className = 'tutorial-spotlight';
+        overlay.appendChild(spotlightEl);
+    }
+
+    if (badgeEl) badgeEl.textContent = 'TIP';
+    if (iconEl) iconEl.textContent = '👍';
+    if (titleEl) titleEl.textContent = 'Tutorial is saved!';
+    if (descEl) descEl.textContent = 'You can always take the quick tour later by clicking this button.';
+
+    if (exitBtnEl) exitBtnEl.style.display = 'none';
+    if (nextBtnEl) {
+        nextBtnEl.innerHTML = 'Got it! <i class="fa-solid fa-check"></i>';
+        nextBtnEl.onclick = closeTutorial;
+    }
+
+    updateSpotlightAndTooltip(helpBtn, 'bottom', tooltip, overlay);
 }
 
 // ---- Tutorial Logic ----
@@ -2118,6 +2156,11 @@ function showTutorialStep(stepIdx) {
         };
     }
     if (exitBtnEl) {
+        if (isLast) {
+            exitBtnEl.style.display = 'none';
+        } else {
+            exitBtnEl.style.display = '';
+        }
         exitBtnEl.onclick = closeTutorial;
     }
 
@@ -2219,5 +2262,14 @@ function closeTutorial() {
     setTimeout(() => {
         showWelcomeModal();
     }, 800);
+
+    // Bind the help button click to manually start the tutorial
+    const helpBtn = document.getElementById('btn-tutorial-help');
+    if (helpBtn) {
+        helpBtn.onclick = (e) => {
+            e.stopPropagation();
+            startTutorial();
+        };
+    }
 })();
 
