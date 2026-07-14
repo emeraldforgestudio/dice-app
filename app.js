@@ -1921,7 +1921,7 @@ function startConfetti(canvas) {
             rotation: Math.random() * 360,
             rotSpeed: (Math.random() - 0.5) * 8,
             shape: isDice ? 'dice' : (Math.random() > 0.5 ? 'rect' : 'circle'),
-            diceChar: isDice ? ['🎲', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'][Math.floor(Math.random() * 7)] : '',
+            diceChar: isDice ? '🎲' : '',
             alpha: 1
         });
     }

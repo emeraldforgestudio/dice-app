@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="style.css?v=116">
+    <link rel="stylesheet" href="style.css?v=117">
 </head>
 <body>
     <div id="app-container">
@@ -128,7 +128,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #113 (bfc3d01)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #114 (8ab358f)</p>
         </footer>
     </div>
 
@@ -399,22 +399,22 @@
     <!-- CUSTOM TOASTS -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- WELCOME MODAL -->
     <div id="welcome-modal" class="welcome-modal-backdrop hidden">
         <!-- Confetti canvas -->
         <canvas id="confetti-canvas" class="confetti-canvas"></canvas>
-        <div class="welcome-card glass-panel">
-            <div class="welcome-trophy">🏆</div>
-            <h2 class="welcome-title">Welcome to Dice Arena!</h2>
-            <p class="welcome-text">
-                Play dice against friends for <strong>virtual coins</strong> — completely fair and transparent.
-                Your <span class="welcome-highlight">welcome bonus of 1,000 🪙</span> has already been credited to your account.
-                Every roll is powered by <strong>Telegram's native dice</strong>, ensuring provably fair results no one can manipulate.
-            </p>
-            <p class="welcome-subtext">Want a quick tour before you start?</p>
-            <button id="btn-start-tutorial" class="btn btn-primary btn-block welcome-btn-tutorial">
-                <i class="fa-solid fa-graduation-cap"></i> Start Quick Tutorial
-            </button>
+        <div class="welcome-card-wrapper">
+            <div class="welcome-card glass-panel">
+                <div class="welcome-trophy">🏆</div>
+                <h2 class="welcome-title">Welcome to Dice Arena!</h2>
+                <p class="welcome-text">
+                    A welcome bonus of <span class="welcome-highlight">1,000 🪙</span> has been credited to your balance!
+                    Play 1v1 dice battles with friends using Telegram's native dice for 100% fair play.
+                </p>
+                <p class="welcome-subtext">Want a quick tour before you start?</p>
+                <button id="btn-start-tutorial" class="btn btn-primary btn-block welcome-btn-tutorial">
+                    <i class="fa-solid fa-graduation-cap"></i> Start Quick Tutorial
+                </button>
+            </div>
             <button id="btn-skip-tutorial" class="welcome-btn-skip">
                 ... or jump straight to the game 👉
             </button>
@@ -441,6 +441,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=116"></script>
+    <script src="app.js?v=117"></script>
 </body>
 </html>

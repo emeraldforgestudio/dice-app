@@ -2268,10 +2268,19 @@ input:checked + .slider:before {
     z-index: 0;
 }
 
+.welcome-card-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 360px;
+    animation: welcomeCardPop 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.1s both;
+}
+
 .welcome-card {
     position: relative;
     z-index: 1;
-    max-width: 360px;
     width: 90%;
     border-radius: 24px;
     padding: 36px 28px 28px;
@@ -2283,7 +2292,6 @@ input:checked + .slider:before {
     box-shadow:
         0 0 60px rgba(0, 255, 135, 0.12),
         0 20px 60px rgba(0,0,0,0.6);
-    animation: welcomeCardPop 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.1s both;
 }
 
 @keyframes welcomeCardPop {
@@ -2355,9 +2363,10 @@ input:checked + .slider:before {
     background: none;
     border: none;
     color: rgba(255,255,255,0.45);
-    font-size: 12.5px;
+    font-size: 14.5px; /* Bigger font size */
+    font-weight: 600;
     cursor: pointer;
-    padding: 4px 8px;
+    padding: 6px 12px;
     transition: color 0.2s ease;
     font-family: 'Outfit', sans-serif;
     animation: skipBtnPulse 2.5s ease-in-out infinite;
