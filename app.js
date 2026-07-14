@@ -2007,21 +2007,35 @@ function showWelcomeModal() {
     // Buttons
     const btnStart = document.getElementById('btn-start-tutorial');
     const btnSkip  = document.getElementById('btn-skip-tutorial');
+    const welcomeCard = modal.querySelector('.welcome-card');
+
+    const handleSkip = () => {
+        if (stopConfetti) stopConfetti();
+        closeWelcomeModal();
+        markWelcomeSeen();
+    };
 
     if (btnStart) {
-        btnStart.onclick = () => {
+        btnStart.onclick = (e) => {
+            e.stopPropagation(); // prevent backdrop click from triggering skip
             if (stopConfetti) stopConfetti();
             closeWelcomeModal();
             startTutorial();
         };
     }
     if (btnSkip) {
-        btnSkip.onclick = () => {
-            if (stopConfetti) stopConfetti();
-            closeWelcomeModal();
-            markWelcomeSeen();
+        btnSkip.onclick = (e) => {
+            e.stopPropagation(); // prevent duplicate calls
+            handleSkip();
         };
     }
+
+    // Dismiss welcome modal when clicking anywhere outside the card
+    modal.onclick = (e) => {
+        if (welcomeCard && !welcomeCard.contains(e.target)) {
+            handleSkip();
+        }
+    };
 }
 
 function closeWelcomeModal() {
