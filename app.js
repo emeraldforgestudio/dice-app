@@ -1824,3 +1824,365 @@ async function syncLobbyData() {
     }
 }
 
+// =============================================
+// WELCOME SCREEN + TUTORIAL MODULE
+// =============================================
+
+const WELCOME_SEEN_KEY = 'dice_arena_welcome_seen';
+
+// ---- Tutorial Steps Definition ----
+// Each step: { icon, title, desc, targetId, position }
+// targetId: CSS selector to highlight (null = no highlight)
+// position: 'top' | 'bottom' | 'center' (where to place tooltip relative to target)
+const TUTORIAL_STEPS = [
+    {
+        icon: '🎲',
+        title: 'How the Game Works',
+        desc: 'Dice Arena is a 1v1 PvP betting game. Two players each roll a Telegram dice — the player with the **lowest** roll wins the entire pot. Ties refund both bets.',
+        targetId: null,
+        position: 'center'
+    },
+    {
+        icon: '🔒',
+        title: 'Provably Fair Rolls',
+        desc: 'Every roll uses **Telegram\'s native animated dice** — sent via the bot in a private chat. Telegram\'s servers generate the result, making it impossible for anyone (including us) to cheat.',
+        targetId: null,
+        position: 'center'
+    },
+    {
+        icon: '🏠',
+        title: 'Active Matches Lobby',
+        desc: 'This is the live lobby. It shows all open game rooms waiting for an opponent. The list updates in real time via WebSocket — you\'ll always see the freshest rooms.',
+        targetId: '.lobby-panel',
+        position: 'bottom'
+    },
+    {
+        icon: '🔍',
+        title: 'Filters & Sorting',
+        desc: 'Use **Filters** to find rooms by bet size, owner, or toggle between All / Mine / Others\' rooms. Sort by bet amount or creation time to find your perfect match quickly.',
+        targetId: '.lobby-filter-bar',
+        position: 'bottom'
+    },
+    {
+        icon: '⚡',
+        title: 'Join a Room',
+        desc: 'Tap a room card to **join** and accept the bet. A confirmation screen will show the owner\'s name and the exact bet amount before you commit your coins.',
+        targetId: '.rooms-list-container',
+        position: 'bottom'
+    },
+    {
+        icon: '➕',
+        title: 'Create Your Own Bet',
+        desc: 'Tap **New Bet** to open a room with your chosen wager. You can set it as public (anyone can join) or private (invite link only). Share the link with a friend to duel!',
+        targetId: '#btn-create-room',
+        position: 'bottom'
+    },
+    {
+        icon: '🎁',
+        title: 'Daily Bonus',
+        desc: 'Claim your **free 1,000 coins** every 6 hours by tapping "Claim Bonus". Watch the short sponsor offer, and the coins drop straight into your balance.',
+        targetId: '#btn-claim-gift',
+        position: 'bottom'
+    },
+    {
+        icon: '👑',
+        title: 'League Badge & Leaderboard',
+        desc: 'Your **league badge** (Rookie → Bronze → Silver → Gold) tracks your daily standing. Tap it to open the **Leaderboard** — top 3 winners earn prize bonuses every day at midnight!',
+        targetId: '#league-badge',
+        position: 'bottom'
+    }
+];
+
+let tutorialStep = 0;
+let spotlightEl = null;
+
+// ---- Confetti Engine ----
+function startConfetti(canvas) {
+    const ctx = canvas.getContext('2d');
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const COLORS = ['#00ff87', '#05c46b', '#ffd700', '#ffffff', '#ff6b6b', '#60dfff', '#ff9f43'];
+    const pieces = [];
+    const TOTAL  = 120;
+
+    for (let i = 0; i < TOTAL; i++) {
+        const fromLeft = i < TOTAL / 2;
+        pieces.push({
+            x: fromLeft ? -10 : canvas.width + 10,
+            y: Math.random() * canvas.height * 0.6,
+            vx: fromLeft ? (3 + Math.random() * 5) : -(3 + Math.random() * 5),
+            vy: -4 - Math.random() * 5,
+            gravity: 0.18 + Math.random() * 0.12,
+            size: 6 + Math.random() * 8,
+            color: COLORS[Math.floor(Math.random() * COLORS.length)],
+            rotation: Math.random() * 360,
+            rotSpeed: (Math.random() - 0.5) * 8,
+            shape: Math.random() > 0.5 ? 'rect' : 'circle',
+            alpha: 1
+        });
+    }
+
+    let animId;
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = false;
+        for (const p of pieces) {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += p.gravity;
+            p.vx *= 0.99;
+            p.rotation += p.rotSpeed;
+            if (p.y > canvas.height) { p.alpha -= 0.04; }
+            if (p.alpha <= 0) continue;
+            alive = true;
+            ctx.save();
+            ctx.globalAlpha = p.alpha;
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation * Math.PI / 180);
+            ctx.fillStyle = p.color;
+            if (p.shape === 'rect') {
+                ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+            } else {
+                ctx.beginPath();
+                ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+        if (alive) {
+            animId = requestAnimationFrame(draw);
+        }
+    }
+    draw();
+    return () => cancelAnimationFrame(animId);
+}
+
+// ---- Welcome Modal Logic ----
+function shouldShowWelcome() {
+    try {
+        return !localStorage.getItem(WELCOME_SEEN_KEY);
+    } catch(e) {
+        return false;
+    }
+}
+
+function markWelcomeSeen() {
+    try { localStorage.setItem(WELCOME_SEEN_KEY, '1'); } catch(e) {}
+}
+
+function showWelcomeModal() {
+    const modal  = document.getElementById('welcome-modal');
+    const canvas = document.getElementById('confetti-canvas');
+    if (!modal) return;
+
+    modal.classList.remove('hidden');
+
+    // Haptic
+    if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+
+    // Launch confetti
+    let stopConfetti;
+    if (canvas) {
+        stopConfetti = startConfetti(canvas);
+        // Stop after 5 seconds
+        setTimeout(() => { if (stopConfetti) stopConfetti(); }, 5000);
+    }
+
+    // Buttons
+    const btnStart = document.getElementById('btn-start-tutorial');
+    const btnSkip  = document.getElementById('btn-skip-tutorial');
+
+    if (btnStart) {
+        btnStart.onclick = () => {
+            if (stopConfetti) stopConfetti();
+            closeWelcomeModal();
+            startTutorial();
+        };
+    }
+    if (btnSkip) {
+        btnSkip.onclick = () => {
+            if (stopConfetti) stopConfetti();
+            closeWelcomeModal();
+            markWelcomeSeen();
+        };
+    }
+}
+
+function closeWelcomeModal() {
+    const modal = document.getElementById('welcome-modal');
+    if (modal) {
+        modal.style.animation = 'welcomeFadeIn 0.3s ease reverse forwards';
+        setTimeout(() => { modal.classList.add('hidden'); modal.style.animation = ''; }, 300);
+    }
+}
+
+// ---- Tutorial Logic ----
+function startTutorial() {
+    markWelcomeSeen();
+    tutorialStep = 0;
+    const overlay = document.getElementById('tutorial-overlay');
+    if (!overlay) return;
+    overlay.classList.remove('hidden');
+
+    // Create spotlight element
+    if (!spotlightEl) {
+        spotlightEl = document.createElement('div');
+        spotlightEl.className = 'tutorial-spotlight';
+        overlay.appendChild(spotlightEl);
+    }
+
+    showTutorialStep(tutorialStep);
+}
+
+function showTutorialStep(stepIdx) {
+    const steps   = TUTORIAL_STEPS;
+    const overlay = document.getElementById('tutorial-overlay');
+    const tooltip = document.getElementById('tutorial-tooltip');
+
+    if (!overlay || !tooltip || stepIdx >= steps.length) {
+        closeTutorial();
+        return;
+    }
+
+    const step = steps[stepIdx];
+
+    // Update tooltip content
+    const badgeEl    = document.getElementById('tutorial-step-badge');
+    const iconEl     = document.getElementById('tutorial-icon');
+    const titleEl    = document.getElementById('tutorial-title');
+    const descEl     = document.getElementById('tutorial-desc');
+    const nextBtnEl  = document.getElementById('tutorial-btn-next');
+    const exitBtnEl  = document.getElementById('tutorial-btn-exit');
+
+    if (badgeEl)   badgeEl.textContent  = `Step ${stepIdx + 1} / ${steps.length}`;
+    if (iconEl)    iconEl.textContent   = step.icon;
+    if (titleEl)   titleEl.textContent  = step.title;
+    if (descEl)    descEl.innerHTML     = step.desc.replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--white)">$1</strong>');
+
+    // Progress bar
+    let progressBar = tooltip.querySelector('.tutorial-progress-bar');
+    if (!progressBar) {
+        progressBar = document.createElement('div');
+        progressBar.className = 'tutorial-progress-bar';
+        progressBar.innerHTML = '<div class="tutorial-progress-fill"></div>';
+        tooltip.appendChild(progressBar);
+    }
+    const fill = progressBar.querySelector('.tutorial-progress-fill');
+    if (fill) fill.style.width = `${((stepIdx + 1) / steps.length) * 100}%`;
+
+    // Button labels
+    const isLast = stepIdx === steps.length - 1;
+    if (nextBtnEl) {
+        if (isLast) {
+            nextBtnEl.innerHTML = '🎮 Start Playing! <i class="fa-solid fa-play"></i>';
+        } else {
+            nextBtnEl.innerHTML = 'Next <i class="fa-solid fa-arrow-right"></i>';
+        }
+        nextBtnEl.onclick = () => {
+            if (isLast) {
+                closeTutorial();
+            } else {
+                tutorialStep++;
+                showTutorialStep(tutorialStep);
+            }
+        };
+    }
+    if (exitBtnEl) {
+        exitBtnEl.onclick = closeTutorial;
+    }
+
+    // Spotlight target
+    const targetSel = step.targetId;
+    let targetEl = targetSel ? document.querySelector(targetSel) : null;
+
+    // Position spotlight and tooltip
+    updateSpotlightAndTooltip(targetEl, step.position, tooltip, overlay);
+}
+
+function updateSpotlightAndTooltip(targetEl, position, tooltip, overlay) {
+    const PADDING = 8;
+
+    if (targetEl && spotlightEl) {
+        const rect = targetEl.getBoundingClientRect();
+        spotlightEl.style.display = 'block';
+        spotlightEl.style.top    = `${rect.top    - PADDING}px`;
+        spotlightEl.style.left   = `${rect.left   - PADDING}px`;
+        spotlightEl.style.width  = `${rect.width  + PADDING * 2}px`;
+        spotlightEl.style.height = `${rect.height + PADDING * 2}px`;
+
+        // Dark backdrop with rectangular hole
+        const backdrop = overlay.querySelector('.tutorial-backdrop');
+        if (backdrop) {
+            const t = rect.top    - PADDING;
+            const l = rect.left   - PADDING;
+            const b = rect.bottom + PADDING;
+            const r = rect.right  + PADDING;
+            const W = window.innerWidth;
+            const H = window.innerHeight;
+            backdrop.style.clipPath =
+                `polygon(0 0, ${W}px 0, ${W}px ${H}px, 0 ${H}px, 0 0, ` +
+                `${l}px ${t}px, ${l}px ${b}px, ${r}px ${b}px, ${r}px ${t}px, ${l}px ${t}px)`;
+        }
+
+        // Position tooltip below or above target
+        const tRect = { width: 330, height: 200 };
+        const spaceBelow = window.innerHeight - rect.bottom - PADDING - 16;
+        const spaceAbove = rect.top - PADDING - 16;
+
+        let tooltipTop, tooltipLeft;
+
+        if (position === 'bottom' || spaceBelow >= tRect.height || spaceBelow > spaceAbove) {
+            tooltipTop  = rect.bottom + PADDING + 16;
+        } else {
+            tooltipTop  = rect.top - PADDING - 16 - tRect.height;
+        }
+
+        tooltipLeft = Math.max(12, Math.min(rect.left, window.innerWidth - tRect.width - 12));
+        tooltipTop  = Math.max(12, Math.min(tooltipTop, window.innerHeight - tRect.height - 12));
+
+        tooltip.style.top       = `${tooltipTop}px`;
+        tooltip.style.left      = `${tooltipLeft}px`;
+        tooltip.style.transform = 'none';
+
+        // Scroll element into view smoothly
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    } else {
+        // No target — center tooltip, hide spotlight
+        if (spotlightEl) spotlightEl.style.display = 'none';
+
+        const backdrop = overlay.querySelector('.tutorial-backdrop');
+        if (backdrop) backdrop.style.clipPath = 'none';
+
+        tooltip.style.top       = '50%';
+        tooltip.style.left      = '50%';
+        tooltip.style.transform = 'translate(-50%, -50%)';
+    }
+
+    // Animate tooltip re-entry
+    tooltip.style.animation = 'none';
+    // Trigger reflow
+    void tooltip.offsetWidth;
+    tooltip.style.animation = 'tooltipFadeIn 0.35s ease both';
+}
+
+function closeTutorial() {
+    const overlay = document.getElementById('tutorial-overlay');
+    if (overlay) overlay.classList.add('hidden');
+    if (spotlightEl) spotlightEl.style.display = 'none';
+
+    // Haptic
+    if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+}
+
+// ---- Auto-show on startup (after profile loads) ----
+(function initWelcome() {
+    if (!shouldShowWelcome()) return;
+
+    // Wait a bit for the app to initialize, then show
+    setTimeout(() => {
+        showWelcomeModal();
+    }, 800);
+})();
+
