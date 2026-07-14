@@ -1868,7 +1868,7 @@ const TUTORIAL_STEPS = [
         title: 'Join a Room',
         desc: 'Tap a room card to **join** and accept the bet. A confirmation screen will show the owner\'s name and the exact bet amount before you commit your coins.',
         targetId: '.rooms-list-container',
-        position: 'bottom'
+        position: 'top'
     },
     {
         icon: '➕',
