@@ -1908,17 +1908,20 @@ function startConfetti(canvas) {
 
     for (let i = 0; i < TOTAL; i++) {
         const fromLeft = i < TOTAL / 2;
+        // 15% chance to generate a dice emoji instead of standard shape
+        const isDice = Math.random() < 0.15; 
         pieces.push({
             x: fromLeft ? -10 : canvas.width + 10,
             y: Math.random() * canvas.height * 0.6,
             vx: fromLeft ? (3 + Math.random() * 5) : -(3 + Math.random() * 5),
             vy: -4 - Math.random() * 5,
             gravity: 0.18 + Math.random() * 0.12,
-            size: 6 + Math.random() * 8,
+            size: isDice ? (16 + Math.random() * 10) : (6 + Math.random() * 8),
             color: COLORS[Math.floor(Math.random() * COLORS.length)],
             rotation: Math.random() * 360,
             rotSpeed: (Math.random() - 0.5) * 8,
-            shape: Math.random() > 0.5 ? 'rect' : 'circle',
+            shape: isDice ? 'dice' : (Math.random() > 0.5 ? 'rect' : 'circle'),
+            diceChar: isDice ? ['🎲', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'][Math.floor(Math.random() * 7)] : '',
             alpha: 1
         });
     }
@@ -1940,13 +1943,25 @@ function startConfetti(canvas) {
             ctx.globalAlpha = p.alpha;
             ctx.translate(p.x, p.y);
             ctx.rotate(p.rotation * Math.PI / 180);
-            ctx.fillStyle = p.color;
-            if (p.shape === 'rect') {
-                ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+            
+            if (p.shape === 'dice') {
+                ctx.font = `${p.size}px Outfit, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                // Add a small glowing shadow to the dice characters
+                ctx.shadowColor = 'rgba(0, 255, 135, 0.4)';
+                ctx.shadowBlur = 6;
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(p.diceChar, 0, 0);
             } else {
-                ctx.beginPath();
-                ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.fillStyle = p.color;
+                if (p.shape === 'rect') {
+                    ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
             ctx.restore();
         }
@@ -2178,9 +2193,7 @@ function closeTutorial() {
 
 // ---- Auto-show on startup (after profile loads) ----
 (function initWelcome() {
-    if (!shouldShowWelcome()) return;
-
-    // Wait a bit for the app to initialize, then show
+    // Show on every reload (ignoring localStorage)
     setTimeout(() => {
         showWelcomeModal();
     }, 800);
