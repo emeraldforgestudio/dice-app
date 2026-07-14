@@ -2158,20 +2158,23 @@ function updateSpotlightAndTooltip(targetEl, position, tooltip, overlay) {
         }
 
         // Position tooltip below or above target
-        const tRect = { width: 330, height: 200 };
-        const spaceBelow = window.innerHeight - rect.bottom - PADDING - 16;
-        const spaceAbove = rect.top - PADDING - 16;
-
-        let tooltipTop, tooltipLeft;
-
-        if (position === 'bottom' || spaceBelow >= tRect.height || spaceBelow > spaceAbove) {
-            tooltipTop  = rect.bottom + PADDING + 16;
+        const tWidth = Math.min(330, window.innerWidth - 24);
+        
+        let tooltipTop;
+        // If explicitly requested 'top', try to place above if space permits
+        if (position === 'top' && spaceAbove >= 130) {
+            tooltipTop = rect.top - PADDING - 12 - tooltip.offsetHeight;
+        } else if (position === 'bottom' || spaceBelow >= 150 || spaceBelow > spaceAbove) {
+            tooltipTop = rect.bottom + PADDING + 12;
         } else {
-            tooltipTop  = rect.top - PADDING - 16 - tRect.height;
+            tooltipTop = rect.top - PADDING - 12 - tooltip.offsetHeight;
         }
 
-        tooltipLeft = Math.max(12, Math.min(rect.left, window.innerWidth - tRect.width - 12));
-        tooltipTop  = Math.max(12, Math.min(tooltipTop, window.innerHeight - tRect.height - 12));
+        // Center tooltip horizontally relative to the target element's bounds
+        let tooltipLeft = rect.left + (rect.width - tWidth) / 2;
+        // Keep inside screen bounds
+        tooltipLeft = Math.max(12, Math.min(tooltipLeft, window.innerWidth - tWidth - 12));
+        tooltipTop  = Math.max(12, Math.min(tooltipTop, window.innerHeight - tooltip.offsetHeight - 12));
 
         tooltip.style.top       = `${tooltipTop}px`;
         tooltip.style.left      = `${tooltipLeft}px`;
