@@ -1899,27 +1899,32 @@ let spotlightEl = null;
 // ---- Confetti Engine ----
 function startConfetti(canvas) {
     const ctx = canvas.getContext('2d');
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
+    
+    // Support retina displays and set physical pixels correctly
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width  = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
 
     const COLORS = ['#00ff87', '#05c46b', '#ffd700', '#ffffff', '#ff6b6b', '#60dfff', '#ff9f43'];
     const pieces = [];
-    const TOTAL  = 120;
+    // Reduced particle count from 120 to 60 for better performance on mobile devices
+    const TOTAL  = 60;
 
     for (let i = 0; i < TOTAL; i++) {
         const fromLeft = i < TOTAL / 2;
-        // 15% chance to generate a dice emoji instead of standard shape
         const isDice = Math.random() < 0.15; 
         pieces.push({
-            x: fromLeft ? -10 : canvas.width + 10,
-            y: Math.random() * canvas.height * 0.6,
-            vx: fromLeft ? (3 + Math.random() * 5) : -(3 + Math.random() * 5),
-            vy: -4 - Math.random() * 5,
-            gravity: 0.18 + Math.random() * 0.12,
-            size: isDice ? (16 + Math.random() * 10) : (6 + Math.random() * 8),
+            x: fromLeft ? -10 : rect.width + 10,
+            y: Math.random() * rect.height * 0.5,
+            vx: fromLeft ? (2 + Math.random() * 4) : -(2 + Math.random() * 4),
+            vy: -3 - Math.random() * 4,
+            gravity: 0.15 + Math.random() * 0.1,
+            size: isDice ? (14 + Math.random() * 6) : (5 + Math.random() * 6),
             color: COLORS[Math.floor(Math.random() * COLORS.length)],
             rotation: Math.random() * 360,
-            rotSpeed: (Math.random() - 0.5) * 8,
+            rotSpeed: (Math.random() - 0.5) * 6,
             shape: isDice ? 'dice' : (Math.random() > 0.5 ? 'rect' : 'circle'),
             diceChar: isDice ? '🎲' : '',
             alpha: 1
@@ -1928,15 +1933,15 @@ function startConfetti(canvas) {
 
     let animId;
     function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, rect.width, rect.height);
         let alive = false;
         for (const p of pieces) {
             p.x += p.vx;
             p.y += p.vy;
             p.vy += p.gravity;
-            p.vx *= 0.99;
+            p.vx *= 0.98;
             p.rotation += p.rotSpeed;
-            if (p.y > canvas.height) { p.alpha -= 0.04; }
+            if (p.y > rect.height) { p.alpha -= 0.05; }
             if (p.alpha <= 0) continue;
             alive = true;
             ctx.save();
@@ -1948,9 +1953,7 @@ function startConfetti(canvas) {
                 ctx.font = `${p.size}px Outfit, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                // Add a small glowing shadow to the dice characters
-                ctx.shadowColor = 'rgba(0, 255, 135, 0.4)';
-                ctx.shadowBlur = 6;
+                // Removed shadowBlur to prevent GPU lag / micro-stutters on mobile WebView
                 ctx.fillStyle = '#ffffff';
                 ctx.fillText(p.diceChar, 0, 0);
             } else {
