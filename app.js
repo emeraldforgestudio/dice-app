@@ -1853,7 +1853,7 @@ const TUTORIAL_STEPS = [
         icon: '🏠',
         title: 'Active Matches Lobby',
         desc: 'This is the live lobby. It shows all open game rooms waiting for an opponent. The list updates in real time via WebSocket — you\'ll always see the freshest rooms.',
-        targetId: '.lobby-header',
+        targetId: '.lobby-panel',
         position: 'bottom'
     },
     {
@@ -1867,7 +1867,7 @@ const TUTORIAL_STEPS = [
         icon: '⚡',
         title: 'Join a Room',
         desc: 'Tap a room card to **join** and accept the bet. A confirmation screen will show the owner\'s name and the exact bet amount before you commit your coins.',
-        targetId: '.rooms-list-container',
+        targetId: '.btn-join',
         position: 'top'
     },
     {
