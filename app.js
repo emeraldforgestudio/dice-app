@@ -1868,7 +1868,7 @@ const TUTORIAL_STEPS = [
         title: 'Join a Room',
         desc: 'Tap a room card to **join** and accept the bet. A confirmation screen will show the owner\'s name and the exact bet amount before you commit your coins.',
         targetId: '.btn-join',
-        position: 'top'
+        position: 'bottom'
     },
     {
         icon: '➕',
@@ -2223,15 +2223,18 @@ function updateSpotlightAndTooltip(targetEl, position, tooltip, overlay) {
 
         // Position tooltip below or above target
         const tWidth = Math.min(330, window.innerWidth - 24);
+        const tHeight = tooltip.offsetHeight || 160; // Fallback height if not rendered yet
+        const spaceBelow = window.innerHeight - rect.bottom - PADDING - 16;
+        const spaceAbove = rect.top - PADDING - 16;
         
         let tooltipTop;
         // If explicitly requested 'top', try to place above if space permits
-        if (position === 'top' && spaceAbove >= 130) {
-            tooltipTop = rect.top - PADDING - 12 - tooltip.offsetHeight;
-        } else if (position === 'bottom' || spaceBelow >= 150 || spaceBelow > spaceAbove) {
+        if (position === 'top' && spaceAbove >= tHeight) {
+            tooltipTop = rect.top - PADDING - 12 - tHeight;
+        } else if (position === 'bottom' || spaceBelow >= tHeight || spaceBelow > spaceAbove) {
             tooltipTop = rect.bottom + PADDING + 12;
         } else {
-            tooltipTop = rect.top - PADDING - 12 - tooltip.offsetHeight;
+            tooltipTop = rect.top - PADDING - 12 - tHeight;
         }
 
         // Center tooltip horizontally relative to the target element's bounds
