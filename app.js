@@ -2131,6 +2131,9 @@ function showTutorialStep(stepIdx) {
 
 function updateSpotlightAndTooltip(targetEl, position, tooltip, overlay) {
     const PADDING = 8;
+    
+    // Always start by removing the centered class to reset layout styles
+    tooltip.classList.remove('centered');
 
     if (targetEl && spotlightEl) {
         const rect = targetEl.getBoundingClientRect();
@@ -2184,16 +2187,18 @@ function updateSpotlightAndTooltip(targetEl, position, tooltip, overlay) {
         const backdrop = overlay.querySelector('.tutorial-backdrop');
         if (backdrop) backdrop.style.clipPath = 'none';
 
-        tooltip.style.top       = '50%';
-        tooltip.style.left      = '50%';
-        tooltip.style.transform = 'translate(-50%, -50%)';
+        tooltip.classList.add('centered');
     }
 
     // Animate tooltip re-entry
     tooltip.style.animation = 'none';
     // Trigger reflow
     void tooltip.offsetWidth;
-    tooltip.style.animation = 'tooltipFadeIn 0.35s ease both';
+    if (targetEl && spotlightEl) {
+        tooltip.style.animation = 'tooltipFadeIn 0.35s ease both';
+    } else {
+        tooltip.style.animation = 'tooltipFadeInCentered 0.35s ease both';
+    }
 }
 
 function closeTutorial() {
