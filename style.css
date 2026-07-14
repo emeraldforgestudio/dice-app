@@ -2247,16 +2247,27 @@ input:checked + .slider:before {
     background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    animation: welcomeFadeIn 0.5s ease forwards;
 }
 
 .welcome-modal-backdrop.hidden {
     display: none;
 }
 
-@keyframes welcomeFadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+/* Spinner Loader Overlay */
+.welcome-loading-spinner {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(0, 255, 135, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--neon-green);
+    animation: welcomeSpinnerSpin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    z-index: 2;
+    transition: opacity 0.3s ease;
+}
+
+@keyframes welcomeSpinnerSpin {
+    to { transform: rotate(360deg); }
 }
 
 .confetti-canvas {
@@ -2275,7 +2286,16 @@ input:checked + .slider:before {
     gap: 20px;
     width: 100%;
     max-width: 360px;
-    animation: welcomeCardPop 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) 0.1s both;
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+    transition: opacity 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.2), 
+                transform 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.2);
+    z-index: 1;
+}
+
+.welcome-card-wrapper.loaded {
+    opacity: 1;
+    transform: scale(1) translateY(0);
 }
 
 .welcome-card {

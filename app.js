@@ -1992,20 +1992,38 @@ function markWelcomeSeen() {
 function showWelcomeModal() {
     const modal  = document.getElementById('welcome-modal');
     const canvas = document.getElementById('confetti-canvas');
+    const loader = document.getElementById('welcome-loader');
+    const wrapper = modal ? modal.querySelector('.welcome-card-wrapper') : null;
     if (!modal) return;
 
     modal.classList.remove('hidden');
 
-    // Haptic
-    if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+    // Keep card layout hidden and show loader spinner first to reduce entrance thrashing
+    if (wrapper) wrapper.classList.remove('loaded');
+    if (loader) loader.style.display = 'block';
 
-    // Launch confetti
+    // Wait a brief delay (600ms) for main page rendering & websockets to settle
+    setTimeout(() => {
+        // Haptic Feedback
+        if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+
+        // Fade out loader spinner
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => { loader.style.display = 'none'; }, 300);
+        }
+
+        // Show card and trigger confetti
+        if (wrapper) wrapper.classList.add('loaded');
+
+        if (canvas) {
+            stopConfetti = startConfetti(canvas);
+            // Stop after 5 seconds
+            setTimeout(() => { if (stopConfetti) stopConfetti(); }, 5000);
+        }
+    }, 600);
+
     let stopConfetti;
-    if (canvas) {
-        stopConfetti = startConfetti(canvas);
-        // Stop after 5 seconds
-        setTimeout(() => { if (stopConfetti) stopConfetti(); }, 5000);
-    }
 
     // Buttons
     const btnStart = document.getElementById('btn-start-tutorial');
