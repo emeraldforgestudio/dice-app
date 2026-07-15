@@ -771,11 +771,10 @@ async function leaveRoom() {
 
 function tgInvite() {
     if (!currentRoomId) return;
-    
     if (tg && tg.switchInlineQuery) {
         // Launches inline query mode with selected chats.
         // Will output e.g. "@botname join_123" in the chat input.
-        tg.switchInlineQuery(`join_${currentRoomId}`);
+        tg.switchInlineQuery(`join_${currentRoomId}`, ['users', 'groups']);
     } else {
         const shareUrl = `https://t.me/share/url?url=https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}&text=🎲 Join my Dice match! Low roll wins, bets are returned on tie. Let's play! 🪙`;
         if (tg && tg.openTelegramLink) {
