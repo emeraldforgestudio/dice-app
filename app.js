@@ -2016,7 +2016,8 @@ const TUTORIAL_STEPS = [
         title: 'King of the Hill',
         desc: 'The top 3 winners of the day get extra prizes!',
         targetId: '#league-badge',
-        position: 'bottom'
+        position: 'bottom',
+        blocked: true
     }
 ];
 
