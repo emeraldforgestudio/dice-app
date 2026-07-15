@@ -851,7 +851,7 @@ function tgInvite() {
         const text = `🤝 Join my Dice Arena match!\n\n💰 Bet: ${betVal}\n📜 Rules: Lowest roll wins (⚀ beats ⚅)\n\nTap the link to roll! 👇`;
 
         const telegramShareFallback = () => {
-            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            const shareUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(text + "\n\n" + url)}`;
             if (tg && tg.openTelegramLink) {
                 tg.openTelegramLink(shareUrl);
             } else {
@@ -862,8 +862,7 @@ function tgInvite() {
         if (navigator.share) {
             navigator.share({
                 title: 'Dice Arena Match',
-                text: text,
-                url: url
+                text: text + "\n\n" + url
             }).catch((err) => {
                 console.log("Share failed or cancelled:", err);
                 telegramShareFallback();
@@ -883,12 +882,12 @@ function systemShare() {
     const fallbackCopyAndShare = () => {
         copyTextToClipboard(url).then(() => {
             showToast("Link copied! Opening share menu...", "success");
-            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            const shareUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(text + "\n\n" + url)}`;
             if (tg && tg.openTelegramLink) {
                 tg.openTelegramLink(shareUrl);
             }
         }).catch(() => {
-            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            const shareUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(text + "\n\n" + url)}`;
             if (tg && tg.openTelegramLink) {
                 tg.openTelegramLink(shareUrl);
             } else {
@@ -900,8 +899,7 @@ function systemShare() {
     if (navigator.share) {
         navigator.share({
             title: 'Dice Arena Match',
-            text: text,
-            url: url
+            text: text + "\n\n" + url
         }).catch((err) => {
             console.log("Share failed or cancelled:", err);
             // Fallback if system share is supported but fails or is cancelled
