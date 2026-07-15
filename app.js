@@ -847,7 +847,8 @@ function tgInvite() {
     if (!success) {
         // Fallback to standard share if switchInlineQuery is not supported or failed
         const url = TG_INVITE_BACKUP.url.replace('{BOT_USERNAME}', BOT_USERNAME).replace('{ROOM_ID}', currentRoomId);
-        const text = TG_INVITE_BACKUP.text;
+        const betVal = typeof currentRoomBet !== 'undefined' && currentRoomBet ? `${currentRoomBet.toLocaleString()} 🪙` : "some";
+        const text = `🤝 Join my Dice Arena match!\n\n💰 Bet: ${betVal}\n📜 Rules: Lowest roll wins (⚀ beats ⚅)\n\nTap the link to roll! 👇`;
 
         const telegramShareFallback = () => {
             const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
@@ -876,7 +877,8 @@ function tgInvite() {
 function systemShare() {
     if (!currentRoomId) return;
     const url = `https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`;
-    const text = `🎲 Join my room in Dice Arena and let's roll! Low roll wins. 🪙`;
+    const betVal = typeof currentRoomBet !== 'undefined' && currentRoomBet ? `${currentRoomBet.toLocaleString()} 🪙` : "some";
+    const text = `🤝 Join my Dice Arena match!\n\n💰 Bet: ${betVal}\n📜 Rules: Lowest roll wins (⚀ beats ⚅)\n\nTap the link to roll! 👇`;
     
     const fallbackCopyAndShare = () => {
         copyTextToClipboard(url).then(() => {
