@@ -796,6 +796,23 @@ function systemShare() {
     const url = `https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`;
     const text = `🎲 Join my room in Dice Arena and let's roll! Low roll wins. 🪙`;
     
+    const fallbackCopyAndShare = () => {
+        navigator.clipboard.writeText(url).then(() => {
+            showToast("Link copied! Opening share menu...", "success");
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            if (tg && tg.openTelegramLink) {
+                tg.openTelegramLink(shareUrl);
+            }
+        }).catch(() => {
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            if (tg && tg.openTelegramLink) {
+                tg.openTelegramLink(shareUrl);
+            } else {
+                showToast("Unable to share or copy link", "error");
+            }
+        });
+    };
+
     if (navigator.share) {
         navigator.share({
             title: 'Dice Arena Match',
@@ -803,13 +820,11 @@ function systemShare() {
             url: url
         }).catch((err) => {
             console.log("Share failed or cancelled:", err);
+            // Fallback if system share is supported but fails or is cancelled
+            fallbackCopyAndShare();
         });
     } else {
-        navigator.clipboard.writeText(url).then(() => {
-            showToast("Invite link copied to clipboard!", "success");
-        }).catch(() => {
-            showToast("Unable to copy link", "error");
-        });
+        fallbackCopyAndShare();
     }
 }
 
