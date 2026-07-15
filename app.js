@@ -1837,8 +1837,8 @@ const WELCOME_SEEN_KEY = 'dice_arena_welcome_seen';
 const TUTORIAL_STEPS = [
     {
         icon: '🤔',
-        title: 'How it works?',
-        desc: 'Dice Arena is a 1v1 free to play betting game.\n\nEach of two players roll a Telegram dice — the player with the **lowest** roll takes the whole pot.\n\n<div style="text-align: center; font-size: 2em; line-height: 1; margin-top: 10px; margin-bottom: 15px;">⚀ &gt; ⚄</div>',
+        title: 'How it works',
+        desc: 'Dice Arena is a 1v1 free to play betting game.\n\nBoth players roll a Telegram die — the player with the **lowest** roll takes the whole pot.\n\n<div style="text-align: center; font-size: 2em; line-height: 1; margin-top: 10px; margin-bottom: 15px;">⚀ &gt; ⚄</div>',
         targetId: null,
         position: 'center'
     },
@@ -1861,7 +1861,7 @@ const TUTORIAL_STEPS = [
     {
         icon: '⚡',
         title: 'Join a Room',
-        desc: 'Tap here to **accept existing bet**.',
+        desc: 'Tap here to **accept an existing bet**.',
         targetId: '.btn-join',
         position: 'bottom'
     },
@@ -1875,14 +1875,14 @@ const TUTORIAL_STEPS = [
     {
         icon: '➕',
         title: 'Create Your Own',
-        desc: 'Play with your friends or against the straingers',
+        desc: 'Play with your friends or against strangers.',
         targetId: '#btn-create-room',
         position: 'bottom'
     },
     {
         icon: '🎁',
         title: 'Daily Bonus',
-        desc: 'You can claim a **free 1,000 coins** every 6 hours.',
+        desc: 'You can claim **1,000 free coins** every 6 hours.',
         targetId: '#btn-claim-gift',
         position: 'bottom'
     },
