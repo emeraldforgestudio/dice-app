@@ -1838,7 +1838,7 @@ const TUTORIAL_STEPS = [
     {
         icon: '🤔',
         title: 'How it works',
-        desc: 'Numbers are generated dynamically inside the Telegram chat with the bot, guaranteeing fair and tamper-proof outcomes.',
+        desc: 'Results are generated directly in the Telegram chat to guarantee fair and honest rolls.',
         targetId: null,
         position: 'center'
     },
