@@ -830,7 +830,7 @@ function tgInvite() {
 
     if (tg && tg.switchInlineQuery) {
         // Use inline query for a beautiful invitation card with inline button
-        tg.switchInlineQuery(`join_${currentRoomId}`);
+        tg.switchInlineQuery(`join_${currentRoomId}`, ['users', 'chats', 'groups', 'channels']);
     } else {
         // Fallback to standard share if switchInlineQuery is not supported
         const url = TG_INVITE_BACKUP.url.replace('{BOT_USERNAME}', BOT_USERNAME).replace('{ROOM_ID}', currentRoomId);
