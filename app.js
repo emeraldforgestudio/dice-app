@@ -848,7 +848,7 @@ function tgInvite() {
         // Fallback to standard share if switchInlineQuery is not supported or failed
         const url = TG_INVITE_BACKUP.url.replace('{BOT_USERNAME}', BOT_USERNAME).replace('{ROOM_ID}', currentRoomId);
         const betVal = typeof currentRoomBet !== 'undefined' && currentRoomBet ? `${currentRoomBet.toLocaleString()} 🪙` : "some";
-        const text = `🎲 VERDE Dice Match!\n━━━━━━━━━━━━━━━━━━\n🤝 You are invited to play!\n💰 Bet: ${betVal}\n📜 Rules: Lowest roll wins (⚀ beats ⚅)\n\n👇 Click here to join:`;
+        const text = `🎲 VERDE Dice Match!\n━━━━━━━━━━━━━━━━━━\n🤝 You are invited to play!\n💰 Bet: ${betVal}\n📜 Rules: Lowest roll wins (⚀ beats ⚅)\n\n👉 Click here to join:\n`;
 
         const telegramShareFallback = () => {
             const shareUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(text + "\n" + url)}`;
@@ -877,7 +877,7 @@ function systemShare() {
     if (!currentRoomId) return;
     const url = `https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`;
     const betVal = typeof currentRoomBet !== 'undefined' && currentRoomBet ? `${currentRoomBet.toLocaleString()} 🪙` : "some";
-    const text = `🎲 VERDE Dice Match!\n━━━━━━━━━━━━━━━━━━\n🤝 You are invited to play!\n💰 Bet: ${betVal}\n📜 Rules: Lowest roll wins (⚀ beats ⚅)\n\n👇 Click here to join:`;
+    const text = `🎲 VERDE Dice Match!\n━━━━━━━━━━━━━━━━━━\n🤝 You are invited to play!\n💰 Bet: ${betVal}\n📜 Rules: Lowest roll wins (⚀ beats ⚅)\n\n👉 Click here to join:\n`;
     
     const fallbackCopyAndShare = () => {
         copyTextToClipboard(url).then(() => {
