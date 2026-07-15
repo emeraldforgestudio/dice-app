@@ -1874,7 +1874,7 @@ const TUTORIAL_STEPS = [
     },
     {
         icon: '➕',
-        title: 'Create Your Own',
+        title: 'Create Your Own Bet',
         desc: 'Play with your friends or against strangers.',
         targetId: '#btn-create-room',
         position: 'bottom'
