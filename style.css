@@ -2413,11 +2413,27 @@ input:checked + .slider:before {
     transition: color 0.2s ease;
     font-family: 'Outfit', sans-serif;
     animation: skipBtnPulse 2.5s ease-in-out infinite;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin: 0 auto;
 }
 
 .welcome-btn-skip:hover {
     color: rgba(255,255,255,0.75);
     animation-play-state: paused;
+}
+
+.welcome-skip-pointer {
+    font-size: 22px; /* Bigger size */
+    color: inherit; /* Sync with button color pulse */
+    animation: pointerFloat 1s ease-in-out infinite alternate;
+}
+
+@keyframes pointerFloat {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(6px); }
 }
 
 @keyframes skipBtnPulse {
