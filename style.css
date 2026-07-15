@@ -2572,4 +2572,15 @@ input:checked + .slider:before {
     transition: width 0.4s ease;
 }
 
+@keyframes nudgeRight {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(12px); }
+    100% { transform: translateX(0); }
+}
+
+.tutorial-btn-nudge {
+    animation: nudgeRight 0.25s ease-in-out;
+}
+
+
 

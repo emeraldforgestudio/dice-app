@@ -2139,6 +2139,24 @@ function startTutorial() {
     if (!overlay) return;
     overlay.classList.remove('hidden');
 
+    // Add click handler to nudge Next button if user clicks outside the tooltip
+    overlay.onclick = (e) => {
+        const tooltip = document.getElementById('tutorial-tooltip');
+        if (tooltip && !tooltip.contains(e.target)) {
+            const nextBtn = document.getElementById('tutorial-btn-next');
+            if (nextBtn) {
+                nextBtn.classList.remove('tutorial-btn-nudge');
+                void nextBtn.offsetWidth; // Trigger reflow to restart CSS animation
+                nextBtn.classList.add('tutorial-btn-nudge');
+                
+                // Add Telegram haptic feedback if available
+                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                }
+            }
+        }
+    };
+
     // Create spotlight element
     if (!spotlightEl) {
         spotlightEl = document.createElement('div');
@@ -2371,8 +2389,14 @@ function updateSpotlightAndTooltipPositionOnly(targetEl, position, tooltip, over
 
 function closeTutorial() {
     const overlay = document.getElementById('tutorial-overlay');
-    if (overlay) overlay.classList.add('hidden');
+    if (overlay) {
+        overlay.classList.add('hidden');
+        overlay.onclick = null;
+    }
     if (spotlightEl) spotlightEl.style.display = 'none';
+
+    const nextBtn = document.getElementById('tutorial-btn-next');
+    if (nextBtn) nextBtn.classList.remove('tutorial-btn-nudge');
 
     // Remove window resize/scroll realignment handlers on exit
     if (window._tutorialResizeHandler) {
