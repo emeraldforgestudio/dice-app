@@ -2092,13 +2092,37 @@ input:checked + .slider:before {
 .lb-podium-avatar.silver-av { background: linear-gradient(45deg, #b0b0b0, #e0e0e0); box-shadow: 0 0 10px rgba(180,180,180,0.4); }
 .lb-podium-avatar.bronze-av { background: linear-gradient(45deg, #cd7f32, #e8a96b); box-shadow: 0 0 10px rgba(205,127,50,0.4); }
 
+.lb-podium-avatar-wrapper {
+    position: relative;
+    margin-top: 18px;
+}
+
 .lb-podium-crown {
     position: absolute;
-    top: -16px;
+    top: -18px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 18px;
+    font-size: 20px;
     line-height: 1;
+    z-index: 10;
+}
+
+.lb-podium-medal {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    font-size: 14px;
+    line-height: 1;
+    z-index: 10;
+    background: #06140c;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .lb-podium-name {

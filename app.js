@@ -1723,14 +1723,28 @@ function renderLeaderboard(data) {
                 const avCls  = ['gold-av','silver-av','bronze-av'][e.rank - 1];
                 const prize  = PRIZES[e.rank] ? `${PRIZES[e.rank]} 🎁` : '';
 
+                let rankIndicatorHtml = '';
+                let avatarBadgeHtml = '';
+
+                if (e.rank === 1) {
+                    rankIndicatorHtml = `<span class="lb-podium-crown">👑</span>`;
+                } else if (e.rank === 2) {
+                    avatarBadgeHtml = `<span class="lb-podium-medal">🥈</span>`;
+                } else if (e.rank === 3) {
+                    avatarBadgeHtml = `<span class="lb-podium-medal">🥉</span>`;
+                }
+
                 return `
                 <div class="lb-podium-card place-${e.rank}${isMe ? ' is-me' : ''}">
-                    <span class="lb-podium-rank">${['👑','🥈','🥉'][e.rank-1]}</span>
-                    <div class="lb-podium-avatar ${avCls}">
-                        ${initial}
+                    <span class="lb-podium-league ${meta.cls}">${meta.label}</span>
+                    <div class="lb-podium-avatar-wrapper">
+                        ${rankIndicatorHtml}
+                        <div class="lb-podium-avatar ${avCls}">
+                            ${initial}
+                            ${avatarBadgeHtml}
+                        </div>
                     </div>
                     <span class="lb-podium-name">${isMe ? '⭐ You' : name}</span>
-                    <span class="lb-podium-league ${meta.cls}">${meta.label}</span>
                     <span class="lb-podium-score">${e.won_today.toLocaleString()} 🪙</span>
                     ${prize ? `<span class="lb-podium-prize">${prize}</span>` : ''}
                 </div>`;
