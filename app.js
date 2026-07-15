@@ -769,20 +769,61 @@ async function leaveRoom() {
     }
 }
 
+function legacyCopy(text) {
+    try {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.width = "2em";
+        textArea.style.height = "2em";
+        textArea.style.padding = "0";
+        textArea.style.border = "none";
+        textArea.style.outline = "none";
+        textArea.style.boxShadow = "none";
+        textArea.style.background = "transparent";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        return successful;
+    } catch (err) {
+        console.error("Legacy copy failed: ", err);
+        return false;
+    }
+}
+
+function copyTextToClipboard(text) {
+    return new Promise((resolve, reject) => {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text)
+                .then(resolve)
+                .catch((err) => {
+                    if (legacyCopy(text)) resolve();
+                    else reject(err);
+                });
+        } else {
+            if (legacyCopy(text)) resolve();
+            else reject(new Error("Clipboard API not supported"));
+        }
+    });
+}
+
 function tgInvite() {
     if (!currentRoomId) return;
     
     const inviteUrl = `https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`;
     
-    // Check if Web App supports version 7.2+ for native sharing inside the app without closure
-    if (tg && tg.isVersionAtLeast && tg.isVersionAtLeast('7.2') && tg.shareToBot) {
-        tg.shareToBot(`join_${currentRoomId}`);
+    // Open Telegram contact selection screen with inline query to send game invitation card
+    if (tg && tg.switchInlineQuery) {
+        tg.switchInlineQuery(`join_${currentRoomId}`);
     } else {
-        // Fallback: copy to clipboard and show toast
-        navigator.clipboard.writeText(inviteUrl).then(() => {
+        // Fallback for regular web browsers
+        copyTextToClipboard(inviteUrl).then(() => {
             showToast("Link copied! Send it to your opponent.", "success");
         }).catch(() => {
-            // Ultimate fallback: open share link if clipboard API is blocked
             const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(inviteUrl)}&text=${encodeURIComponent("🎲 Join my Dice match! Low roll wins. Let's play! 🪙")}`;
             if (tg && tg.openTelegramLink) {
                 tg.openTelegramLink(shareUrl);
@@ -797,7 +838,7 @@ function systemShare() {
     const text = `🎲 Join my room in Dice Arena and let's roll! Low roll wins. 🪙`;
     
     const fallbackCopyAndShare = () => {
-        navigator.clipboard.writeText(url).then(() => {
+        copyTextToClipboard(url).then(() => {
             showToast("Link copied! Opening share menu...", "success");
             const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
             if (tg && tg.openTelegramLink) {
