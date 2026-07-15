@@ -848,10 +848,10 @@ function tgInvite() {
         // Fallback to standard share if switchInlineQuery is not supported or failed
         const url = TG_INVITE_BACKUP.url.replace('{BOT_USERNAME}', BOT_USERNAME).replace('{ROOM_ID}', currentRoomId);
         const betVal = typeof currentRoomBet !== 'undefined' && currentRoomBet ? `${currentRoomBet.toLocaleString()} 🪙` : "some";
-        const text = `🤝 Join my Dice Arena match!\n\n💰 Bet: ${betVal}\n📜 Rules: Lowest roll wins (⚀ beats ⚅)\n\nTap the link to roll! 👇`;
+        const text = `🎲 VERDE Dice Match!\n━━━━━━━━━━━━━━━━━━\n🤝 You are invited to play!\n💰 Bet: ${betVal}\n📜 Rules: Lowest roll wins (⚀ beats ⚅)\n\n👇 Click here to join:`;
 
         const telegramShareFallback = () => {
-            const shareUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(text + "\n\n" + url)}`;
+            const shareUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(text + "\n" + url)}`;
             if (tg && tg.openTelegramLink) {
                 tg.openTelegramLink(shareUrl);
             } else {
@@ -862,7 +862,7 @@ function tgInvite() {
         if (navigator.share) {
             navigator.share({
                 title: 'Dice Arena Match',
-                text: text + "\n\n" + url
+                text: text + "\n" + url
             }).catch((err) => {
                 console.log("Share failed or cancelled:", err);
                 telegramShareFallback();
@@ -877,7 +877,7 @@ function systemShare() {
     if (!currentRoomId) return;
     const url = `https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`;
     const betVal = typeof currentRoomBet !== 'undefined' && currentRoomBet ? `${currentRoomBet.toLocaleString()} 🪙` : "some";
-    const text = `🤝 Join my Dice Arena match!\n\n💰 Bet: ${betVal}\n📜 Rules: Lowest roll wins (⚀ beats ⚅)\n\nTap the link to roll! 👇`;
+    const text = `🎲 VERDE Dice Match!\n━━━━━━━━━━━━━━━━━━\n🤝 You are invited to play!\n💰 Bet: ${betVal}\n📜 Rules: Lowest roll wins (⚀ beats ⚅)\n\n👇 Click here to join:`;
     
     const fallbackCopyAndShare = () => {
         copyTextToClipboard(url).then(() => {
