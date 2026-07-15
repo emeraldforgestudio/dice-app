@@ -813,22 +813,29 @@ function copyTextToClipboard(text) {
 
 function tgInvite() {
     if (!currentRoomId) return;
-    
-    const inviteUrl = `https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`;
-    
-    // Open Telegram contact selection screen with inline query to send game invitation card
-    if (tg && tg.switchInlineQuery) {
-        tg.switchInlineQuery(`join_${currentRoomId}`, ['users', 'groups']);
-    } else {
-        // Fallback for regular web browsers
-        copyTextToClipboard(inviteUrl).then(() => {
-            showToast("Link copied! Send it to your opponent.", "success");
-        }).catch(() => {
-            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(inviteUrl)}&text=${encodeURIComponent("🎲 Join my Dice match! Low roll wins. Let's play! 🪙")}`;
-            if (tg && tg.openTelegramLink) {
-                tg.openTelegramLink(shareUrl);
-            }
+    const url = `https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`;
+    const text = `🎲 Join my room in Dice Arena and let's roll! Low roll wins. 🪙`;
+
+    const telegramShareFallback = () => {
+        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+        if (tg && tg.openTelegramLink) {
+            tg.openTelegramLink(shareUrl);
+        } else {
+            showToast("Unable to open share menu", "error");
+        }
+    };
+
+    if (navigator.share) {
+        navigator.share({
+            title: 'Dice Arena Match',
+            text: text,
+            url: url
+        }).catch((err) => {
+            console.log("Share failed or cancelled:", err);
+            telegramShareFallback();
         });
+    } else {
+        telegramShareFallback();
     }
 }
 
