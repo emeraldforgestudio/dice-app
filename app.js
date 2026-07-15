@@ -1859,17 +1859,17 @@ const TUTORIAL_STEPS = [
         blocked: true
     },
     {
-        icon: '🔍',
-        title: 'Filters & Sorting',
-        desc: 'Use **Filters** to find rooms by bet size, owner, or toggle between All / Mine / Others\' rooms. Sort by bet amount or creation time to find your perfect match quickly.',
-        targetId: '.lobby-filter-bar',
-        position: 'bottom'
-    },
-    {
         icon: '⚡',
         title: 'Join a Room',
         desc: 'Tap a room card to **join** and accept the bet. A confirmation screen will show the owner\'s name and the exact bet amount before you commit your coins.',
         targetId: '.btn-join',
+        position: 'bottom'
+    },
+    {
+        icon: '🔍',
+        title: 'Filters & Sorting',
+        desc: 'Use **Filters** to find rooms by bet size, owner, or toggle between All / Mine / Others\' rooms. Sort by bet amount or creation time to find your perfect match quickly.',
+        targetId: '.lobby-filter-bar',
         position: 'bottom'
     },
     {
@@ -2107,7 +2107,7 @@ function showHelpIndicatorHint() {
 
     if (badgeEl) badgeEl.textContent = 'TIP';
     if (iconEl) iconEl.textContent = '👍';
-    if (titleEl) titleEl.textContent = 'Tutorial is saved!';
+    if (titleEl) titleEl.textContent = 'Here if you need it!';
     if (descEl) descEl.textContent = 'You can always take the quick tour later by clicking this button.';
 
     if (exitBtnEl) exitBtnEl.style.display = 'none';
