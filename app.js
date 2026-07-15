@@ -528,7 +528,7 @@ function renderRooms(rooms) {
         // Если комната принадлежит текущему пользователю, показываем кнопку Cancel
         const actionButton = isOwn
             ? `<button class="btn-join btn-cancel-lobby" onclick="confirmCancelRoom('${room.id}', ${room.bet})">Cancel</button>`
-            : `<button class="btn-join" onclick="confirmJoinRoom('${room.id}', '${room.owner_username}', ${room.bet})">Join Game</button>`;
+            : `<button class="btn-join" onclick="confirmJoinRoom('${room.id}', '${room.owner_username}', ${room.bet})">Join Bet</button>`;
             
         const isPrivate = room.is_private === true;
         const privateBadge = isPrivate 
@@ -599,7 +599,7 @@ async function joinRoom(roomId) {
                 const btn = roomEl.querySelector('.btn-join');
                 if (btn) {
                     btn.disabled = false;
-                    btn.textContent = 'Join Game';
+                    btn.textContent = 'Join Bet';
                 }
             }
             return;
@@ -620,7 +620,7 @@ async function joinRoom(roomId) {
             const btn = roomEl.querySelector('.btn-join');
             if (btn) {
                 btn.disabled = false;
-                btn.textContent = 'Join Game';
+                btn.textContent = 'Join Bet';
             }
         }
     }
@@ -1847,14 +1847,16 @@ const TUTORIAL_STEPS = [
         title: 'Provably Fair Rolls',
         desc: 'Every roll uses **Telegram\'s native animated dice** — sent via the bot in a private chat. Telegram\'s servers generate the result, making it impossible for anyone (including us) to cheat.',
         targetId: null,
-        position: 'center'
+        position: 'center',
+        blocked: true
     },
     {
         icon: '🏠',
         title: 'Active Matches Lobby',
         desc: 'This is the live lobby. It shows all open game rooms waiting for an opponent. The list updates in real time via WebSocket — you\'ll always see the freshest rooms.',
         targetId: '.lobby-panel',
-        position: 'bottom'
+        position: 'bottom',
+        blocked: true
     },
     {
         icon: '🔍',
@@ -1889,7 +1891,8 @@ const TUTORIAL_STEPS = [
         title: 'Match History',
         desc: 'Tap your **avatar** to toggle the notification history drawer. You can check the logs of your previous games, wins, and claim bonuses here.',
         targetId: '#user-avatar-wrapper',
-        position: 'bottom'
+        position: 'bottom',
+        blocked: true
     },
     {
         icon: '👑',
@@ -1899,6 +1902,10 @@ const TUTORIAL_STEPS = [
         position: 'bottom'
     }
 ];
+
+function getActiveTutorialSteps() {
+    return TUTORIAL_STEPS.filter(step => !step.blocked);
+}
 
 let tutorialStep = 0;
 let spotlightEl = null;
@@ -2131,7 +2138,7 @@ function startTutorial() {
 }
 
 function showTutorialStep(stepIdx) {
-    const steps   = TUTORIAL_STEPS;
+    const steps   = getActiveTutorialSteps();
     const overlay = document.getElementById('tutorial-overlay');
     const tooltip = document.getElementById('tutorial-tooltip');
 
@@ -2287,7 +2294,7 @@ function updateSpotlightAndTooltip(targetEl, position, tooltip, overlay) {
     // Track scroll and resize dynamically to realign the spotlight on viewport changes
     if (!window._tutorialResizeHandler) {
         window._tutorialResizeHandler = () => {
-            const steps = TUTORIAL_STEPS;
+            const steps = getActiveTutorialSteps();
             const currentStep = steps[tutorialStep];
             if (currentStep) {
                 const target = currentStep.targetId ? document.querySelector(currentStep.targetId) : null;
