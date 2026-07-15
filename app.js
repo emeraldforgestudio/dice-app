@@ -1968,7 +1968,6 @@ async function syncLobbyData() {
 // WELCOME SCREEN + TUTORIAL MODULE
 // =============================================
 
-const WELCOME_SEEN_KEY = 'dice_arena_welcome_seen';
 
 // ---- Tutorial Steps Definition ----
 // Each step: { icon, title, desc, targetId, position }
@@ -2151,17 +2150,6 @@ function startConfetti(canvas) {
 
 // ---- Welcome Modal Logic ----
 function shouldShowWelcome() {
-    const key = currentUser && currentUser.id ? `${WELCOME_SEEN_KEY}_${currentUser.id}` : WELCOME_SEEN_KEY;
-    console.log("[Welcome] Checking if should show welcome. Key:", key);
-    try {
-        const localSeen = localStorage.getItem(key) || localStorage.getItem(WELCOME_SEEN_KEY);
-        if (localSeen) {
-            console.log("[Welcome] Welcome already seen in localStorage (value:", localSeen, ")");
-            return false;
-        }
-    } catch(e) {
-        console.error("[Welcome] Error reading localStorage:", e);
-    }
     if (currentUser) {
         console.log("[Welcome] Current user welcome_seen status in DB:", currentUser.welcome_seen);
         if (currentUser.welcome_seen) {
@@ -2174,12 +2162,6 @@ function shouldShowWelcome() {
 }
 
 function markWelcomeSeen() {
-    const key = currentUser && currentUser.id ? `${WELCOME_SEEN_KEY}_${currentUser.id}` : WELCOME_SEEN_KEY;
-    console.log("[Welcome] Marking welcome seen in localStorage. Key:", key);
-    try { 
-        localStorage.setItem(key, '1'); 
-    } catch(e) {}
-
     if (currentUser) {
         currentUser.welcome_seen = true;
     }
