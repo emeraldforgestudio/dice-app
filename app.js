@@ -1837,8 +1837,8 @@ const WELCOME_SEEN_KEY = 'dice_arena_welcome_seen';
 const TUTORIAL_STEPS = [
     {
         icon: '🎲',
-        title: 'How the Game Works',
-        desc: 'Dice Arena is a 1v1 PvP betting game. Two players each roll a Telegram dice — the player with the **lowest** roll wins the entire pot. Ties refund both bets.',
+        title: 'How it works?',
+        desc: 'Dice Arena is a 1v1 free to play betting game. Each of two players roll a Telegram dice — the player with the **lowest** roll takes the whole pot. ',
         targetId: null,
         position: 'center'
     },
@@ -1861,28 +1861,28 @@ const TUTORIAL_STEPS = [
     {
         icon: '⚡',
         title: 'Join a Room',
-        desc: 'Tap a room card to **join** and accept the bet. A confirmation screen will show the owner\'s name and the exact bet amount before you commit your coins.',
+        desc: 'Tap here to **accept existing bet**.',
         targetId: '.btn-join',
         position: 'bottom'
     },
     {
         icon: '🔍',
         title: 'Filters & Sorting',
-        desc: 'Use **Filters** to find rooms by bet size, owner, or toggle between All / Mine / Others\' rooms. Sort by bet amount or creation time to find your perfect match quickly.',
+        desc: 'Here you can find your perfect match quickly.',
         targetId: '.lobby-filter-bar',
         position: 'bottom'
     },
     {
         icon: '➕',
-        title: 'Create Your Own Bet',
-        desc: 'Tap **New Bet** to open a room with your chosen wager. You can set it as public (anyone can join) or private (invite link only). Share the link with a friend to duel!',
+        title: 'Create Your Own',
+        desc: 'Play with your friends or against the straingers',
         targetId: '#btn-create-room',
         position: 'bottom'
     },
     {
         icon: '🎁',
         title: 'Daily Bonus',
-        desc: 'Claim your **free 1,000 coins** every 6 hours by tapping "Claim Bonus". Watch the short sponsor offer, and the coins drop straight into your balance.',
+        desc: 'You can claim a **free 1,000 coins** every 6 hours.',
         targetId: '#btn-claim-gift',
         position: 'bottom'
     },
