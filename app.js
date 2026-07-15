@@ -1838,7 +1838,7 @@ const TUTORIAL_STEPS = [
     {
         icon: '🤔',
         title: 'How it works',
-        desc: 'Dice Arena is a 1v1 free to play betting game.\n\nBoth players roll a Telegram die — the player with the **lowest** roll takes the whole pot.\n\n<div style="text-align: center; font-size: 2em; line-height: 1; margin-top: 10px; margin-bottom: 15px;">⚀ &gt; ⚄</div>',
+        desc: 'Numbers are generated dynamically inside the Telegram chat with the bot, guaranteeing fair and tamper-proof outcomes.',
         targetId: null,
         position: 'center'
     },
