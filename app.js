@@ -2187,6 +2187,8 @@ function showWelcomeModal() {
     if (wrapper) wrapper.classList.remove('loaded');
     if (loader) loader.style.display = 'block';
 
+    let canDismiss = false;
+
     // Wait a brief delay (600ms) for main page rendering & websockets to settle
     setTimeout(() => {
         // Haptic Feedback
@@ -2206,6 +2208,11 @@ function showWelcomeModal() {
             // Stop after 5 seconds
             setTimeout(() => { if (stopConfetti) stopConfetti(); }, 5000);
         }
+
+        // Only allow dismissing after the card has fully transitioned in
+        setTimeout(() => {
+            canDismiss = true;
+        }, 500);
     }, 600);
 
     let stopConfetti;
@@ -2217,6 +2224,7 @@ function showWelcomeModal() {
     const welcomeCard = modal.querySelector('.welcome-card');
 
     const handleSkip = () => {
+        if (!canDismiss) return;
         if (stopConfetti) stopConfetti();
         closeWelcomeModal();
         markWelcomeSeen();
@@ -2226,6 +2234,7 @@ function showWelcomeModal() {
     if (btnStart) {
         btnStart.onclick = (e) => {
             e.stopPropagation(); // prevent backdrop click from triggering skip
+            if (!canDismiss) return;
             if (stopConfetti) stopConfetti();
             closeWelcomeModal();
             markWelcomeSeen();
