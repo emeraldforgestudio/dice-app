@@ -811,31 +811,52 @@ function copyTextToClipboard(text) {
     });
 }
 
+// Backup of the original share message parameters
+const TG_INVITE_BACKUP = {
+    url: "https://t.me/{BOT_USERNAME}?start=join_{ROOM_ID}",
+    text: "🎲 Join my room in Dice Arena and let's roll! Low roll wins. 🪙"
+};
+
+// New message configuration containing the link as a button, designed beautifully
+const TG_INVITE_NEW = {
+    title: "Dice Arena Invitation",
+    text: "🤝 You are invited to a Dice Arena Match!\n\n💰 Bet: {BET} 🪙\n📜 Rules: Lowest roll takes the whole pot.",
+    buttonText: "Play 🎲",
+    url: "https://t.me/{BOT_USERNAME}?start=join_{ROOM_ID}"
+};
+
 function tgInvite() {
     if (!currentRoomId) return;
-    const url = `https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`;
-    const text = `🎲 Join my room in Dice Arena and let's roll! Low roll wins. 🪙`;
 
-    const telegramShareFallback = () => {
-        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
-        if (tg && tg.openTelegramLink) {
-            tg.openTelegramLink(shareUrl);
-        } else {
-            showToast("Unable to open share menu", "error");
-        }
-    };
-
-    if (navigator.share) {
-        navigator.share({
-            title: 'Dice Arena Match',
-            text: text,
-            url: url
-        }).catch((err) => {
-            console.log("Share failed or cancelled:", err);
-            telegramShareFallback();
-        });
+    if (tg && tg.switchInlineQuery) {
+        // Use inline query for a beautiful invitation card with inline button
+        tg.switchInlineQuery(`join_${currentRoomId}`);
     } else {
-        telegramShareFallback();
+        // Fallback to standard share if switchInlineQuery is not supported
+        const url = TG_INVITE_BACKUP.url.replace('{BOT_USERNAME}', BOT_USERNAME).replace('{ROOM_ID}', currentRoomId);
+        const text = TG_INVITE_BACKUP.text;
+
+        const telegramShareFallback = () => {
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            if (tg && tg.openTelegramLink) {
+                tg.openTelegramLink(shareUrl);
+            } else {
+                showToast("Unable to open share menu", "error");
+            }
+        };
+
+        if (navigator.share) {
+            navigator.share({
+                title: 'Dice Arena Match',
+                text: text,
+                url: url
+            }).catch((err) => {
+                console.log("Share failed or cancelled:", err);
+                telegramShareFallback();
+            });
+        } else {
+            telegramShareFallback();
+        }
     }
 }
 
