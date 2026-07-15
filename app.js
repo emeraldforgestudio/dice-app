@@ -2117,6 +2117,18 @@ function showHelpIndicatorHint() {
     }
 
     updateSpotlightAndTooltip(helpBtn, 'bottom', tooltip, overlay);
+
+    // Override the generic resize handler so scroll/resize always re-targets [?] button
+    // (the default handler uses tutorialStep index which still points to the last tutorial step)
+    if (window._tutorialResizeHandler) {
+        window.removeEventListener('resize', window._tutorialResizeHandler);
+        window.removeEventListener('scroll', window._tutorialResizeHandler);
+    }
+    window._tutorialResizeHandler = () => {
+        updateSpotlightAndTooltipPositionOnly(helpBtn, 'bottom', tooltip, overlay);
+    };
+    window.addEventListener('resize', window._tutorialResizeHandler, { passive: true });
+    window.addEventListener('scroll', window._tutorialResizeHandler, { passive: true });
 }
 
 // ---- Tutorial Logic ----
