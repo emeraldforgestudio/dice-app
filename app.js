@@ -1838,7 +1838,7 @@ const TUTORIAL_STEPS = [
     {
         icon: '🤔',
         title: 'How it works',
-        desc: 'Results are generated directly in the Telegram chat to guarantee fair and honest rolls.',
+        desc: 'During the match, dice rolls are generated directly inside your chat with the bot on Telegram’s side, guaranteeing fair and honest results.',
         targetId: null,
         position: 'center'
     },
