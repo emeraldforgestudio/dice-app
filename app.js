@@ -1885,6 +1885,13 @@ const TUTORIAL_STEPS = [
         position: 'bottom'
     },
     {
+        icon: '🔔',
+        title: 'Match History',
+        desc: 'Tap your **avatar** to toggle the notification history drawer. You can check the logs of your previous games, wins, and claim bonuses here.',
+        targetId: '#user-avatar-wrapper',
+        position: 'bottom'
+    },
+    {
         icon: '👑',
         title: 'League Badge & Leaderboard',
         desc: 'Your **league badge** (Rookie → Bronze → Silver → Gold) tracks your daily standing. Tap it to open the **Leaderboard** — top 3 winners earn prize bonuses every day at midnight!',
@@ -2170,6 +2177,7 @@ function showTutorialStep(stepIdx) {
         nextBtnEl.onclick = () => {
             if (isLast) {
                 closeTutorial();
+                showHelpIndicatorHint();
             } else {
                 tutorialStep++;
                 showTutorialStep(tutorialStep);
@@ -2201,18 +2209,24 @@ function updateSpotlightAndTooltip(targetEl, position, tooltip, overlay) {
 
     if (targetEl && spotlightEl) {
         const rect = targetEl.getBoundingClientRect();
+        
+        // Highlight the entire vertical space from top (0px) to the very bottom of the screen (window.innerHeight)
+        const isLobby = targetEl.classList.contains('lobby-panel');
+        const spotlightTop = isLobby ? 0 : (rect.top - PADDING);
+        const spotlightHeight = isLobby ? window.innerHeight : (rect.height + PADDING * 2);
+
         spotlightEl.style.display = 'block';
-        spotlightEl.style.top    = `${rect.top    - PADDING}px`;
+        spotlightEl.style.top    = `${spotlightTop}px`;
         spotlightEl.style.left   = `${rect.left   - PADDING}px`;
         spotlightEl.style.width  = `${rect.width  + PADDING * 2}px`;
-        spotlightEl.style.height = `${rect.height + PADDING * 2}px`;
+        spotlightEl.style.height = `${spotlightHeight}px`;
 
         // Dark backdrop with rectangular hole
         const backdrop = overlay.querySelector('.tutorial-backdrop');
         if (backdrop) {
-            const t = rect.top    - PADDING;
+            const t = spotlightTop;
             const l = rect.left   - PADDING;
-            const b = rect.bottom + PADDING;
+            const b = isLobby ? window.innerHeight : (rect.bottom + PADDING);
             const r = rect.right  + PADDING;
             const W = window.innerWidth;
             const H = window.innerHeight;
@@ -2248,7 +2262,7 @@ function updateSpotlightAndTooltip(targetEl, position, tooltip, overlay) {
         tooltip.style.transform = 'none';
 
         // Scroll element into view smoothly
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
     } else {
         // No target — center tooltip, hide spotlight
@@ -2269,12 +2283,84 @@ function updateSpotlightAndTooltip(targetEl, position, tooltip, overlay) {
     } else {
         tooltip.style.animation = 'tooltipFadeInCentered 0.35s ease both';
     }
+
+    // Track scroll and resize dynamically to realign the spotlight on viewport changes
+    if (!window._tutorialResizeHandler) {
+        window._tutorialResizeHandler = () => {
+            const steps = TUTORIAL_STEPS;
+            const currentStep = steps[tutorialStep];
+            if (currentStep) {
+                const target = currentStep.targetId ? document.querySelector(currentStep.targetId) : null;
+                // Re-align silently without scrolling again or re-animating
+                updateSpotlightAndTooltipPositionOnly(target, currentStep.position, tooltip, overlay);
+            }
+        };
+        window.addEventListener('resize', window._tutorialResizeHandler, { passive: true });
+        window.addEventListener('scroll', window._tutorialResizeHandler, { passive: true });
+    }
+}
+
+// Quietly updates coordinates during viewport/scroll actions without scrollIntoView trigger or animations
+function updateSpotlightAndTooltipPositionOnly(targetEl, position, tooltip, overlay) {
+    const PADDING = 8;
+    if (!targetEl || !spotlightEl) return;
+    
+    const rect = targetEl.getBoundingClientRect();
+    const isLobby = targetEl.classList.contains('lobby-panel');
+    const spotlightTop = isLobby ? 0 : (rect.top - PADDING);
+    const spotlightHeight = isLobby ? window.innerHeight : (rect.height + PADDING * 2);
+
+    spotlightEl.style.top    = `${spotlightTop}px`;
+    spotlightEl.style.left   = `${rect.left   - PADDING}px`;
+    spotlightEl.style.width  = `${rect.width  + PADDING * 2}px`;
+    spotlightEl.style.height = `${spotlightHeight}px`;
+
+    const backdrop = overlay.querySelector('.tutorial-backdrop');
+    if (backdrop) {
+        const t = spotlightTop;
+        const l = rect.left   - PADDING;
+        const b = isLobby ? window.innerHeight : (rect.bottom + PADDING);
+        const r = rect.right  + PADDING;
+        const W = window.innerWidth;
+        const H = window.innerHeight;
+        backdrop.style.clipPath =
+            `polygon(0 0, ${W}px 0, ${W}px ${H}px, 0 ${H}px, 0 0, ` +
+            `${l}px ${t}px, ${l}px ${b}px, ${r}px ${b}px, ${r}px ${t}px, ${l}px ${t}px)`;
+    }
+
+    const tWidth = Math.min(330, window.innerWidth - 24);
+    const tHeight = tooltip.offsetHeight || 160;
+    const spaceBelow = window.innerHeight - rect.bottom - PADDING - 16;
+    const spaceAbove = rect.top - PADDING - 16;
+    
+    let tooltipTop;
+    if (position === 'top' && spaceAbove >= tHeight) {
+        tooltipTop = rect.top - PADDING - 12 - tHeight;
+    } else if (position === 'bottom' || spaceBelow >= tHeight || spaceBelow > spaceAbove) {
+        tooltipTop = rect.bottom + PADDING + 12;
+    } else {
+        tooltipTop = rect.top - PADDING - 12 - tHeight;
+    }
+
+    let tooltipLeft = rect.left + (rect.width - tWidth) / 2;
+    tooltipLeft = Math.max(12, Math.min(tooltipLeft, window.innerWidth - tWidth - 12));
+    tooltipTop  = Math.max(12, Math.min(tooltipTop, window.innerHeight - tooltip.offsetHeight - 12));
+
+    tooltip.style.top  = `${tooltipTop}px`;
+    tooltip.style.left = `${tooltipLeft}px`;
 }
 
 function closeTutorial() {
     const overlay = document.getElementById('tutorial-overlay');
     if (overlay) overlay.classList.add('hidden');
     if (spotlightEl) spotlightEl.style.display = 'none';
+
+    // Remove window resize/scroll realignment handlers on exit
+    if (window._tutorialResizeHandler) {
+        window.removeEventListener('resize', window._tutorialResizeHandler);
+        window.removeEventListener('scroll', window._tutorialResizeHandler);
+        window._tutorialResizeHandler = null;
+    }
 
     // Haptic
     if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
