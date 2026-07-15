@@ -1920,11 +1920,19 @@ const WELCOME_SEEN_KEY = 'dice_arena_welcome_seen';
 // position: 'top' | 'bottom' | 'center' (where to place tooltip relative to target)
 const TUTORIAL_STEPS = [
     {
+        icon: '⚔️',
+        title: 'Choose your fighter',
+        desc: 'This is the bet amount you need to double.',
+        targetId: '.room-bet-amount',
+        position: 'bottom'
+    },
+    {
         icon: '🤔',
         title: 'How it works',
         desc: 'During the match, dice rolls are generated directly inside your chat with our bot on Telegram’s side, guaranteeing fair and honest results.',
         targetId: null,
-        position: 'center'
+        position: 'center',
+        blocked: true
     },
     {
         icon: '🔒',
@@ -2126,6 +2134,7 @@ function showWelcomeModal() {
     // Buttons
     const btnStart = document.getElementById('btn-start-tutorial');
     const btnSkip  = document.getElementById('btn-skip-tutorial');
+    const btnClose = document.getElementById('btn-close-welcome-modal');
     const welcomeCard = modal.querySelector('.welcome-card');
 
     const handleSkip = () => {
@@ -2146,6 +2155,12 @@ function showWelcomeModal() {
     if (btnSkip) {
         btnSkip.onclick = (e) => {
             e.stopPropagation(); // prevent duplicate calls
+            handleSkip();
+        };
+    }
+    if (btnClose) {
+        btnClose.onclick = (e) => {
+            e.stopPropagation();
             handleSkip();
         };
     }
