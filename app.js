@@ -119,6 +119,7 @@ const elements = {
     confirmMessageText: document.getElementById('confirm-message-text'),
     btnConfirmActionCancel: document.getElementById('btn-confirm-action-cancel'),
     btnConfirmActionSubmit: document.getElementById('btn-confirm-action-submit'),
+    btnConfirmActionCancelRoom: document.getElementById('btn-confirm-action-cancel-room'),
     
     matchResults: document.getElementById('match-results'),
     resultTitle: document.getElementById('result-title'),
@@ -635,6 +636,11 @@ function confirmJoinRoom(roomId, ownerUsername, bet) {
     if (elements.confirmOwner) elements.confirmOwner.textContent = `@${maskUsername(ownerUsername)}`;
     if (elements.confirmBet) elements.confirmBet.textContent = `${bet.toLocaleString()} 🪙`;
     if (elements.confirmMessageText) elements.confirmMessageText.textContent = "Are you sure you want to join this room? The bet amount will be immediately deducted from your balance.";
+    
+    // Показываем кнопку входа, скрываем кнопку отмены комнаты
+    if (elements.btnConfirmActionSubmit) elements.btnConfirmActionSubmit.classList.remove('hidden');
+    if (elements.btnConfirmActionCancelRoom) elements.btnConfirmActionCancelRoom.classList.add('hidden');
+    
     if (elements.confirmModal) elements.confirmModal.classList.remove('hidden');
     
     if (elements.btnConfirmActionSubmit) {
@@ -663,10 +669,15 @@ function confirmCancelRoom(roomId, bet) {
     if (elements.confirmOwner) elements.confirmOwner.textContent = "You (Owner)";
     if (elements.confirmBet) elements.confirmBet.textContent = `${bet.toLocaleString()} 🪙`;
     if (elements.confirmMessageText) elements.confirmMessageText.textContent = "Are you sure you want to cancel this room? Your bet will be fully refunded to your balance.";
+    
+    // Скрываем кнопку входа, показываем кнопку отмены комнаты
+    if (elements.btnConfirmActionSubmit) elements.btnConfirmActionSubmit.classList.add('hidden');
+    if (elements.btnConfirmActionCancelRoom) elements.btnConfirmActionCancelRoom.classList.remove('hidden');
+    
     if (elements.confirmModal) elements.confirmModal.classList.remove('hidden');
     
-    if (elements.btnConfirmActionSubmit) {
-        elements.btnConfirmActionSubmit.onclick = async () => {
+    if (elements.btnConfirmActionCancelRoom) {
+        elements.btnConfirmActionCancelRoom.onclick = async () => {
             if (elements.confirmModal) elements.confirmModal.classList.add('hidden');
             try {
                 const res = await fetch(`${API_BASE_URL}/api/rooms/delete/${roomId}`, {
@@ -696,10 +707,15 @@ function confirmDeleteRoom() {
     if (elements.confirmOwner) elements.confirmOwner.textContent = "You (Owner)";
     if (elements.confirmBet) elements.confirmBet.textContent = `${currentRoomBet ? currentRoomBet.toLocaleString() : '0'} 🪙`;
     if (elements.confirmMessageText) elements.confirmMessageText.textContent = "Are you sure you want to delete this room and leave? Your bet will be fully refunded to your balance.";
+    
+    // Скрываем кнопку входа, показываем кнопку отмены комнаты
+    if (elements.btnConfirmActionSubmit) elements.btnConfirmActionSubmit.classList.add('hidden');
+    if (elements.btnConfirmActionCancelRoom) elements.btnConfirmActionCancelRoom.classList.remove('hidden');
+    
     if (elements.confirmModal) elements.confirmModal.classList.remove('hidden');
     
-    if (elements.btnConfirmActionSubmit) {
-        elements.btnConfirmActionSubmit.onclick = () => {
+    if (elements.btnConfirmActionCancelRoom) {
+        elements.btnConfirmActionCancelRoom.onclick = () => {
             if (elements.confirmModal) elements.confirmModal.classList.add('hidden');
             leaveRoom();
         };
