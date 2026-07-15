@@ -2113,6 +2113,18 @@ input:checked + .slider:before {
 }
 
 .lb-podium-score { font-size: 12px; font-weight: 700; color: #ffd700; }
+.lb-podium-league {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: -2px;
+    margin-bottom: 2px;
+}
+.lb-podium-league.league-gold { color: #ffd700; text-shadow: 0 0 4px rgba(255, 215, 0, 0.4); }
+.lb-podium-league.league-silver { color: #d0d0d0; }
+.lb-podium-league.league-bronze { color: #e8a96b; }
+.lb-podium-league.league-rookie { color: var(--text-muted); }
 .lb-podium-prize { font-size: 10px; color: var(--text-muted); font-weight: 500; }
 
 /* ---- List (4-10) ---- */

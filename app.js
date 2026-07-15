@@ -1730,6 +1730,7 @@ function renderLeaderboard(data) {
                         ${initial}
                     </div>
                     <span class="lb-podium-name">${isMe ? '⭐ You' : name}</span>
+                    <span class="lb-podium-league ${meta.cls}">${meta.label}</span>
                     <span class="lb-podium-score">${e.won_today.toLocaleString()} 🪙</span>
                     ${prize ? `<span class="lb-podium-prize">${prize}</span>` : ''}
                 </div>`;
