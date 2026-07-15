@@ -1836,9 +1836,9 @@ const WELCOME_SEEN_KEY = 'dice_arena_welcome_seen';
 // position: 'top' | 'bottom' | 'center' (where to place tooltip relative to target)
 const TUTORIAL_STEPS = [
     {
-        icon: '🎲',
+        icon: '🤔',
         title: 'How it works?',
-        desc: 'Dice Arena is a 1v1 free to play betting game. Each of two players roll a Telegram dice — the player with the **lowest** roll takes the whole pot. ',
+        desc: 'Dice Arena is a 1v1 free to play betting game.\n\nEach of two players roll a Telegram dice — the player with the **lowest** roll takes the whole pot.\n\n<div style="text-align: center; font-size: 2em; line-height: 1; margin-top: 10px; margin-bottom: 15px;">⚀ &gt; ⚄</div>',
         targetId: null,
         position: 'center'
     },
@@ -1896,8 +1896,8 @@ const TUTORIAL_STEPS = [
     },
     {
         icon: '👑',
-        title: 'League Badge & Leaderboard',
-        desc: 'Your **league badge** (Rookie → Bronze → Silver → Gold) tracks your daily standing. Tap it to open the **Leaderboard** — top 3 winners earn prize bonuses every day at midnight!',
+        title: 'King of the Hill',
+        desc: 'The top 3 winners of the day get extra prizes!',
         targetId: '#league-badge',
         position: 'bottom'
     }
@@ -2172,7 +2172,7 @@ function showTutorialStep(stepIdx) {
     if (badgeEl)   badgeEl.textContent  = `Step ${stepIdx + 1} / ${steps.length}`;
     if (iconEl)    iconEl.textContent   = step.icon;
     if (titleEl)   titleEl.textContent  = step.title;
-    if (descEl)    descEl.innerHTML     = step.desc.replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--white)">$1</strong>');
+    if (descEl)    descEl.innerHTML     = step.desc.replace(/\n\n/g, '<br><br>').replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--white)">$1</strong>');
 
     // Progress bar
     let progressBar = tooltip.querySelector('.tutorial-progress-bar');
