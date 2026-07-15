@@ -818,7 +818,7 @@ function tgInvite() {
     
     // Open Telegram contact selection screen with inline query to send game invitation card
     if (tg && tg.switchInlineQuery) {
-        tg.switchInlineQuery(`join_${currentRoomId}`);
+        tg.switchInlineQuery(`join_${currentRoomId}`, ['users', 'groups']);
     } else {
         // Fallback for regular web browsers
         copyTextToClipboard(inviteUrl).then(() => {
