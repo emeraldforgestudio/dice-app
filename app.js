@@ -1528,13 +1528,27 @@ if (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
     const startParam = tg.initDataUnsafe.start_param;
     if (startParam.startsWith('join_')) {
         const roomId = startParam.split('join_')[1];
-        // Заходим автоматически через 1.2 секунды после инициализации
-        setTimeout(() => {
-            console.log("Auto-joining room from start_param:", roomId);
-            joinRoom(roomId);
+        setTimeout(async () => {
+            console.log("Deep-link join: fetching room info for", roomId);
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/rooms`, { headers: getHeaders() });
+                const rooms = await res.json();
+                const roomInfo = Array.isArray(rooms) ? rooms.find(r => r.id === roomId) : null;
+                if (roomInfo) {
+                    // Полностью тот же флоу что при нажатии кнопки Join Bet
+                    confirmJoinRoom(roomId, roomInfo.owner_username || 'Opponent', roomInfo.bet);
+                } else {
+                    // Комната приватная или не найдена в публичном списке — показываем базовое подтверждение
+                    confirmJoinRoom(roomId, 'Opponent', '—');
+                }
+            } catch (e) {
+                console.error("Deep-link join error:", e);
+                showToast("Failed to load room info", "error");
+            }
         }, 1200);
     }
 }
+
 
 // Фоновое обновление лобби раз в 10 секунд (синхронизация)
 setInterval(async () => {
