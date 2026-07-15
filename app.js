@@ -828,11 +828,24 @@ const TG_INVITE_NEW = {
 function tgInvite() {
     if (!currentRoomId) return;
 
+    let success = false;
     if (tg && tg.switchInlineQuery) {
-        // Use inline query for a beautiful invitation card with inline button
-        tg.switchInlineQuery(`join_${currentRoomId}`, ['users', 'chats', 'groups', 'channels']);
-    } else {
-        // Fallback to standard share if switchInlineQuery is not supported
+        try {
+            // Check if client supports choosing specific chat types (API 6.7+)
+            if (tg.isVersionAtLeast && tg.isVersionAtLeast('6.7')) {
+                tg.switchInlineQuery(`join_${currentRoomId}`, ['users', 'chats', 'groups', 'channels']);
+                success = true;
+            } else {
+                tg.switchInlineQuery(`join_${currentRoomId}`);
+                success = true;
+            }
+        } catch (e) {
+            console.error("switchInlineQuery failed:", e);
+        }
+    }
+
+    if (!success) {
+        // Fallback to standard share if switchInlineQuery is not supported or failed
         const url = TG_INVITE_BACKUP.url.replace('{BOT_USERNAME}', BOT_USERNAME).replace('{ROOM_ID}', currentRoomId);
         const text = TG_INVITE_BACKUP.text;
 
