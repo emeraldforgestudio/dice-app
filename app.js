@@ -2147,8 +2147,8 @@ function startConfetti(canvas) {
 
 // ---- Welcome Modal Logic ----
 function shouldShowWelcome() {
-    if (currentUser && currentUser.welcome_seen === true) {
-        return false;
+    if (currentUser) {
+        return !currentUser.welcome_seen;
     }
     try {
         return !localStorage.getItem(WELCOME_SEEN_KEY);
