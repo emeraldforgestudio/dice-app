@@ -1412,9 +1412,10 @@ input:checked + .slider:before {
 }
 
 .btn-filter-trigger.active {
-    background: rgba(46, 213, 115, 0.15);
-    border-color: var(--green);
-    color: var(--green);
+    background: rgba(0, 255, 135, 0.12);
+    border-color: var(--neon-green);
+    color: var(--neon-green);
+    box-shadow: 0 0 10px rgba(0, 255, 135, 0.2);
 }
 
 .expandable-filters {
@@ -1491,7 +1492,7 @@ input:checked + .slider:before {
 
 .filter-toggle {
     background: transparent;
-    border: none;
+    border: 1px solid transparent;
     color: var(--text-muted);
     padding: 5px;
     font-size: 11px;
@@ -1502,9 +1503,10 @@ input:checked + .slider:before {
 }
 
 .filter-toggle.active {
-    background: linear-gradient(135deg, var(--green) 0%, #10ac84 100%);
-    color: var(--white);
-    box-shadow: 0 2px 8px rgba(46, 213, 115, 0.2);
+    background: rgba(0, 255, 135, 0.12);
+    border-color: var(--neon-green);
+    color: var(--neon-green);
+    box-shadow: 0 0 10px rgba(0, 255, 135, 0.2);
 }
 
 .bet-range-row {
