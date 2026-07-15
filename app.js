@@ -1895,6 +1895,9 @@ async function syncLobbyData() {
         // 1. Profile
         if (data.profile) {
             currentUser = data.profile;
+            if (typeof checkAndShowWelcome === 'function') {
+                checkAndShowWelcome();
+            }
             if (currentUser.bot_username) {
                 BOT_USERNAME = currentUser.bot_username;
             }
@@ -2148,14 +2151,15 @@ function startConfetti(canvas) {
 
 // ---- Welcome Modal Logic ----
 function shouldShowWelcome() {
-    if (currentUser) {
-        return !currentUser.welcome_seen;
-    }
     try {
-        return !localStorage.getItem(WELCOME_SEEN_KEY);
-    } catch(e) {
+        if (localStorage.getItem(WELCOME_SEEN_KEY)) {
+            return false;
+        }
+    } catch(e) {}
+    if (currentUser && currentUser.welcome_seen) {
         return false;
     }
+    return true;
 }
 
 function markWelcomeSeen() {
