@@ -1922,9 +1922,17 @@ const TUTORIAL_STEPS = [
     {
         icon: '⚔️',
         title: 'Choose your fighter',
+        desc: 'This is the list of active game rooms. Tap the button to double the selected bet.',
+        targetId: '.room-card-item',
+        position: 'bottom'
+    },
+    {
+        icon: '⚔️',
+        title: 'Choose your fighter',
         desc: 'This is the bet amount you need to double.',
         targetId: '.room-bet-amount',
-        position: 'bottom'
+        position: 'bottom',
+        blocked: true
     },
     {
         icon: '🤔',
@@ -1955,7 +1963,8 @@ const TUTORIAL_STEPS = [
         title: 'Join a Room',
         desc: 'Tap here to **accept an existing bet**.',
         targetId: '.btn-join',
-        position: 'bottom'
+        position: 'bottom',
+        blocked: true
     },
     {
         icon: '🔍',
