@@ -328,6 +328,9 @@ async function fetchUserProfile() {
         }
         
         currentUser = data;
+        if (typeof checkAndShowWelcome === 'function') {
+            checkAndShowWelcome();
+        }
         if (data.bot_username) {
             BOT_USERNAME = data.bot_username;
         }
@@ -2144,6 +2147,9 @@ function startConfetti(canvas) {
 
 // ---- Welcome Modal Logic ----
 function shouldShowWelcome() {
+    if (currentUser && currentUser.welcome_seen === true) {
+        return false;
+    }
     try {
         return !localStorage.getItem(WELCOME_SEEN_KEY);
     } catch(e) {
@@ -2152,7 +2158,19 @@ function shouldShowWelcome() {
 }
 
 function markWelcomeSeen() {
-    try { localStorage.setItem(WELCOME_SEEN_KEY, '1'); } catch(e) {}
+    try { 
+        localStorage.setItem(WELCOME_SEEN_KEY, '1'); 
+    } catch(e) {}
+
+    if (currentUser) {
+        currentUser.welcome_seen = true;
+    }
+
+    // Call API to mark welcome seen in DB
+    fetch(`${API_BASE_URL}/api/user/welcome-seen`, {
+        method: 'POST',
+        headers: getHeaders()
+    }).catch(err => console.error("Failed to mark welcome seen in DB:", err));
 }
 
 function showWelcomeModal() {
@@ -2209,6 +2227,7 @@ function showWelcomeModal() {
             e.stopPropagation(); // prevent backdrop click from triggering skip
             if (stopConfetti) stopConfetti();
             closeWelcomeModal();
+            markWelcomeSeen();
             startTutorial();
         };
     }
@@ -2567,13 +2586,19 @@ function closeTutorial() {
     if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
 }
 
+let welcomeChecked = false;
+function checkAndShowWelcome() {
+    if (welcomeChecked) return;
+    welcomeChecked = true;
+    if (shouldShowWelcome()) {
+        setTimeout(() => {
+            showWelcomeModal();
+        }, 600);
+    }
+}
+
 // ---- Auto-show on startup (after profile loads) ----
 (function initWelcome() {
-    // Show on every reload (ignoring localStorage)
-    setTimeout(() => {
-        showWelcomeModal();
-    }, 800);
-
     // Bind the help button click to manually start the tutorial
     const helpBtn = document.getElementById('btn-tutorial-help');
     if (helpBtn) {
