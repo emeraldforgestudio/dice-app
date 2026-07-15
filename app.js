@@ -1985,7 +1985,8 @@ const TUTORIAL_STEPS = [
         title: 'Daily Bonus',
         desc: 'You can claim **1,000 free coins** every 6 hours.',
         targetId: '#btn-claim-gift',
-        position: 'bottom'
+        position: 'bottom',
+        blocked: true
     },
     {
         icon: '🔔',
