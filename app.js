@@ -2151,20 +2151,33 @@ function startConfetti(canvas) {
 
 // ---- Welcome Modal Logic ----
 function shouldShowWelcome() {
+    const key = currentUser && currentUser.id ? `${WELCOME_SEEN_KEY}_${currentUser.id}` : WELCOME_SEEN_KEY;
+    console.log("[Welcome] Checking if should show welcome. Key:", key);
     try {
-        if (localStorage.getItem(WELCOME_SEEN_KEY)) {
+        const localSeen = localStorage.getItem(key) || localStorage.getItem(WELCOME_SEEN_KEY);
+        if (localSeen) {
+            console.log("[Welcome] Welcome already seen in localStorage (value:", localSeen, ")");
             return false;
         }
-    } catch(e) {}
-    if (currentUser && currentUser.welcome_seen) {
-        return false;
+    } catch(e) {
+        console.error("[Welcome] Error reading localStorage:", e);
+    }
+    if (currentUser) {
+        console.log("[Welcome] Current user welcome_seen status in DB:", currentUser.welcome_seen);
+        if (currentUser.welcome_seen) {
+            return false;
+        }
+    } else {
+        console.log("[Welcome] currentUser is not set yet");
     }
     return true;
 }
 
 function markWelcomeSeen() {
+    const key = currentUser && currentUser.id ? `${WELCOME_SEEN_KEY}_${currentUser.id}` : WELCOME_SEEN_KEY;
+    console.log("[Welcome] Marking welcome seen in localStorage. Key:", key);
     try { 
-        localStorage.setItem(WELCOME_SEEN_KEY, '1'); 
+        localStorage.setItem(key, '1'); 
     } catch(e) {}
 
     if (currentUser) {
@@ -2175,10 +2188,13 @@ function markWelcomeSeen() {
     fetch(`${API_BASE_URL}/api/user/welcome-seen`, {
         method: 'POST',
         headers: getHeaders()
-    }).catch(err => console.error("Failed to mark welcome seen in DB:", err));
+    }).then(res => res.json()).then(data => {
+        console.log("[Welcome] Successfully marked welcome seen in DB:", data);
+    }).catch(err => console.error("[Welcome] Failed to mark welcome seen in DB:", err));
 }
 
 function showWelcomeModal() {
+    console.log("[Welcome] showWelcomeModal executed");
     const modal  = document.getElementById('welcome-modal');
     const canvas = document.getElementById('confetti-canvas');
     const loader = document.getElementById('welcome-loader');
@@ -2601,9 +2617,13 @@ function closeTutorial() {
 }
 
 function checkAndShowWelcome() {
+    console.log("[Welcome] checkAndShowWelcome called. welcomeChecked:", welcomeChecked);
     if (welcomeChecked) return;
     welcomeChecked = true;
-    if (shouldShowWelcome()) {
+    const shouldShow = shouldShowWelcome();
+    console.log("[Welcome] shouldShowWelcome result:", shouldShow);
+    if (shouldShow) {
+        console.log("[Welcome] Scheduling showWelcomeModal in 600ms...");
         setTimeout(() => {
             showWelcomeModal();
         }, 600);
