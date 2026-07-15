@@ -24,6 +24,7 @@ let gameSocket = null;
 let roomPollInterval = null;
 let activeRooms = [];
 let lastRenderedRoomsHash = "";
+let welcomeChecked = false;
 
 // Параметры фильтрации и пагинации
 let currentFilterType = 'all'; // 'all', 'own', 'other'
@@ -2586,7 +2587,6 @@ function closeTutorial() {
     if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
 }
 
-let welcomeChecked = false;
 function checkAndShowWelcome() {
     if (welcomeChecked) return;
     welcomeChecked = true;
