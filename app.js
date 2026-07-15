@@ -2214,7 +2214,6 @@ function showTutorialStep(stepIdx) {
         nextBtnEl.onclick = () => {
             if (isLast) {
                 closeTutorial();
-                showHelpIndicatorHint();
             } else {
                 tutorialStep++;
                 showTutorialStep(tutorialStep);
