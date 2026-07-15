@@ -772,15 +772,21 @@ async function leaveRoom() {
 function tgInvite() {
     if (!currentRoomId) return;
     
-    const shareUrl = `https://t.me/share/url?url=https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}&text=🎲 Join my Dice match! Low roll wins, bets are returned on tie. Let's play! 🪙`;
+    const inviteUrl = `https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`;
     
-    if (tg && tg.openTelegramLink) {
-        tg.openTelegramLink(shareUrl);
+    // Check if Web App supports version 7.2+ for native sharing inside the app without closure
+    if (tg && tg.isVersionAtLeast && tg.isVersionAtLeast('7.2') && tg.shareToBot) {
+        tg.shareToBot(`join_${currentRoomId}`);
     } else {
-        navigator.clipboard.writeText(`https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`).then(() => {
-            showToast("Invite link copied to clipboard!", "success");
+        // Fallback: copy to clipboard and show toast
+        navigator.clipboard.writeText(inviteUrl).then(() => {
+            showToast("Link copied! Send it to your opponent.", "success");
         }).catch(() => {
-            showToast("Unable to copy link", "error");
+            // Ultimate fallback: open share link if clipboard API is blocked
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(inviteUrl)}&text=${encodeURIComponent("🎲 Join my Dice match! Low roll wins. Let's play! 🪙")}`;
+            if (tg && tg.openTelegramLink) {
+                tg.openTelegramLink(shareUrl);
+            }
         });
     }
 }
