@@ -78,6 +78,7 @@ const elements = {
     btnCloseCreateModal: document.getElementById('btn-close-create-modal'),
     btnConfirmCreate: document.getElementById('btn-confirm-create'),
     inputBet: document.getElementById('input-bet'),
+    btnClearBet: document.getElementById('btn-clear-bet'),
     checkPrivate: document.getElementById('check-private'),
     presetBets: document.querySelectorAll('.btn-preset'),
     
@@ -1380,6 +1381,7 @@ if (elements.createRoomModal) {
         if (e.target === elements.inputBet || 
             e.target.closest('#btn-confirm-create') || 
             e.target.closest('#btn-close-create-modal') ||
+            e.target.closest('#btn-clear-bet') ||
             e.target.closest('.custom-checkbox-container')) {
             return;
         }
@@ -1434,6 +1436,14 @@ async function updateRoomLimitDisplay() {
 elements.btnCloseCreateModal.onclick = () => {
     elements.createRoomModal.classList.add('hidden');
 };
+
+if (elements.btnClearBet) {
+    elements.btnClearBet.onclick = () => {
+        if (elements.inputBet) {
+            elements.inputBet.value = "";
+        }
+    };
+}
 
 // Выбор готовых пресетов ставок
 elements.presetBets.forEach(btn => {
