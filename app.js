@@ -145,6 +145,11 @@ const elements = {
     adsInfoModal: document.getElementById('ads-info-modal'),
     btnCloseAdsInfoModal: document.getElementById('btn-close-ads-info-modal'),
     btnVisitChannel: document.getElementById('btn-visit-channel'),
+
+    // Окно предупреждения для дев-плеера (наблюдателя)
+    devPlayerWarnModal: document.getElementById('dev-player-warn-modal'),
+    btnCloseDevWarnModal: document.getElementById('btn-close-dev-warn-modal'),
+    btnDevWarnVisitChannel: document.getElementById('btn-dev-warn-visit-channel'),
 };
 
 // --- УВЕДОМЛЕНИЯ ---
@@ -653,6 +658,7 @@ async function joinRoom(roomId) {
 }
 
 function confirmJoinRoom(roomId, ownerUsername, bet) {
+    if (checkDevPlayer()) return;
     if (elements.confirmTitle) elements.confirmTitle.textContent = "Confirm Match Entry";
     if (elements.confirmOwner) elements.confirmOwner.textContent = `@${maskUsername(ownerUsername)}`;
     if (elements.confirmBet) elements.confirmBet.textContent = `${bet.toLocaleString()} 🪙`;
@@ -1334,8 +1340,20 @@ function startRoomPolling(roomId) {
 
 // --- ИВЕНТ ХЕНДЛЕРЫ ---
 
+// Вспомогательная функция для проверки режима наблюдателя (dev_player вне Telegram)
+function checkDevPlayer() {
+    if (currentUser && currentUser.username === 'dev_player') {
+        if (elements.devPlayerWarnModal) {
+            elements.devPlayerWarnModal.classList.remove('hidden');
+        }
+        return true;
+    }
+    return false;
+}
+
 // Управление модальным окном
 elements.btnCreateRoom.onclick = () => {
+    if (checkDevPlayer()) return;
     elements.createRoomModal.classList.remove('hidden');
     // elements.inputBet.focus(); // Убрано автооткрытие клавиатуры со старта
     updateRoomLimitDisplay();
@@ -1448,7 +1466,27 @@ if (elements.btnConfirmCreate) {
 
 if (elements.btnClaimGift) {
     elements.btnClaimGift.onclick = () => {
+        if (checkDevPlayer()) return;
         showAdAndCountdown();
+    };
+}
+
+if (elements.btnCloseDevWarnModal) {
+    elements.btnCloseDevWarnModal.onclick = () => {
+        if (elements.devPlayerWarnModal) {
+            elements.devPlayerWarnModal.classList.add('hidden');
+        }
+    };
+}
+
+if (elements.btnDevWarnVisitChannel) {
+    elements.btnDevWarnVisitChannel.onclick = () => {
+        const channelUrl = 'https://t.me/verdecasino';
+        if (tg && tg.openTelegramLink) {
+            tg.openTelegramLink(channelUrl);
+        } else {
+            window.open(channelUrl, '_blank');
+        }
     };
 }
 

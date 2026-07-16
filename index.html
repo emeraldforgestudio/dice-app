@@ -131,7 +131,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #198 (53ae0a3)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #199 (8be4626)</p>
         </footer>
     </div>
 
@@ -270,7 +270,30 @@
             </div>
         </div>
     </div>
-
+    
+    <!-- MODAL: DEV PLAYER WATCH ONLY WARNING -->
+    <div id="dev-player-warn-modal" class="modal-backdrop hidden">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3>💬 Telegram Only</h3>
+                <button class="btn-close-modal" id="btn-close-dev-warn-modal"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="modal-body text-center" style="padding: 10px 0; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+                <span style="font-size: 56px; filter: drop-shadow(0 0 10px rgba(36, 129, 204, 0.4)); line-height: 1;">📢</span>
+                <h4 style="font-size: 18px; font-weight: 700; color: var(--white); margin: 6px 0 0 0;">Spectator Mode Active</h4>
+                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; text-align: center; margin: 0;">
+                    To place bets and participate in matches, you must open the game via our official Telegram bot. Currently, you are viewing the game in read-only mode.
+                </p>
+            </div>
+            <div class="modal-footer" style="margin-top: 20px;">
+                <button id="btn-dev-warn-visit-channel" class="btn btn-telegram btn-block">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Go to Telegram Channel</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <!-- SCREEN: LEADERBOARD (Hidden by default) -->
     <div id="leaderboard-screen" class="screen-backdrop hidden">
         <div class="leaderboard-content glass-panel">
