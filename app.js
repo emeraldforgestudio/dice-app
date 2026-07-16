@@ -1679,9 +1679,10 @@ setInterval(async () => {
 
 
 
-// Клик по аватарке — открыть/закрыть уведомления
+// Клик по аватарке — открыть/закрыть уведомления (для наблюдателей player показывает предупреждение)
 if (elements.userAvatarWrapper) {
     elements.userAvatarWrapper.onclick = () => {
+        if (checkDevPlayer()) return;
         if (elements.notifPanel && elements.notifPanel.classList.contains('hidden')) {
             openNotifications();
         } else {
