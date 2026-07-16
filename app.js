@@ -579,6 +579,18 @@ async function createRoom(bet, isPrivate) {
         
         // Открываем экран ожидания игры
         openGameplayScreen(data.room_id, true, bet);
+        
+        // Запуск эффекта переливания (shimmer) для кнопки Return to lobby через 3 секунды
+        setTimeout(() => {
+            if (elements.btnKeepRoomLobby) {
+                elements.btnKeepRoomLobby.classList.add('shimmer-glow');
+                setTimeout(() => {
+                    if (elements.btnKeepRoomLobby) {
+                        elements.btnKeepRoomLobby.classList.remove('shimmer-glow');
+                    }
+                }, 1400);
+            }
+        }, 3000);
     } catch (e) {
         showToast("Network error", "error");
     }
