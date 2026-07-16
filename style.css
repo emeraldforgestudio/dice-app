@@ -237,13 +237,13 @@ body {
     box-shadow: 0 2px 5px rgba(36, 129, 204, 0.15);
 }
 
-/* Эффект блика для кнопки Daily Bonus */
-#btn-claim-gift {
+/* Эффект блика для кнопки Daily Bonus и Return to Lobby */
+#btn-claim-gift, #btn-keep-room-lobby {
     position: relative;
     overflow: hidden;
 }
 
-#btn-claim-gift::after {
+#btn-claim-gift::after, #btn-keep-room-lobby::after {
     content: '';
     position: absolute;
     top: 0;
@@ -264,7 +264,7 @@ body {
     will-change: transform;
 }
 
-#btn-claim-gift.shimmer-glow::after {
+#btn-claim-gift.shimmer-glow::after, #btn-keep-room-lobby.shimmer-glow::after {
     animation: button-shimmer 1.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
