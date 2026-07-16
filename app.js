@@ -53,7 +53,7 @@ if (!initData) {
     const mockUser = {
         id: 99999,
         first_name: "Developer",
-        username: "dev_player",
+        username: "player",
         language_code: "en"
     };
     initData = `mock_${encodeURIComponent(JSON.stringify(mockUser))}`;
@@ -1342,7 +1342,7 @@ function startRoomPolling(roomId) {
 
 // Вспомогательная функция для проверки режима наблюдателя (dev_player вне Telegram)
 function checkDevPlayer() {
-    if (currentUser && currentUser.username === 'dev_player') {
+    if (currentUser && currentUser.username === 'player') {
         if (elements.devPlayerWarnModal) {
             elements.devPlayerWarnModal.classList.remove('hidden');
         }
