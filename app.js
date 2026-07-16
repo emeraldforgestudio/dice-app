@@ -140,6 +140,11 @@ const elements = {
     expandableFiltersPanel: document.getElementById('expandable-filters-panel'),
     vsRingSvg: document.getElementById('vs-ring-svg'),
     vsBadgeText: document.getElementById('vs-badge-text'),
+    
+    // Новое модальное окно рекламы
+    adsInfoModal: document.getElementById('ads-info-modal'),
+    btnCloseAdsInfoModal: document.getElementById('btn-close-ads-info-modal'),
+    btnVisitChannel: document.getElementById('btn-visit-channel'),
 };
 
 // --- УВЕДОМЛЕНИЯ ---
@@ -1451,6 +1456,37 @@ if (elements.btnCloseAdModal) {
     elements.btnCloseAdModal.onclick = () => {
         if (adTimer) clearInterval(adTimer);
         elements.adModal.classList.add('hidden');
+    };
+}
+
+// Перехват клика по рекламному баннеру
+const adLink = document.querySelector('.ad-banner-link');
+if (adLink) {
+    adLink.onclick = (e) => {
+        e.preventDefault(); // Отменяем переход по пустой ссылке
+        // Открываем модальное окно с деталями рекламы
+        if (elements.adsInfoModal) {
+            elements.adsInfoModal.classList.remove('hidden');
+        }
+    };
+}
+
+if (elements.btnCloseAdsInfoModal) {
+    elements.btnCloseAdsInfoModal.onclick = () => {
+        if (elements.adsInfoModal) {
+            elements.adsInfoModal.classList.add('hidden');
+        }
+    };
+}
+
+if (elements.btnVisitChannel) {
+    elements.btnVisitChannel.onclick = () => {
+        const channelUrl = 'https://t.me/verdecasino';
+        if (tg && tg.openTelegramLink) {
+            tg.openTelegramLink(channelUrl);
+        } else {
+            window.open(channelUrl, '_blank');
+        }
     };
 }
 
