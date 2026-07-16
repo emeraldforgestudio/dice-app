@@ -540,8 +540,12 @@ function renderRooms(rooms) {
             ? `<span class="private-badge"><i class="fa-solid fa-eye-slash"></i> Hidden</span>`
             : '';
             
+        const isOwnClickHtml = isOwn
+            ? `onclick="if (!event.target.closest('button')) openGameplayScreen('${room.id}', true, ${room.bet})"`
+            : '';
+            
         return `
-            <div class="room-card-item ${isPrivate ? 'private-room-card' : ''}" id="room-${room.id}">
+            <div class="room-card-item ${isPrivate ? 'private-room-card' : ''} ${isOwn ? 'my-room-card-clickable' : ''}" id="room-${room.id}" ${isOwnClickHtml}>
                 <div class="room-info-side">
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span class="room-bet-amount">${room.bet.toLocaleString()} 🪙</span>
