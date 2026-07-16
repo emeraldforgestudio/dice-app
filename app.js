@@ -896,38 +896,12 @@ function tgInvite() {
 function systemShare() {
     if (!currentRoomId) return;
     const url = `https://t.me/${BOT_USERNAME}?start=join_${currentRoomId}`;
-    const betVal = typeof currentRoomBet !== 'undefined' && currentRoomBet ? `${currentRoomBet.toLocaleString()} 🪙` : "some";
-    const text = `🎲 VERDE Dice Match!\n━━━━━━━━━━━━━━━━━━\n🤝 You are invited to play!\n💰 Bet: ${betVal}\n📜 Rules: Lowest roll wins (⚀ beats ⚅)\n\n👉 Click here to join:\n`;
     
-    const fallbackCopyAndShare = () => {
-        copyTextToClipboard(url).then(() => {
-            showToast("Link copied! Opening share menu...", "success");
-            const shareUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(text + "\n\n" + url)}`;
-            if (tg && tg.openTelegramLink) {
-                tg.openTelegramLink(shareUrl);
-            }
-        }).catch(() => {
-            const shareUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(text + "\n\n" + url)}`;
-            if (tg && tg.openTelegramLink) {
-                tg.openTelegramLink(shareUrl);
-            } else {
-                showToast("Unable to share or copy link", "error");
-            }
-        });
-    };
-
-    if (navigator.share) {
-        navigator.share({
-            title: 'Dice Arena Match',
-            text: text + "\n\n" + url
-        }).catch((err) => {
-            console.log("Share failed or cancelled:", err);
-            // Fallback if system share is supported but fails or is cancelled
-            fallbackCopyAndShare();
-        });
-    } else {
-        fallbackCopyAndShare();
-    }
+    copyTextToClipboard(url).then(() => {
+        showToast("Invite link copied to clipboard!", "success");
+    }).catch(() => {
+        showToast("Failed to copy link", "error");
+    });
 }
 
 function openGameplayScreen(roomId, isOwner, bet, result = null) {
