@@ -1342,9 +1342,9 @@ if (elements.createRoomModal) {
                 
                 // Вручную применяем пресет
                 const btn = e.target.closest('.btn-preset');
-                elements.presetBets.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                elements.inputBet.value = btn.dataset.val;
+                const currentVal = parseInt(elements.inputBet.value) || 0;
+                const presetVal = parseInt(btn.dataset.val) || 0;
+                elements.inputBet.value = currentVal + presetVal;
             }
             return;
         }
@@ -1411,9 +1411,9 @@ elements.btnCloseCreateModal.onclick = () => {
 // Выбор готовых пресетов ставок
 elements.presetBets.forEach(btn => {
     btn.onclick = () => {
-        elements.presetBets.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        elements.inputBet.value = btn.dataset.val;
+        const currentVal = parseInt(elements.inputBet.value) || 0;
+        const presetVal = parseInt(btn.dataset.val) || 0;
+        elements.inputBet.value = currentVal + presetVal;
     };
 });
 
