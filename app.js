@@ -1585,14 +1585,6 @@ if (elements.btnReturnLobby) {
 }
 
 // Слушатели для фильтрации и сортировки
-if (elements.searchOwner) {
-    elements.searchOwner.oninput = (e) => {
-        currentSearchQuery = e.target.value;
-        currentPage = 1;
-        renderRooms(activeRooms);
-    };
-}
-
 if (elements.sortRooms) {
     elements.sortRooms.onchange = (e) => {
         currentSortType = e.target.value;
