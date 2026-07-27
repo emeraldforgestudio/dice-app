@@ -570,11 +570,22 @@ async function claimDailyGift() {
 async function fetchActiveRooms() {
     try {
         const res = await fetch(`${API_BASE_URL}/api/rooms?t=${Date.now()}`, { headers: getHeaders() });
-        if (!res.ok) throw new Error();
+        if (!res.ok) return;
         activeRooms = await res.json();
         renderRooms(activeRooms);
     } catch (e) {
-        console.error("Failed to fetch rooms list");
+        console.error("Failed to fetch rooms list:", e);
+    }
+}
+
+async function syncLobbyData() {
+    try {
+        await Promise.all([
+            fetchUserProfile(),
+            fetchActiveRooms()
+        ]);
+    } catch (e) {
+        // Silent fail for background sync
     }
 }
 
