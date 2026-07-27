@@ -18,9 +18,9 @@
     <div id="app-container">
         <!-- BRANDING LOGO -->
         <div class="brand-logo-container">
+            <div style="position: absolute; right: 16px; top: 16px;" id="ton-connect-btn"></div>
             <span class="brand-dice">🎲</span>
             <span class="brand-name">VERDE</span>
-            <div id="ton-connect-btn" style="margin-left: auto;"></div>
         </div>
 
         <!-- HEADER PROFILE SECTION -->
@@ -37,14 +37,13 @@
                     <span class="league-badge" id="league-badge" onclick="openLeaderboard()"></span>
                 </div>
             </div>
-            <div class="balance-container" style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
-                <div>
-                    <span class="balance-label">Coins:</span>
+            <div class="balance-container" style="display: flex; flex-direction: column; align-items: flex-end; cursor: pointer;" onclick="toggleActiveBalance()">
+                <div id="balance-coins-box" class="balance-toggle-box">
                     <span class="balance-value" id="balance-display">0 🪙</span>
                 </div>
-                <div>
-                    <span class="balance-label">TON <span style="background: rgba(255,193,7,0.2); color: #ffc107; font-size: 9px; padding: 2px 5px; border-radius: 4px; border: 1px solid rgba(255,193,7,0.4); font-weight: bold;">TESTNET</span>:</span>
+                <div id="balance-ton-box" class="balance-toggle-box hidden" style="display: flex; flex-direction: column; align-items: flex-end;">
                     <span class="balance-value" id="ton-balance-display" style="color: #0088cc; font-weight: bold;">0.00 💎</span>
+                    <span style="background: rgba(255,193,7,0.2); color: #ffc107; font-size: 8px; padding: 1px 4px; border-radius: 4px; border: 1px solid rgba(255,193,7,0.4); font-weight: bold; margin-top: 2px;">TESTNET</span>
                 </div>
             </div>
         </header>
@@ -132,7 +131,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #213 (cab0d82)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #214 (192859f)</p>
         </footer>
     </div>
 
@@ -538,6 +537,6 @@
 
     <!-- TON Connect UI SDK -->
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-    <script src="app.js?v=212"></script>
+    <script src="app.js?v=213"></script>
 </body>
 </html>

@@ -105,8 +105,35 @@ async function updateTonBalanceDisplay() {
     }
 }
 
+let activeHeaderBalanceMode = 'coins'; // 'coins' or 'ton'
+
+function toggleActiveBalance(forceMode = null) {
+    if (forceMode) {
+        activeHeaderBalanceMode = forceMode;
+    } else {
+        activeHeaderBalanceMode = (activeHeaderBalanceMode === 'coins') ? 'ton' : 'coins';
+    }
+
+    const coinsBox = document.getElementById('balance-coins-box');
+    const tonBox = document.getElementById('balance-ton-box');
+
+    if (activeHeaderBalanceMode === 'ton') {
+        if (coinsBox) coinsBox.classList.add('hidden');
+        if (tonBox) {
+            tonBox.classList.remove('hidden');
+            tonBox.style.display = 'flex';
+        }
+    } else {
+        if (tonBox) tonBox.classList.add('hidden');
+        if (coinsBox) coinsBox.classList.remove('hidden');
+    }
+}
+window.toggleActiveBalance = toggleActiveBalance;
+
 function selectBetCurrency(currency) {
     currentBetCurrency = currency;
+    toggleActiveBalance(currency);
+
     const coinsBtn = document.getElementById('mode-coins-btn');
     const tonBtn = document.getElementById('mode-ton-btn');
     const symbolDisplay = document.getElementById('currency-symbol-display');
