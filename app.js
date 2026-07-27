@@ -739,7 +739,7 @@ async function createRoom(bet, isPrivate) {
             } catch (txError) {
                 console.error("TON Tx failed/cancelled:", txError);
                 const errMsg = (txError && txError.message) ? txError.message : JSON.stringify(txError);
-                showToast(`TON Error: ${errMsg.slice(0, 40)}`, "error");
+                alert(`TON CONNECT DETAILS: ${errMsg}`);
                 return; // ПРЕДОТВРАЩАЕМ создание комнаты при отмене или ошибке транзакции
             }
         }
