@@ -108,19 +108,20 @@ function updateHeaderTonConnectButton() {
     const headerBtnContainer = document.getElementById('ton-connect-btn');
     if (!headerBtnContainer) return;
     
+    const tonSvgIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><path d="M12 2L2 8.5L12 22L22 8.5L12 2Z" fill="white" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 2V22" stroke="#0088cc" stroke-width="1.5"/><path d="M2 8.5L12 13L22 8.5" stroke="#0088cc" stroke-width="1.5"/></svg>`;
+
     if (userTonAddress) {
-        // Когда кошелек подключен, очищаем кастомную кнопку, чтобы показывалась оригинальная кнопка TON Connect UI
-        headerBtnContainer.innerHTML = '';
+        const shortAddr = userTonAddress.slice(0, 4) + '...' + userTonAddress.slice(-4);
+        headerBtnContainer.innerHTML = `<button class="btn-preset-ton" onclick="handleHeaderTonButtonClick()">${tonSvgIcon} ${shortAddr}</button>`;
     } else {
-        const tonSvgIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><path d="M12 2L2 8.5L12 22L22 8.5L12 2Z" fill="white" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 2V22" stroke="#0088cc" stroke-width="1.5"/><path d="M2 8.5L12 13L22 8.5" stroke="#0088cc" stroke-width="1.5"/></svg>`;
-        headerBtnContainer.innerHTML = `<button class="btn-preset-ton" style="padding: 8px 16px; font-size: 14px; display: flex; align-items: center; gap: 6px;" onclick="handleHeaderTonButtonClick()">${tonSvgIcon} Connect TON</button>`;
+        headerBtnContainer.innerHTML = `<button class="btn-preset-ton" onclick="handleHeaderTonButtonClick()">${tonSvgIcon} Connect TON</button>`;
     }
 }
 
 function handleHeaderTonButtonClick() {
     if (userTonAddress) {
-        // Если кошелек уже подключен, открываем стандартное меню отключения/управления TON Connect UI
-        if (tonConnectUI) tonConnectUI.openModal();
+        // Если кошелек уже подключен, открываем поп-ап настроек (Settings)
+        openTonSettingsModal();
     } else {
         // Если кошелек не подключен, показываем предупреждающий поп-ап
         openTonWarningModal();
@@ -144,6 +145,32 @@ function closeTonWarningModal() {
     if (modal) modal.classList.add('hidden');
 }
 
+function openTonSettingsModal() {
+    const modal = document.getElementById('ton-settings-modal');
+    const addrDiv = document.getElementById('ton-settings-address');
+    if (addrDiv && userTonAddress) {
+        addrDiv.innerText = userTonAddress;
+    }
+    if (modal) modal.classList.remove('hidden');
+}
+
+function closeTonSettingsModal() {
+    const modal = document.getElementById('ton-settings-modal');
+    if (modal) modal.classList.add('hidden');
+}
+
+async function disconnectTonWalletFromSettings() {
+    if (tonConnectUI) {
+        try {
+            await tonConnectUI.disconnect();
+            showToast("TON Wallet disconnected", "info");
+        } catch (err) {
+            console.error("Error disconnecting wallet:", err);
+        }
+    }
+    closeTonSettingsModal();
+}
+
 function setupTonWarningModalEvents() {
     const closeBtn = document.getElementById('btn-close-ton-warning-modal');
     const cancelBtn = document.getElementById('btn-cancel-ton-warning');
@@ -154,6 +181,15 @@ function setupTonWarningModalEvents() {
     if (modal) {
         modal.onclick = (e) => {
             if (e.target === modal) closeTonWarningModal();
+        };
+    }
+
+    const settingsCloseBtn = document.getElementById('btn-close-ton-settings-modal');
+    const settingsModal = document.getElementById('ton-settings-modal');
+    if (settingsCloseBtn) settingsCloseBtn.onclick = closeTonSettingsModal;
+    if (settingsModal) {
+        settingsModal.onclick = (e) => {
+            if (e.target === settingsModal) closeTonSettingsModal();
         };
     }
 }

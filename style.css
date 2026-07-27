@@ -74,6 +74,7 @@ body {
 #ton-connect-btn {
     display: flex;
     justify-content: center;
+    width: 100%;
     filter: none;
 }
 
@@ -86,10 +87,15 @@ body {
     border: 1px solid rgba(0, 136, 204, 0.4);
     color: #0088cc;
     font-weight: 600;
-    padding: 8px 12px;
+    padding: 8px 16px;
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
+    width: 75%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .btn-preset-ton:hover {

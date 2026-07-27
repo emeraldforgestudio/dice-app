@@ -136,7 +136,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #239 (18c4185)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #240 (1c96f57)</p>
         </footer>
     </div>
 
@@ -294,6 +294,28 @@
                     </svg> Connect Wallet
                 </button>
                 <button id="btn-cancel-ton-warning" class="btn btn-secondary btn-block">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TON SETTINGS -->
+    <div id="ton-settings-modal" class="modal-backdrop hidden">
+        <div class="modal-content glass-panel text-center" style="max-width: 360px;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-gear" style="color: var(--neon-green);"></i> Settings</h3>
+                <button class="btn-close-modal" id="btn-close-ton-settings-modal"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 16px 0;">
+                <div style="background: rgba(0, 136, 204, 0.1); border: 1px solid rgba(0, 136, 204, 0.3); border-radius: 16px; padding: 14px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Connected TON Wallet</div>
+                    <div id="ton-settings-address" style="font-family: monospace; font-size: 13px; color: #0088cc; font-weight: bold; background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 8px; width: 100%; word-break: break-all;"></div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                <button id="btn-ton-disconnect" class="btn btn-danger btn-block" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px;" onclick="disconnectTonWalletFromSettings()">
+                    <i class="fa-solid fa-right-from-bracket"></i> Disconnect Wallet
+                </button>
+                <button id="btn-close-ton-settings" class="btn btn-secondary btn-block" onclick="closeTonSettingsModal()">Close</button>
             </div>
         </div>
     </div>
