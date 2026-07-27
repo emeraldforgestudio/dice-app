@@ -1495,9 +1495,10 @@ if (elements.createRoomModal) {
                 
                 // Вручную применяем пресет
                 const btn = e.target.closest('.btn-preset');
-                const currentVal = parseInt(elements.inputBet.value) || 0;
-                const presetVal = parseInt(btn.dataset.val) || 0;
-                elements.inputBet.value = currentVal + presetVal;
+                const currentVal = parseFloat(elements.inputBet.value) || 0;
+                const presetVal = parseFloat(btn.dataset.val) || 0;
+                const newVal = currentVal + presetVal;
+                elements.inputBet.value = currentBetCurrency === 'ton' ? parseFloat(newVal.toFixed(2)) : Math.round(newVal);
             }
             return;
         }
@@ -1571,18 +1572,21 @@ if (elements.btnClearBet) {
 }
 
 // Выбор готовых пресетов ставок
-elements.presetBets.forEach(btn => {
-    btn.onclick = () => {
-        const currentVal = parseInt(elements.inputBet.value) || 0;
-        const presetVal = parseInt(btn.dataset.val) || 0;
-        elements.inputBet.value = currentVal + presetVal;
-    };
+document.querySelectorAll('.preset-bets').forEach(container => {
+    container.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-preset');
+        if (!btn) return;
+        const currentVal = parseFloat(elements.inputBet.value) || 0;
+        const presetVal = parseFloat(btn.dataset.val) || 0;
+        const newVal = currentVal + presetVal;
+        elements.inputBet.value = currentBetCurrency === 'ton' ? parseFloat(newVal.toFixed(2)) : Math.round(newVal);
+    });
 });
 
 // Кнопка подтверждения создания комнаты
 if (elements.btnConfirmCreate) {
     elements.btnConfirmCreate.onclick = () => {
-        const bet = parseInt(elements.inputBet.value);
+        const bet = parseFloat(elements.inputBet.value);
         const isPrivate = elements.checkPrivate.checked;
         
         if (isNaN(bet) || bet <= 0) {
@@ -1590,8 +1594,8 @@ if (elements.btnConfirmCreate) {
             return;
         }
         
-        if (bet > currentUser.balance) {
-            showToast("Insufficient balance", "error");
+        if (currentBetCurrency === 'coins' && bet > currentUser.balance) {
+            showToast("Insufficient coins balance", "error");
             return;
         }
         
