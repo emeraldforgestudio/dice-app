@@ -69,7 +69,7 @@ function initTonConnect() {
         const TONSDK = window.TON_CONNECT_UI || window.TonConnectUI;
         if (TONSDK && document.getElementById('ton-connect-btn')) {
             tonConnectUI = new TONSDK.TonConnectUI({
-                manifestUrl: 'https://raw.githubusercontent.com/ton-defi-org/tonconnect-manifest-temp/main/tonconnect-manifest.json',
+                manifestUrl: 'https://raw.githubusercontent.com/emeraldforgestudio/dice-app/main/tonconnect-manifest.json',
                 buttonRootId: 'ton-connect-btn'
             });
 
