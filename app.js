@@ -411,7 +411,7 @@ async function fetchUserProfile() {
             }
         }
     } catch (e) {
-        showToast("Error connecting to server", "error");
+        showToast(`Server error: ${e.message || e}`, "error");
         console.error(e);
     }
 }
