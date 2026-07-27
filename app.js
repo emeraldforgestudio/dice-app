@@ -892,15 +892,30 @@ function encodeTactPayload(opcodeHex, gameIdNum) {
 
 async function createRoom(bet, isPrivate) {
     try {
-        const numericRoomId = Math.floor(Date.now() / 1000); // 32-bit unique timestamp ID
-
-        // 1. Для TON комнат СНАЧАЛА запрашиваем подтверждение в кошельке
         if (currentBetCurrency === 'ton') {
             if (!tonConnectUI || !userTonAddress) {
                 showToast("Please connect your TON wallet first!", "error");
                 return;
             }
+        }
 
+        // 1. Сначала создаем комнату на бэкенде чтобы получить ID
+        const res = await fetch(`${API_BASE_URL}/api/rooms/create`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ bet, currency: currentBetCurrency, is_private: isPrivate })
+        });
+        const data = await res.json();
+        
+        if (!handleApiResponse(res, data, "Failed to create room")) {
+            return;
+        }
+
+        const roomId = data.room_id;
+        const numericRoomId = parseInt(roomId.toString().replace(/\D/g, '')) || 0;
+
+        // 2. Для TON комнат запрашиваем подтверждение в кошельке используя ID от бэкенда
+        if (currentBetCurrency === 'ton') {
             const nanoAmount = Math.round(bet * 1e9).toString();
             const vaultContractAddress = "kQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
 
@@ -920,28 +935,31 @@ async function createRoom(bet, isPrivate) {
             try {
                 const txResult = await tonConnectUI.sendTransaction(transaction);
                 console.log("💎 TON Transaction sent:", txResult);
-                showToast("TON deposit confirmed! Registering room...", "success");
+                showToast("TON deposit confirmed!", "success");
             } catch (txError) {
                 console.error("TON Tx failed/cancelled:", txError);
                 showToast("TON transfer failed or cancelled in wallet!", "error");
-                return; // ПРЕДОТВРАЩАЕМ регистрацию комнаты, если транзакция не подтверждена
+                
+                // Удаляем комнату на бэкенде, так как транзакция не прошла
+                try {
+                    await fetch(`${API_BASE_URL}/api/rooms/delete/${roomId}`, {
+                        method: 'POST',
+                        headers: getHeaders()
+                    });
+                } catch (e) {
+                    console.error("Failed to delete unpaid room", e);
+                }
+                return; 
             }
-        }
-
-        // 2. Только ПОСЛЕ того как кошелек подтвердил транзакцию — создаем комнату на бэкенде
-        const res = await fetch(`${API_BASE_URL}/api/rooms/create`, {
-            method: 'POST',
-            headers: getHeaders(),
-            body: JSON.stringify({ bet, currency: currentBetCurrency, is_private: isPrivate })
-        });
-        const data = await res.json();
-        
-        if (!handleApiResponse(res, data, "Failed to create room")) {
-            return;
         }
         
         const roomsLeftText = data.rooms_left !== undefined ? ` (${data.rooms_left} rooms left)` : "";
-        showToast(`Room created successfully!${roomsLeftText}`, "success");
+        if (currentBetCurrency !== 'ton') {
+            showToast(`Room created successfully!${roomsLeftText}`, "success");
+        } else {
+            showToast(`Room registered successfully!${roomsLeftText}`, "success");
+        }
+        
         elements.createRoomModal.classList.add('hidden');
         fetchUserProfile();
         if (currentBetCurrency === 'ton') {
@@ -949,7 +967,7 @@ async function createRoom(bet, isPrivate) {
         }
         
         // Открываем экран ожидания игры
-        openGameplayScreen(data.room_id, true, bet);
+        openGameplayScreen(roomId, true, bet);
         
         setTimeout(() => {
             if (elements.btnKeepRoomLobby) {
