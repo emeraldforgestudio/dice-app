@@ -935,6 +935,13 @@ async function createRoom(bet, isPrivate) {
             try {
                 const txResult = await tonConnectUI.sendTransaction(transaction);
                 console.log("💎 TON Transaction sent:", txResult);
+                
+                // 3. Подтверждаем бэкенду что оплата прошла, чтобы он разослал комнату всем
+                await fetch(`${API_BASE_URL}/api/rooms/confirm_ton/${roomId}`, {
+                    method: 'POST',
+                    headers: getHeaders()
+                });
+                
                 showToast("TON deposit confirmed!", "success");
             } catch (txError) {
                 console.error("TON Tx failed/cancelled:", txError);
@@ -1015,11 +1022,26 @@ async function joinRoom(roomId) {
             try {
                 const txResult = await tonConnectUI.sendTransaction(transaction);
                 console.log("💎 TON Join Transaction sent:", txResult);
+                
+                await fetch(`${API_BASE_URL}/api/rooms/confirm_ton/${roomId}`, {
+                    method: 'POST',
+                    headers: getHeaders()
+                });
+                
                 showToast("TON deposit confirmed! Joining match...", "success");
                 setTimeout(updateTonBalanceDisplay, 3000);
             } catch (txError) {
                 console.error("TON Join Tx failed/cancelled:", txError);
                 showToast("Transaction cancelled or failed in wallet", "error");
+                
+                // Выходим из комнаты на бэкенде
+                try {
+                    await fetch(`${API_BASE_URL}/api/rooms/leave/${roomId}`, {
+                        method: 'POST',
+                        headers: getHeaders()
+                    });
+                } catch (e) {}
+                
                 return;
             }
         }
