@@ -708,20 +708,27 @@ function renderRooms(rooms) {
     }).join('');
 }
 
-// Хелпер: формирование валидного Base64 BOC Cell для сообщений Tact контракта
+// Хелпер: формирование официального TON Cell BOC через TonWeb
 function encodeTactPayload(opcodeHex, gameIdNum) {
-    // Opcode uint32 (4 bytes) + game_id uint64 Big-Endian (8 bytes) = 12 bytes
+    try {
+        if (window.TonWeb) {
+            const cell = new window.TonWeb.boc.Cell();
+            // Opcode uint32
+            cell.bits.writeUint(parseInt(opcodeHex, 16), 32);
+            // game_id uint64
+            cell.bits.writeUint(BigInt(gameIdNum || 0), 64);
+            return window.TonWeb.utils.bytesToBase64(cell.toBoc(false));
+        }
+    } catch (err) {
+        console.warn("TonWeb cell encoding fallback:", err);
+    }
+
+    // Fallback: ручная сборка ячейки
     const buffer = new ArrayBuffer(12);
     const view = new DataView(buffer);
-    
-    // Записываем opcode (uint32)
     view.setUint32(0, parseInt(opcodeHex, 16), false);
-    
-    // Записываем game_id (uint64)
     const bigGameId = BigInt(gameIdNum || 0);
     view.setBigUint64(4, bigGameId, false);
-    
-    // Формируем стандартизированный TON Cell BOC заголовок для 12-байтовой ячейки
     const bytes = new Uint8Array(buffer);
     const bocHeader = [
         0xb5, 0xee, 0x9c, 0x72, // magic
@@ -729,12 +736,9 @@ function encodeTactPayload(opcodeHex, gameIdNum) {
         0x00, 0x11, 0x00, 0x00, // payload length info
         0x00, 0x00, 0x60        // bit len (96 bits)
     ];
-    
     const fullBoc = new Uint8Array(bocHeader.length + bytes.length);
     fullBoc.set(bocHeader, 0);
     fullBoc.set(bytes, bocHeader.length);
-    
-    // Конвертируем в Base64
     let binary = '';
     for (let i = 0; i < fullBoc.length; i++) {
         binary += String.fromCharCode(fullBoc[i]);
@@ -744,28 +748,15 @@ function encodeTactPayload(opcodeHex, gameIdNum) {
 
 async function createRoom(bet, isPrivate) {
     try {
-        let tempGameId = Date.now(); // временный идентификатор до получения от сервера
+        const numericRoomId = Math.floor(Date.now() / 1000); // 32-bit unique timestamp ID
 
-        const res = await fetch(`${API_BASE_URL}/api/rooms/create`, {
-            method: 'POST',
-            headers: getHeaders(),
-            body: JSON.stringify({ bet, currency: currentBetCurrency, is_private: isPrivate })
-        });
-        const data = await res.json();
-        
-        if (!handleApiResponse(res, data, "Failed to create room")) {
-            return;
-        }
-
-        const numericRoomId = parseInt(data.room_id.replace(/\D/g, '')) || tempGameId;
-
+        // 1. Для TON комнат СНАЧАЛА запрашиваем подтверждение в кошельке
         if (currentBetCurrency === 'ton') {
             if (!tonConnectUI || !userTonAddress) {
                 showToast("Please connect your TON wallet first!", "error");
                 return;
             }
 
-            // Сумма ставки в наноединицах (1 TON = 1,000,000,000 nanoTON)
             const nanoAmount = Math.round(bet * 1e9).toString();
             const vaultContractAddress = "kQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
 
@@ -785,14 +776,24 @@ async function createRoom(bet, isPrivate) {
             try {
                 const txResult = await tonConnectUI.sendTransaction(transaction);
                 console.log("💎 TON Transaction sent:", txResult);
-                showToast("TON deposit confirmed!", "success");
+                showToast("TON deposit confirmed! Registering room...", "success");
             } catch (txError) {
                 console.error("TON Tx failed/cancelled:", txError);
                 showToast("TON transfer failed or cancelled in wallet!", "error");
-                // Отменяем создание комнаты на бэкенде, если транзакция отменена
-                fetch(`${API_BASE_URL}/api/rooms/delete/${data.room_id}`, { method: 'POST', headers: getHeaders() });
-                return;
+                return; // ПРЕДОТВРАЩАЕМ регистрацию комнаты, если транзакция не подтверждена
             }
+        }
+
+        // 2. Только ПОСЛЕ того как кошелек подтвердил транзакцию — создаем комнату на бэкенде
+        const res = await fetch(`${API_BASE_URL}/api/rooms/create`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ bet, currency: currentBetCurrency, is_private: isPrivate })
+        });
+        const data = await res.json();
+        
+        if (!handleApiResponse(res, data, "Failed to create room")) {
+            return;
         }
         
         const roomsLeftText = data.rooms_left !== undefined ? ` (${data.rooms_left} rooms left)` : "";
