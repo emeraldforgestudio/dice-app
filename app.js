@@ -729,8 +729,8 @@ async function createRoom(bet, isPrivate) {
                 showToast("TON deposit confirmed! Registering room...", "success");
             } catch (txError) {
                 console.error("TON Tx failed/cancelled:", txError);
-                showToast("Transaction cancelled or failed in wallet", "error");
-                return;
+                showToast("TON transfer failed or cancelled in wallet!", "error");
+                return; // ПРЕДОТВРАЩАЕМ создание комнаты при отмене или ошибке транзакции
             }
         }
 
