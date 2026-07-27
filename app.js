@@ -97,11 +97,13 @@ function initTonConnect() {
                     console.log('💎 TON Wallet connected:', userTonAddress);
                     closeTonWarningModal();
                     updateHeaderTonConnectButton();
+                    toggleActiveBalance('ton');
                     updateTonBalanceDisplay();
                 } else {
                     userTonAddress = null;
                     console.log('💎 TON Wallet disconnected');
                     updateHeaderTonConnectButton();
+                    toggleActiveBalance('coins');
                     const tonDisplay = document.getElementById('ton-balance-display');
                     if (tonDisplay) tonDisplay.innerText = '0.00 💎';
                 }
@@ -733,14 +735,25 @@ function renderRooms(rooms) {
         filtered = filtered.filter(r => r.bet <= currentBetMax);
     }
     
-    // 2. Сортировка
-    if (currentSortType === 'bet-asc') {
-        filtered.sort((a, b) => a.bet - b.bet);
-    } else if (currentSortType === 'bet-desc') {
-        filtered.sort((a, b) => b.bet - a.bet);
-    } else if (currentSortType === 'newest') {
-        filtered.sort((a, b) => b.id.localeCompare(a.id));
-    }
+    // 2. Сортировка: TON комнаты ВСЕГДА идут первыми наверх
+    filtered.sort((a, b) => {
+        const aIsTon = a.currency === 'ton' ? 1 : 0;
+        const bIsTon = b.currency === 'ton' ? 1 : 0;
+        
+        if (aIsTon !== bIsTon) {
+            return bIsTon - aIsTon; // TON комнаты (1) идут раньше обычных (0)
+        }
+        
+        // Внутри одной категории валют применяем выбранный режим сортировки
+        if (currentSortType === 'bet-asc') {
+            return a.bet - b.bet;
+        } else if (currentSortType === 'bet-desc') {
+            return b.bet - a.bet;
+        } else if (currentSortType === 'newest') {
+            return b.id.localeCompare(a.id);
+        }
+        return 0;
+    });
     
     // 3. Пагинация
     const totalRooms = filtered.length;
@@ -763,7 +776,7 @@ function renderRooms(rooms) {
     if (elements.pageInfo) elements.pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
 
     // Проверяем, изменился ли контент комнат на текущей странице, чтобы избежать лишней перерисовки DOM
-    const renderHash = paginated.map(r => `${r.id}:${r.bet}:${r.owner_username}:${r.is_private}`).join('|');
+    const renderHash = paginated.map(r => `${r.id}:${r.bet}:${r.currency}:${r.owner_username}:${r.is_private}`).join('|');
     if (renderHash === lastRenderedRoomsHash) {
         return;
     }
