@@ -708,22 +708,51 @@ function renderRooms(rooms) {
     }).join('');
 }
 
-// Хелпер: формирование официального TON Cell BOC через TonWeb
+// Хелпер: формирование валидного 100% нативного TON Cell BOC без внешних библиотек
 function encodeTactPayload(opcodeHex, gameIdNum) {
-    try {
-        if (window.TonWeb) {
-            const cell = new window.TonWeb.boc.Cell();
-            // Opcode uint32
-            cell.bits.writeUint(parseInt(opcodeHex, 16), 32);
-            // game_id uint64
-            // ИСПОЛЬЗУЕМ BN вместо BigInt, так как старый TonWeb не поддерживает нативный BigInt
-            cell.bits.writeUint(new window.TonWeb.utils.BN(gameIdNum || 0), 64);
-            return window.TonWeb.utils.bytesToBase64(cell.toBoc(false));
+    // 1. Формируем данные (12 байт: 4 байта opcode + 8 байт uint64)
+    const dataBuffer = new ArrayBuffer(12);
+    const view = new DataView(dataBuffer);
+    view.setUint32(0, parseInt(opcodeHex, 16), false); // Big-Endian
+    view.setUint32(4, 0, false); // Старшие 4 байта 64-битного числа (всегда 0 для timestamp)
+    view.setUint32(8, gameIdNum || 0, false); // Младшие 4 байта
+    const payloadBytes = new Uint8Array(dataBuffer);
+
+    // 2. Стандартный заголовок BOC для одной ячейки (12 байт, 0 ссылок)
+    const headerBytes = new Uint8Array([
+        0xb5, 0xee, 0x9c, 0x72, // magic
+        0x41, 0x01, 0x01, 0x01, // flags (has_crc32c=1), 1 cell, 1 root, 0 absent
+        0x00, 0x0e, 0x00,       // root offset=0, cells length=14, root cell=0
+        0x00, 0x18              // cell refs=0, cell size desc=24 (12 bytes)
+    ]);
+
+    // 3. Соединяем
+    const bocWithoutCrc = new Uint8Array(headerBytes.length + payloadBytes.length);
+    bocWithoutCrc.set(headerBytes, 0);
+    bocWithoutCrc.set(payloadBytes, headerBytes.length);
+
+    // 4. Считаем официальный CRC32-C (по стандарту TON)
+    let crc = 0xFFFFFFFF;
+    for (let i = 0; i < bocWithoutCrc.length; i++) {
+        crc ^= bocWithoutCrc[i];
+        for (let j = 0; j < 8; j++) {
+            crc = (crc & 1) ? (crc >>> 1) ^ 0x82F63B78 : (crc >>> 1);
         }
-    } catch (err) {
-        console.warn("TonWeb cell encoding fallback:", err);
     }
-    return ""; // Фоллбэк отключен, так как ручная сборка BOC без CRC32C невалидна
+    crc = (crc ^ 0xFFFFFFFF) >>> 0;
+
+    // 5. Записываем CRC32-C в конец (Little-Endian)
+    const finalBoc = new Uint8Array(bocWithoutCrc.length + 4);
+    finalBoc.set(bocWithoutCrc, 0);
+    const crcView = new DataView(finalBoc.buffer);
+    crcView.setUint32(bocWithoutCrc.length, crc, true);
+
+    // 6. Конвертируем в Base64
+    let binary = '';
+    for (let i = 0; i < finalBoc.length; i++) {
+        binary += String.fromCharCode(finalBoc[i]);
+    }
+    return btoa(binary);
 }
 
 async function createRoom(bet, isPrivate) {
