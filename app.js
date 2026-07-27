@@ -708,41 +708,43 @@ function renderRooms(rooms) {
     }).join('');
 }
 
+// Хелпер: формирование валидного Base64 BOC Cell для сообщений Tact контракта
+function encodeTactPayload(opcodeHex, gameIdNum) {
+    // Opcode uint32 (4 bytes) + game_id uint64 Big-Endian (8 bytes) = 12 bytes
+    const buffer = new ArrayBuffer(12);
+    const view = new DataView(buffer);
+    
+    // Записываем opcode (uint32)
+    view.setUint32(0, parseInt(opcodeHex, 16), false);
+    
+    // Записываем game_id (uint64)
+    const bigGameId = BigInt(gameIdNum || 0);
+    view.setBigUint64(4, bigGameId, false);
+    
+    // Формируем стандартизированный TON Cell BOC заголовок для 12-байтовой ячейки
+    const bytes = new Uint8Array(buffer);
+    const bocHeader = [
+        0xb5, 0xee, 0x9c, 0x72, // magic
+        0x41, 0x01, 0x01, 0x01, // cell header flags
+        0x00, 0x11, 0x00, 0x00, // payload length info
+        0x00, 0x00, 0x60        // bit len (96 bits)
+    ];
+    
+    const fullBoc = new Uint8Array(bocHeader.length + bytes.length);
+    fullBoc.set(bocHeader, 0);
+    fullBoc.set(bytes, bocHeader.length);
+    
+    // Конвертируем в Base64
+    let binary = '';
+    for (let i = 0; i < fullBoc.length; i++) {
+        binary += String.fromCharCode(fullBoc[i]);
+    }
+    return btoa(binary);
+}
+
 async function createRoom(bet, isPrivate) {
     try {
-        if (currentBetCurrency === 'ton') {
-            if (!tonConnectUI || !userTonAddress) {
-                showToast("Please connect your TON wallet first!", "error");
-                return;
-            }
-
-            // Сумма ставки в наноединицах (1 TON = 1,000,000,000 nanoTON)
-            const nanoAmount = Math.round(bet * 1e9).toString();
-            // Стандартный валидный адрес TON Testnet
-            const vaultContractAddress = "kQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
-
-            showToast("Please confirm transaction in your TON wallet...", "info");
-
-            const transaction = {
-                validUntil: Math.floor(Date.now() / 1000) + 300, // 5 минут на подпись
-                messages: [
-                    {
-                        address: vaultContractAddress,
-                        amount: nanoAmount
-                    }
-                ]
-            };
-
-            try {
-                const txResult = await tonConnectUI.sendTransaction(transaction);
-                console.log("💎 TON Transaction sent:", txResult);
-                showToast("TON deposit confirmed! Registering room...", "success");
-            } catch (txError) {
-                console.error("TON Tx failed/cancelled:", txError);
-                showToast("TON transfer failed or cancelled in wallet!", "error");
-                return; // ПРЕДОТВРАЩАЕМ создание комнаты при отмене или ошибке транзакции
-            }
-        }
+        let tempGameId = Date.now(); // временный идентификатор до получения от сервера
 
         const res = await fetch(`${API_BASE_URL}/api/rooms/create`, {
             method: 'POST',
@@ -753,6 +755,44 @@ async function createRoom(bet, isPrivate) {
         
         if (!handleApiResponse(res, data, "Failed to create room")) {
             return;
+        }
+
+        const numericRoomId = parseInt(data.room_id.replace(/\D/g, '')) || tempGameId;
+
+        if (currentBetCurrency === 'ton') {
+            if (!tonConnectUI || !userTonAddress) {
+                showToast("Please connect your TON wallet first!", "error");
+                return;
+            }
+
+            // Сумма ставки в наноединицах (1 TON = 1,000,000,000 nanoTON)
+            const nanoAmount = Math.round(bet * 1e9).toString();
+            const vaultContractAddress = "kQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
+
+            showToast("Please confirm transaction in your TON wallet...", "info");
+
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 300,
+                messages: [
+                    {
+                        address: vaultContractAddress,
+                        amount: nanoAmount,
+                        payload: encodeTactPayload("5fa44b36", numericRoomId) // CreateGame op-code 0x5fa44b36
+                    }
+                ]
+            };
+
+            try {
+                const txResult = await tonConnectUI.sendTransaction(transaction);
+                console.log("💎 TON Transaction sent:", txResult);
+                showToast("TON deposit confirmed!", "success");
+            } catch (txError) {
+                console.error("TON Tx failed/cancelled:", txError);
+                showToast("TON transfer failed or cancelled in wallet!", "error");
+                // Отменяем создание комнаты на бэкенде, если транзакция отменена
+                fetch(`${API_BASE_URL}/api/rooms/delete/${data.room_id}`, { method: 'POST', headers: getHeaders() });
+                return;
+            }
         }
         
         const roomsLeftText = data.rooms_left !== undefined ? ` (${data.rooms_left} rooms left)` : "";
@@ -785,6 +825,8 @@ async function joinRoom(roomId) {
     try {
         // Проверяем, является ли комната TON комнатой
         const roomObj = activeRooms.find(r => r.id === roomId);
+        const numericRoomId = parseInt(roomId.replace(/\D/g, '')) || 0;
+
         if (roomObj && roomObj.currency === 'ton') {
             if (!tonConnectUI || !userTonAddress) {
                 showToast("Please connect your TON wallet first!", "error");
@@ -801,7 +843,8 @@ async function joinRoom(roomId) {
                 messages: [
                     {
                         address: vaultContractAddress,
-                        amount: nanoAmount
+                        amount: nanoAmount,
+                        payload: encodeTactPayload("73229b47", numericRoomId) // JoinGame op-code 0x73229b47
                     }
                 ]
             };
