@@ -708,7 +708,18 @@ function renderRooms(rooms) {
     }).join('');
 }
 
-// --- ИГРОВОЙ ПРОЦЕСС ---
+// Хелпер: формирование стандартного Base64 BOC коммента для TON транзакции
+function createTonCommentPayload(commentText) {
+    if (!commentText) return undefined;
+    // Base64 BOC для текстового комментария "CreateGame" / "JoinGame"
+    if (commentText === "CreateGame") {
+        return "te6cckEBAQEACgAAABAAAAAEN3JlYXRlR2FtcX9YtA==";
+    }
+    if (commentText === "JoinGame") {
+        return "te6cckEBAQEACAAAAA4AAAAESm9pbkdhbWVL4x4=";
+    }
+    return undefined;
+}
 
 async function createRoom(bet, isPrivate) {
     try {
@@ -729,7 +740,8 @@ async function createRoom(bet, isPrivate) {
                 messages: [
                     {
                         address: vaultContractAddress,
-                        amount: nanoAmount
+                        amount: nanoAmount,
+                        payload: createTonCommentPayload("CreateGame")
                     }
                 ]
             };
@@ -802,7 +814,8 @@ async function joinRoom(roomId) {
                 messages: [
                     {
                         address: vaultContractAddress,
-                        amount: nanoAmount
+                        amount: nanoAmount,
+                        payload: createTonCommentPayload("JoinGame")
                     }
                 ]
             };
