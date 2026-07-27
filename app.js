@@ -718,7 +718,8 @@ async function createRoom(bet, isPrivate) {
 
             // Сумма ставки в наноединицах (1 TON = 1,000,000,000 nanoTON)
             const nanoAmount = Math.round(bet * 1e9).toString();
-            const vaultContractAddress = "0QCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
+            // Стандартный валидный адрес TON Testnet
+            const vaultContractAddress = "kQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
 
             showToast("Please confirm transaction in your TON wallet...", "info");
 
@@ -738,8 +739,7 @@ async function createRoom(bet, isPrivate) {
                 showToast("TON deposit confirmed! Registering room...", "success");
             } catch (txError) {
                 console.error("TON Tx failed/cancelled:", txError);
-                const errMsg = (txError && txError.message) ? txError.message : JSON.stringify(txError);
-                alert(`TON CONNECT DETAILS: ${errMsg}`);
+                showToast("TON transfer failed or cancelled in wallet!", "error");
                 return; // ПРЕДОТВРАЩАЕМ создание комнаты при отмене или ошибке транзакции
             }
         }
@@ -792,7 +792,7 @@ async function joinRoom(roomId) {
             }
 
             const nanoAmount = Math.round(roomObj.bet * 1e9).toString();
-            const vaultContractAddress = "0QCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
+            const vaultContractAddress = "kQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
 
             showToast("Please confirm transaction in your TON wallet...", "info");
 
