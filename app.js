@@ -16,6 +16,53 @@ let currentBetCurrency = 'coins'; // 'coins' or 'ton'
 let tonConnectUI = null;
 let userTonAddress = null;
 
+// Инициализация Telegram WebApp
+const tg = window.Telegram?.WebApp;
+let initData = '';
+let currentUser = { id: 0, username: 'Player', first_name: 'Player', balance: 0, bonus_cooldown: null };
+let currentRoomId = null;
+let currentRoomBet = 0;
+let weAreRoomOwner = false;
+let lobbySocket = null;
+let gameSocket = null;
+let roomPollInterval = null;
+let activeRooms = [];
+let lastRenderedRoomsHash = "";
+let welcomeChecked = false;
+
+// Параметры фильтрации и пагинации
+let currentFilterType = 'all'; // 'all', 'own', 'other'
+let currentSearchQuery = '';
+let currentSortType = 'bet-desc'; // 'bet-asc', 'bet-desc', 'newest'
+let currentBetMin = null;
+let currentBetMax = null;
+let currentPage = 1;
+const roomsPerPage = 5;
+
+// Настройка стилей для темы Telegram
+if (tg) {
+    tg.ready();
+    tg.expand();
+    initData = tg.initData || '';
+    
+    // Включаем виброотклик
+    if (tg.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred('medium');
+    }
+}
+
+// Заглушка для локального тестирования (если запущен вне Telegram)
+if (!initData) {
+    console.log("⚠️ Running outside Telegram. Injecting mock auth data.");
+    const mockUser = {
+        id: 99999,
+        first_name: "Developer",
+        username: "player",
+        language_code: "en"
+    };
+    initData = `mock_${encodeURIComponent(JSON.stringify(mockUser))}`;
+}
+
 // Инициализация TON Connect UI
 document.addEventListener('DOMContentLoaded', () => {
     try {
