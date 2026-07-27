@@ -777,7 +777,7 @@ async function createRoom(bet, isPrivate) {
                     {
                         address: vaultContractAddress,
                         amount: nanoAmount,
-                        payload: encodeTactPayload("5fa44b36", numericRoomId) // CreateGame op-code 0x5fa44b36
+                        payload: encodeTactPayload("c94dac62", numericRoomId) // CreateGame op-code 0xc94dac62
                     }
                 ]
             };
@@ -844,7 +844,7 @@ async function joinRoom(roomId) {
                     {
                         address: vaultContractAddress,
                         amount: nanoAmount,
-                        payload: encodeTactPayload("73229b47", numericRoomId) // JoinGame op-code 0x73229b47
+                        payload: encodeTactPayload("192d165d", numericRoomId) // JoinGame op-code 0x192d165d
                     }
                 ]
             };
