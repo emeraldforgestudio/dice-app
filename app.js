@@ -64,10 +64,11 @@ if (!initData) {
 }
 
 // Инициализация TON Connect UI
-document.addEventListener('DOMContentLoaded', () => {
+function initTonConnect() {
     try {
-        if (window.TonConnectUI && document.getElementById('ton-connect-btn')) {
-            tonConnectUI = new TonConnectUI.TonConnectUI({
+        const TONSDK = window.TON_CONNECT_UI || window.TonConnectUI;
+        if (TONSDK && document.getElementById('ton-connect-btn')) {
+            tonConnectUI = new TONSDK.TonConnectUI({
                 manifestUrl: 'https://raw.githubusercontent.com/ton-defi-org/tonconnect-manifest-temp/main/tonconnect-manifest.json',
                 buttonRootId: 'ton-connect-btn'
             });
@@ -88,7 +89,13 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
         console.warn('TonConnect initialization warning:', err);
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTonConnect);
+} else {
+    initTonConnect();
+}
 
 async function updateTonBalanceDisplay() {
     if (!userTonAddress) return;
