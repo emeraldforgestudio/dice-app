@@ -12,51 +12,84 @@ function maskUsername(username) {
     return clean[0] + "*".repeat(clean.length - 2) + clean[clean.length - 1];
 }
 
-// Инициализация Telegram WebApp
-const tg = window.Telegram?.WebApp;
-let initData = '';
-let currentUser = { id: 0, username: 'Player', first_name: 'Player', balance: 0, bonus_cooldown: null };
-let currentRoomId = null;
-let currentRoomBet = 0;
-let weAreRoomOwner = false;
-let lobbySocket = null;
-let gameSocket = null;
-let roomPollInterval = null;
-let activeRooms = [];
-let lastRenderedRoomsHash = "";
-let welcomeChecked = false;
+let currentBetCurrency = 'coins'; // 'coins' or 'ton'
+let tonConnectUI = null;
+let userTonAddress = null;
 
-// Параметры фильтрации и пагинации
-let currentFilterType = 'all'; // 'all', 'own', 'other'
-let currentSearchQuery = '';
-let currentSortType = 'bet-desc'; // 'bet-asc', 'bet-desc', 'newest'
-let currentBetMin = null;
-let currentBetMax = null;
-let currentPage = 1;
-const roomsPerPage = 5;
+// Инициализация TON Connect UI
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.TonConnectUI) {
+        tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://raw.githubusercontent.com/ton-defi-org/tonconnect-manifest-temp/main/tonconnect-manifest.json',
+            buttonRootId: 'ton-connect-btn'
+        });
 
-// Настройка стилей для темы Telegram
-if (tg) {
-    tg.ready();
-    tg.expand();
-    initData = tg.initData || '';
-    
-    // Включаем виброотклик
-    if (tg.HapticFeedback) {
-        tg.HapticFeedback.impactOccurred('medium');
+        tonConnectUI.onStatusChange(async (wallet) => {
+            if (wallet) {
+                userTonAddress = wallet.account.address;
+                console.log('💎 TON Wallet connected:', userTonAddress);
+                updateTonBalanceDisplay();
+            } else {
+                userTonAddress = null;
+                console.log('💎 TON Wallet disconnected');
+                document.getElementById('ton-balance-display').innerText = '0.00 💎';
+            }
+        });
+    }
+});
+
+async function updateTonBalanceDisplay() {
+    if (!userTonAddress) return;
+    try {
+        const response = await fetch(`https://testnet.toncenter.com/api/v2/getAddressInformation?address=${userTonAddress}`);
+        const data = await response.json();
+        if (data.ok) {
+            const balanceNano = parseInt(data.result.balance || 0);
+            const balanceTon = (balanceNano / 1e9).toFixed(2);
+            document.getElementById('ton-balance-display').innerText = `${balanceTon} 💎`;
+        }
+    } catch (e) {
+        console.error('Failed to fetch TON balance:', e);
     }
 }
 
-// Заглушка для локального тестирования (если запущен вне Telegram)
-if (!initData) {
-    console.log("⚠️ Running outside Telegram. Injecting mock auth data.");
-    const mockUser = {
-        id: 99999,
-        first_name: "Developer",
-        username: "player",
-        language_code: "en"
-    };
-    initData = `mock_${encodeURIComponent(JSON.stringify(mockUser))}`;
+function selectBetCurrency(currency) {
+    currentBetCurrency = currency;
+    const coinsBtn = document.getElementById('mode-coins-btn');
+    const tonBtn = document.getElementById('mode-ton-btn');
+    const symbolDisplay = document.getElementById('currency-symbol-display');
+    const labelBet = document.getElementById('label-bet-amount');
+    const presetCoins = document.getElementById('preset-bets-coins');
+    const presetTon = document.getElementById('preset-bets-ton');
+    const inputBet = document.getElementById('input-bet');
+
+    const testnetWarning = document.getElementById('ton-testnet-warning');
+
+    if (currency === 'ton') {
+        coinsBtn.classList.remove('active');
+        tonBtn.classList.add('active');
+        symbolDisplay.innerText = '💎';
+        labelBet.innerText = 'Enter Bet Amount (TON Testnet)';
+        presetCoins.classList.add('hidden');
+        presetTon.classList.remove('hidden');
+        if (testnetWarning) testnetWarning.classList.remove('hidden');
+        inputBet.placeholder = 'e.g. 0.5';
+        inputBet.min = '0.05';
+        inputBet.step = '0.1';
+        inputBet.value = '0.5';
+    } else {
+        tonBtn.classList.remove('active');
+        coinsBtn.classList.add('active');
+        symbolDisplay.innerText = '🪙';
+        labelBet.innerText = 'Enter Bet Amount (Coins)';
+        presetTon.classList.add('hidden');
+        presetCoins.classList.remove('hidden');
+        if (testnetWarning) testnetWarning.classList.add('hidden');
+        inputBet.placeholder = 'e.g. 500';
+        inputBet.min = '10';
+        inputBet.step = '10';
+        inputBet.value = '500';
+    }
 }
 
 // Заголовки для авторизованных запросов
@@ -541,6 +574,12 @@ function renderRooms(rooms) {
             ? (room.owner_username ? `@${room.owner_username}` : "You")
             : `@${maskUsername(room.owner_username)}`;
             
+        const isTon = room.currency === 'ton';
+        const currencySymbol = isTon ? '💎' : '🪙';
+        const betFormatted = isTon 
+            ? `${room.bet} 💎 <span style="font-size: 9px; color: #ffc107; background: rgba(255,193,7,0.15); padding: 1px 4px; border-radius: 4px; border: 1px solid rgba(255,193,7,0.3);">TESTNET</span>` 
+            : `${room.bet.toLocaleString()} 🪙`;
+
         // Если комната принадлежит текущему пользователю, показываем кнопку Cancel
         const actionButton = isOwn
             ? `<button class="btn-join btn-cancel-lobby" onclick="confirmCancelRoom('${room.id}', ${room.bet})">Cancel</button>`
@@ -559,7 +598,7 @@ function renderRooms(rooms) {
             <div class="room-card-item ${isPrivate ? 'private-room-card' : ''} ${isOwn ? 'my-room-card-clickable' : ''}" id="room-${room.id}" ${isOwnClickHtml}>
                 <div class="room-info-side">
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span class="room-bet-amount">${room.bet.toLocaleString()} 🪙</span>
+                        <span class="room-bet-amount" style="${isTon ? 'color: #0088cc;' : ''}">${betFormatted}</span>
                         ${privateBadge}
                     </div>
                     <span class="room-owner-name">by ${displayName}</span>
@@ -579,7 +618,7 @@ async function createRoom(bet, isPrivate) {
         const res = await fetch(`${API_BASE_URL}/api/rooms/create`, {
             method: 'POST',
             headers: getHeaders(),
-            body: JSON.stringify({ bet, is_private: isPrivate })
+            body: JSON.stringify({ bet, currency: currentBetCurrency, is_private: isPrivate })
         });
         const data = await res.json();
         

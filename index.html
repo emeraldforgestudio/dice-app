@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- TON Connect UI SDK -->
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <link rel="stylesheet" href="style.css?v=147">
 </head>
 <body>
@@ -20,6 +22,7 @@
         <div class="brand-logo-container">
             <span class="brand-dice">🎲</span>
             <span class="brand-name">VERDE</span>
+            <div id="ton-connect-btn" style="margin-left: auto;"></div>
         </div>
 
         <!-- HEADER PROFILE SECTION -->
@@ -36,9 +39,15 @@
                     <span class="league-badge" id="league-badge" onclick="openLeaderboard()"></span>
                 </div>
             </div>
-            <div class="balance-container">
-                <span class="balance-label">Balance</span>
-                <span class="balance-value" id="balance-display">0 🪙</span>
+            <div class="balance-container" style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                <div>
+                    <span class="balance-label">Coins:</span>
+                    <span class="balance-value" id="balance-display">0 🪙</span>
+                </div>
+                <div>
+                    <span class="balance-label">TON <span style="background: rgba(255,193,7,0.2); color: #ffc107; font-size: 9px; padding: 2px 5px; border-radius: 4px; border: 1px solid rgba(255,193,7,0.4); font-weight: bold;">TESTNET</span>:</span>
+                    <span class="balance-value" id="ton-balance-display" style="color: #0088cc; font-weight: bold;">0.00 💎</span>
+                </div>
             </div>
         </header>
 
@@ -125,7 +134,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #206 (98e7cf5)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #207 (bfdc014)</p>
         </footer>
     </div>
 
@@ -137,14 +146,28 @@
                 <button class="btn-close-modal" id="btn-close-create-modal"><i class="fa-solid fa-times"></i></button>
             </div>
             <div class="modal-body">
-                <label for="input-bet">Enter Bet Amount</label>
+                <!-- Currency Mode Selector -->
+                <div class="currency-mode-selector" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button id="mode-coins-btn" class="filter-toggle active" style="flex: 1; padding: 10px; font-weight: bold;" onclick="selectBetCurrency('coins')">
+                        🪙 Coins
+                    </button>
+                    <button id="mode-ton-btn" class="filter-toggle" style="flex: 1; padding: 10px; font-weight: bold; color: #0088cc;" onclick="selectBetCurrency('ton')">
+                        💎 TON (TESTNET)
+                    </button>
+                </div>
+
+                <div id="ton-testnet-warning" class="hidden" style="background: rgba(255, 193, 7, 0.12); border: 1px dashed rgba(255, 193, 7, 0.5); color: #ffc107; padding: 8px 12px; border-radius: 10px; font-size: 11px; margin-bottom: 12px; text-align: center;">
+                    ⚠️ <b>TESTNET MODE:</b> Uses testnet TON coins only. Real TON funds will not be charged.
+                </div>
+
+                <label for="input-bet" id="label-bet-amount">Enter Bet Amount (Coins)</label>
                 <div class="bet-input-wrapper">
-                    <span class="currency-symbol">🪙</span>
+                    <span class="currency-symbol" id="currency-symbol-display">🪙</span>
                     <input type="number" id="input-bet" placeholder="e.g. 500" min="10" step="10">
                     <button id="btn-clear-bet" class="btn-clear-bet-input" title="Clear amount"><i class="fa-solid fa-broom"></i></button>
                 </div>
                 
-                <div class="preset-bets">
+                <div class="preset-bets" id="preset-bets-coins">
                     <button class="btn-preset" data-val="100">100</button>
                     <button class="btn-preset" data-val="500">500</button>
                     <button class="btn-preset" data-val="1000">1K</button>
@@ -152,7 +175,14 @@
                     <button class="btn-preset" data-val="10000">10K</button>
                 </div>
 
-                <div class="room-limit-container">
+                <div class="preset-bets hidden" id="preset-bets-ton">
+                    <button class="btn-preset-ton" data-val="0.1">0.1 TON</button>
+                    <button class="btn-preset-ton" data-val="0.5">0.5 TON</button>
+                    <button class="btn-preset-ton" data-val="1.0">1.0 TON</button>
+                    <button class="btn-preset-ton" data-val="2.0">2.0 TON</button>
+                </div>
+
+                <div class="room-limit-container" id="room-limit-box">
                     <span class="limit-label">Limit check:</span>
                     <span class="limit-value" id="room-limit-info">Scanning limits...</span>
                 </div>
