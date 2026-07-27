@@ -18,23 +18,28 @@ let userTonAddress = null;
 
 // Инициализация TON Connect UI
 document.addEventListener('DOMContentLoaded', () => {
-    if (window.TonConnectUI) {
-        tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://raw.githubusercontent.com/ton-defi-org/tonconnect-manifest-temp/main/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect-btn'
-        });
+    try {
+        if (window.TonConnectUI && document.getElementById('ton-connect-btn')) {
+            tonConnectUI = new TonConnectUI.TonConnectUI({
+                manifestUrl: 'https://raw.githubusercontent.com/ton-defi-org/tonconnect-manifest-temp/main/tonconnect-manifest.json',
+                buttonRootId: 'ton-connect-btn'
+            });
 
-        tonConnectUI.onStatusChange(async (wallet) => {
-            if (wallet) {
-                userTonAddress = wallet.account.address;
-                console.log('💎 TON Wallet connected:', userTonAddress);
-                updateTonBalanceDisplay();
-            } else {
-                userTonAddress = null;
-                console.log('💎 TON Wallet disconnected');
-                document.getElementById('ton-balance-display').innerText = '0.00 💎';
-            }
-        });
+            tonConnectUI.onStatusChange(async (wallet) => {
+                if (wallet) {
+                    userTonAddress = wallet.account.address;
+                    console.log('💎 TON Wallet connected:', userTonAddress);
+                    updateTonBalanceDisplay();
+                } else {
+                    userTonAddress = null;
+                    console.log('💎 TON Wallet disconnected');
+                    const tonDisplay = document.getElementById('ton-balance-display');
+                    if (tonDisplay) tonDisplay.innerText = '0.00 💎';
+                }
+            });
+        }
+    } catch (err) {
+        console.warn('TonConnect initialization warning:', err);
     }
 });
 
