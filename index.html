@@ -16,13 +16,15 @@
 </head>
 <body>
     <div id="app-container">
-        <!-- TOP ROW: BRANDING LOGO & TON CONNECT -->
-        <div class="top-bar-container" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; padding: 0 5px;">
-            <div class="brand-logo-container" style="margin-bottom: 0; align-items: flex-start;">
-                <span class="brand-dice">🎲</span>
-                <span class="brand-name">VERDE</span>
-            </div>
-            <div id="ton-connect-btn" style="transform: scale(0.9); transform-origin: top right;"></div>
+        <!-- ABSOLUTE TON CONNECT BUTTON -->
+        <div style="position: absolute; top: 15px; right: 15px; z-index: 100;">
+            <div id="ton-connect-btn" style="transform: scale(0.85); transform-origin: top right; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); width: 140px; overflow: hidden; border-radius: 20px;"></div>
+        </div>
+
+        <!-- BRANDING LOGO -->
+        <div class="brand-logo-container">
+            <span class="brand-dice">🎲</span>
+            <span class="brand-name">VERDE</span>
         </div>
 
         <!-- HEADER PROFILE SECTION -->
@@ -135,7 +137,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #235 (eb8bb75)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #236 (f352766)</p>
         </footer>
     </div>
 
