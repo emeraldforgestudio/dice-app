@@ -917,7 +917,7 @@ async function createRoom(bet, isPrivate) {
         // 2. Для TON комнат запрашиваем подтверждение в кошельке используя ID от бэкенда
         if (currentBetCurrency === 'ton') {
             const nanoAmount = Math.round(bet * 1e9).toString();
-            const vaultContractAddress = "kQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
+            const vaultContractAddress = "EQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmeAY";
 
             showToast("Please confirm transaction in your TON wallet...", "info");
 
@@ -997,7 +997,7 @@ async function joinRoom(roomId) {
             }
 
             const nanoAmount = Math.round(roomObj.bet * 1e9).toString();
-            const vaultContractAddress = "kQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
+            const vaultContractAddress = "EQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmeAY";
 
             showToast("Please confirm transaction in your TON wallet...", "info");
 
