@@ -32,6 +32,7 @@ let welcomeChecked = false;
 
 // Параметры фильтрации и пагинации
 let currentFilterType = 'all'; // 'all', 'own', 'other'
+let currentCurrencyFilter = 'all'; // 'all', 'coins', 'ton'
 let currentSearchQuery = '';
 let currentSortType = 'bet-desc'; // 'bet-asc', 'bet-desc', 'newest'
 let currentBetMin = null;
@@ -717,6 +718,13 @@ function renderRooms(rooms) {
     } else if (currentFilterType === 'other') {
         filtered = filtered.filter(r => r.owner_id !== currentUser.id);
     }
+
+    // Фильтр по валюте комнат (все / монеты / ton)
+    if (currentCurrencyFilter === 'coins') {
+        filtered = filtered.filter(r => r.currency !== 'ton');
+    } else if (currentCurrencyFilter === 'ton') {
+        filtered = filtered.filter(r => r.currency === 'ton');
+    }
     
     // Поиск по имени создателя
     if (currentSearchQuery) {
@@ -1133,6 +1141,25 @@ function confirmDeleteRoom() {
             leaveRoom();
         };
     }
+}
+
+function setCurrencyFilter(currencyType) {
+    currentCurrencyFilter = currencyType;
+    
+    const buttons = ['all', 'coins', 'ton'];
+    buttons.forEach(b => {
+        const btn = document.getElementById(`btn-currency-${b}`);
+        if (btn) {
+            if (b === currencyType) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+    });
+    
+    currentPage = 1;
+    renderRooms(activeRooms);
 }
 
 function setRoomFilter(filterType) {

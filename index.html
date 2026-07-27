@@ -102,6 +102,14 @@
                 <!-- Expandable Filters Section -->
                 <div class="expandable-filters hidden" id="expandable-filters-panel">
                     
+                    <!-- Currency Filter Row -->
+                    <div class="filter-row filter-toggles-row" style="margin-bottom: 8px;">
+                        <button class="filter-toggle active" id="btn-currency-all" onclick="setCurrencyFilter('all')">ALL</button>
+                        <button class="filter-toggle" id="btn-currency-coins" onclick="setCurrencyFilter('coins')">Coins 🪙</button>
+                        <button class="filter-toggle" id="btn-currency-ton" onclick="setCurrencyFilter('ton')">TON 💎</button>
+                    </div>
+
+                    <!-- Owner Filter Row -->
                     <div class="filter-row filter-toggles-row">
                         <button class="filter-toggle active" id="btn-filter-all" onclick="setRoomFilter('all')">All</button>
                         <button class="filter-toggle" id="btn-filter-own" onclick="setRoomFilter('own')">My bets</button>
@@ -136,7 +144,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #244 (7a321ac)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #245 (04c57ec)</p>
         </footer>
     </div>
 
