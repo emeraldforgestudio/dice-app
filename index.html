@@ -16,10 +16,13 @@
 </head>
 <body>
     <div id="app-container">
-        <!-- BRANDING LOGO -->
-        <div class="brand-logo-container">
-            <span class="brand-dice">🎲</span>
-            <span class="brand-name">VERDE</span>
+        <!-- TOP ROW: BRANDING LOGO & TON CONNECT -->
+        <div class="top-bar-container" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; padding: 0 5px;">
+            <div class="brand-logo-container" style="margin-bottom: 0; align-items: flex-start;">
+                <span class="brand-dice">🎲</span>
+                <span class="brand-name">VERDE</span>
+            </div>
+            <div id="ton-connect-btn" style="transform: scale(0.9); transform-origin: top right;"></div>
         </div>
 
         <!-- HEADER PROFILE SECTION -->
@@ -37,7 +40,6 @@
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
-                <div id="ton-connect-btn"></div>
                 <div class="balance-container" style="display: flex; flex-direction: column; align-items: flex-end; cursor: pointer;" onclick="toggleActiveBalance()">
                     <div id="balance-coins-box" class="balance-toggle-box">
                         <span class="balance-value" id="balance-display">0 🪙</span>
@@ -133,7 +135,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #234 (cf5b43a)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #235 (eb8bb75)</p>
         </footer>
     </div>
 
@@ -539,6 +541,6 @@
 
     <!-- TON Connect UI SDK -->
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-    <script src="app.js?v=234"></script>
+    <script src="app.js?v=235"></script>
 </body>
 </html>
