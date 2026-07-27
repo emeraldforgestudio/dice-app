@@ -912,7 +912,7 @@ async function createRoom(bet, isPrivate) {
         }
 
         const roomId = data.room_id;
-        const numericRoomId = parseInt(roomId.toString().replace(/\D/g, '')) || 0;
+        const numericRoomId = parseInt(roomId.toString().substring(0, 8), 16) || 0;
 
         // 2. Для TON комнат запрашиваем подтверждение в кошельке используя ID от бэкенда
         if (currentBetCurrency === 'ton') {
@@ -995,7 +995,7 @@ async function joinRoom(roomId) {
     try {
         // Проверяем, является ли комната TON комнатой
         const roomObj = activeRooms.find(r => r.id === roomId);
-        const numericRoomId = parseInt(roomId.replace(/\D/g, '')) || 0;
+        const numericRoomId = parseInt(roomId.substring(0, 8), 16) || 0;
 
         if (roomObj && roomObj.currency === 'ton') {
             if (!tonConnectUI || !userTonAddress) {
