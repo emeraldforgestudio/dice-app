@@ -701,6 +701,39 @@ function renderRooms(rooms) {
 
 async function createRoom(bet, isPrivate) {
     try {
+        if (currentBetCurrency === 'ton') {
+            if (!tonConnectUI || !userTonAddress) {
+                showToast("Please connect your TON wallet first!", "error");
+                return;
+            }
+
+            // Сумма ставки в наноединицах (1 TON = 1,000,000,000 nanoTON)
+            const nanoAmount = Math.round(bet * 1e9).toString();
+            const vaultContractAddress = "kQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
+
+            showToast("Please confirm transaction in your TON wallet...", "info");
+
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 300, // 5 минут на подпись
+                messages: [
+                    {
+                        address: vaultContractAddress,
+                        amount: nanoAmount
+                    }
+                ]
+            };
+
+            try {
+                const txResult = await tonConnectUI.sendTransaction(transaction);
+                console.log("💎 TON Transaction sent:", txResult);
+                showToast("TON deposit confirmed! Registering room...", "success");
+            } catch (txError) {
+                console.error("TON Tx failed/cancelled:", txError);
+                showToast("Transaction cancelled or failed in wallet", "error");
+                return;
+            }
+        }
+
         const res = await fetch(`${API_BASE_URL}/api/rooms/create`, {
             method: 'POST',
             headers: getHeaders(),
@@ -716,11 +749,13 @@ async function createRoom(bet, isPrivate) {
         showToast(`Room created successfully!${roomsLeftText}`, "success");
         elements.createRoomModal.classList.add('hidden');
         fetchUserProfile();
+        if (currentBetCurrency === 'ton') {
+            setTimeout(updateTonBalanceDisplay, 3000);
+        }
         
         // Открываем экран ожидания игры
         openGameplayScreen(data.room_id, true, bet);
         
-        // Запуск эффекта переливания (shimmer) для кнопки Return to lobby через 3 секунды
         setTimeout(() => {
             if (elements.btnKeepRoomLobby) {
                 elements.btnKeepRoomLobby.classList.add('shimmer-glow');
@@ -738,6 +773,41 @@ async function createRoom(bet, isPrivate) {
 
 async function joinRoom(roomId) {
     try {
+        // Проверяем, является ли комната TON комнатой
+        const roomObj = activeRooms.find(r => r.id === roomId);
+        if (roomObj && roomObj.currency === 'ton') {
+            if (!tonConnectUI || !userTonAddress) {
+                showToast("Please connect your TON wallet first!", "error");
+                return;
+            }
+
+            const nanoAmount = Math.round(roomObj.bet * 1e9).toString();
+            const vaultContractAddress = "kQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
+
+            showToast("Please confirm transaction in your TON wallet...", "info");
+
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 300,
+                messages: [
+                    {
+                        address: vaultContractAddress,
+                        amount: nanoAmount
+                    }
+                ]
+            };
+
+            try {
+                const txResult = await tonConnectUI.sendTransaction(transaction);
+                console.log("💎 TON Join Transaction sent:", txResult);
+                showToast("TON deposit confirmed! Joining match...", "success");
+                setTimeout(updateTonBalanceDisplay, 3000);
+            } catch (txError) {
+                console.error("TON Join Tx failed/cancelled:", txError);
+                showToast("Transaction cancelled or failed in wallet", "error");
+                return;
+            }
+        }
+
         // Сразу блокируем интерфейс
         showToast("Connecting to match...", "info");
         
