@@ -99,6 +99,10 @@ body {
 
 .btn-preset-ton.connected {
     width: 85%;
+    font-size: 13.5px;
+    letter-spacing: 0.5px;
+    justify-content: center;
+    padding: 8px 20px;
 }
 
 .btn-preset-ton:hover {

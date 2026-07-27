@@ -122,7 +122,7 @@ function updateHeaderTonConnectButton() {
     const tonSvgIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><path d="M12 2L2 8.5L12 22L22 8.5L12 2Z" fill="white" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 2V22" stroke="#0088cc" stroke-width="1.5"/><path d="M2 8.5L12 13L22 8.5" stroke="#0088cc" stroke-width="1.5"/></svg>`;
 
     if (userTonAddress) {
-        const shortAddr = userTonAddress.slice(0, 4) + '...' + userTonAddress.slice(-4);
+        const shortAddr = userTonAddress.slice(0, 6) + '...' + userTonAddress.slice(-6);
         headerBtnContainer.innerHTML = `<button class="btn-preset-ton connected" onclick="handleHeaderTonButtonClick()">${tonSvgIcon} ${shortAddr}</button>`;
     } else {
         headerBtnContainer.innerHTML = `<button class="btn-preset-ton" onclick="handleHeaderTonButtonClick()">${tonSvgIcon} Connect TON</button>`;
