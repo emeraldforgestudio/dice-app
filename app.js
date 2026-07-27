@@ -1,7 +1,7 @@
 // --- CONFIGURATION ---
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:8000'
-    : 'https://finest-smilies-venue-lol.trycloudflare.com'; 
+    : 'https://slideshow-similarly-settings-helicopter.trycloudflare.com'; 
 let BOT_USERNAME = 'VerdeCasinoBot'; 
 
 function maskUsername(username) {
