@@ -63,6 +63,17 @@ if (!initData) {
     initData = `mock_${encodeURIComponent(JSON.stringify(mockUser))}`;
 }
 
+function tonAddressToUserFriendly(rawAddress, isTestnet = true) {
+    if (!rawAddress) return '';
+    if (window.TON_CONNECT_UI && typeof window.TON_CONNECT_UI.toUserFriendlyAddress === 'function') {
+        return window.TON_CONNECT_UI.toUserFriendlyAddress(rawAddress, isTestnet);
+    }
+    if (window.TonConnectUI && typeof window.TonConnectUI.toUserFriendlyAddress === 'function') {
+        return window.TonConnectUI.toUserFriendlyAddress(rawAddress, isTestnet);
+    }
+    return rawAddress;
+}
+
 // Инициализация TON Connect UI
 function initTonConnect() {
     try {
@@ -82,7 +93,7 @@ function initTonConnect() {
                         return;
                     }
                     
-                    userTonAddress = wallet.account.address;
+                    userTonAddress = tonAddressToUserFriendly(wallet.account.address, true);
                     console.log('💎 TON Wallet connected:', userTonAddress);
                     closeTonWarningModal();
                     updateHeaderTonConnectButton();
