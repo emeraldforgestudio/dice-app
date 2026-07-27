@@ -716,34 +716,14 @@ function encodeTactPayload(opcodeHex, gameIdNum) {
             // Opcode uint32
             cell.bits.writeUint(parseInt(opcodeHex, 16), 32);
             // game_id uint64
-            cell.bits.writeUint(BigInt(gameIdNum || 0), 64);
+            // ИСПОЛЬЗУЕМ BN вместо BigInt, так как старый TonWeb не поддерживает нативный BigInt
+            cell.bits.writeUint(new window.TonWeb.utils.BN(gameIdNum || 0), 64);
             return window.TonWeb.utils.bytesToBase64(cell.toBoc(false));
         }
     } catch (err) {
         console.warn("TonWeb cell encoding fallback:", err);
     }
-
-    // Fallback: ручная сборка ячейки
-    const buffer = new ArrayBuffer(12);
-    const view = new DataView(buffer);
-    view.setUint32(0, parseInt(opcodeHex, 16), false);
-    const bigGameId = BigInt(gameIdNum || 0);
-    view.setBigUint64(4, bigGameId, false);
-    const bytes = new Uint8Array(buffer);
-    const bocHeader = [
-        0xb5, 0xee, 0x9c, 0x72, // magic
-        0x41, 0x01, 0x01, 0x01, // cell header flags
-        0x00, 0x11, 0x00, 0x00, // payload length info
-        0x00, 0x00, 0x60        // bit len (96 bits)
-    ];
-    const fullBoc = new Uint8Array(bocHeader.length + bytes.length);
-    fullBoc.set(bocHeader, 0);
-    fullBoc.set(bytes, bocHeader.length);
-    let binary = '';
-    for (let i = 0; i < fullBoc.length; i++) {
-        binary += String.fromCharCode(fullBoc[i]);
-    }
-    return btoa(binary);
+    return ""; // Фоллбэк отключен, так как ручная сборка BOC без CRC32C невалидна
 }
 
 async function createRoom(bet, isPrivate) {
