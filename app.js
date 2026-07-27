@@ -727,7 +727,8 @@ async function createRoom(bet, isPrivate) {
                 messages: [
                     {
                         address: vaultContractAddress,
-                        amount: nanoAmount
+                        amount: nanoAmount,
+                        bounce: false
                     }
                 ]
             };
@@ -800,7 +801,8 @@ async function joinRoom(roomId) {
                 messages: [
                     {
                         address: vaultContractAddress,
-                        amount: nanoAmount
+                        amount: nanoAmount,
+                        bounce: false
                     }
                 ]
             };
