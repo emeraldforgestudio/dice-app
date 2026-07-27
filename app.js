@@ -718,7 +718,7 @@ async function createRoom(bet, isPrivate) {
 
             // Сумма ставки в наноединицах (1 TON = 1,000,000,000 nanoTON)
             const nanoAmount = Math.round(bet * 1e9).toString();
-            const vaultContractAddress = "kQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
+            const vaultContractAddress = "0QCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
 
             showToast("Please confirm transaction in your TON wallet...", "info");
 
@@ -727,8 +727,7 @@ async function createRoom(bet, isPrivate) {
                 messages: [
                     {
                         address: vaultContractAddress,
-                        amount: nanoAmount,
-                        bounce: false
+                        amount: nanoAmount
                     }
                 ]
             };
@@ -792,7 +791,7 @@ async function joinRoom(roomId) {
             }
 
             const nanoAmount = Math.round(roomObj.bet * 1e9).toString();
-            const vaultContractAddress = "kQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
+            const vaultContractAddress = "0QCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmVuS";
 
             showToast("Please confirm transaction in your TON wallet...", "info");
 
@@ -801,8 +800,7 @@ async function joinRoom(roomId) {
                 messages: [
                     {
                         address: vaultContractAddress,
-                        amount: nanoAmount,
-                        bounce: false
+                        amount: nanoAmount
                     }
                 ]
             };
