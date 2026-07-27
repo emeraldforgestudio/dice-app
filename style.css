@@ -50,7 +50,8 @@ body {
     justify-content: center;
     align-items: center;
     gap: 8px;
-    padding: 24px 16px;
+    padding: 24px 20px;
+    width: 100%;
     background: linear-gradient(135deg, rgba(5, 196, 107, 0.05) 0%, rgba(0, 255, 135, 0.02) 100%);
     border: 1px solid rgba(0, 255, 135, 0.1);
     border-radius: 20px;
@@ -58,6 +59,26 @@ body {
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     position: relative;
+}
+
+#ton-connect-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 2px;
+    transform: scaleY(0.85);
+    transform-origin: center;
+}
+
+#ton-connect-btn {
+    display: flex;
+    justify-content: center;
+    filter: none;
+}
+
+#ton-connect-btn div {
+    margin: 0 auto;
 }
 
 .btn-preset-ton {
