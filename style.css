@@ -91,11 +91,14 @@ body {
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
-    width: 75%;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+}
+
+.btn-preset-ton.connected {
+    width: 85%;
 }
 
 .btn-preset-ton:hover {

@@ -112,7 +112,7 @@ function updateHeaderTonConnectButton() {
 
     if (userTonAddress) {
         const shortAddr = userTonAddress.slice(0, 4) + '...' + userTonAddress.slice(-4);
-        headerBtnContainer.innerHTML = `<button class="btn-preset-ton" onclick="handleHeaderTonButtonClick()">${tonSvgIcon} ${shortAddr}</button>`;
+        headerBtnContainer.innerHTML = `<button class="btn-preset-ton connected" onclick="handleHeaderTonButtonClick()">${tonSvgIcon} ${shortAddr}</button>`;
     } else {
         headerBtnContainer.innerHTML = `<button class="btn-preset-ton" onclick="handleHeaderTonButtonClick()">${tonSvgIcon} Connect TON</button>`;
     }
