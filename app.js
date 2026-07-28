@@ -1149,7 +1149,7 @@ function confirmCancelRoom(roomId, bet, currency = 'coins') {
             if (elements.confirmModal) elements.confirmModal.classList.add('hidden');
             
             if (currency === 'ton') {
-                const numericRoomId = Number(roomId.split('-')[1]);
+                const numericRoomId = parseInt(roomId.toString().substring(0, 8), 16) || 0;
                 const vaultContractAddress = globalVaultAddress;
 
                 showToast("Please confirm Cancel transaction in your TON wallet...", "info");
@@ -1276,7 +1276,7 @@ async function leaveRoom() {
     if (!currentRoomId) return;
 
     if (currentRoomCurrency === 'ton') {
-        const numericRoomId = Number(currentRoomId.split('-')[1]);
+        const numericRoomId = parseInt(currentRoomId.toString().substring(0, 8), 16) || 0;
         const vaultContractAddress = globalVaultAddress;
         showToast("Please confirm Cancel transaction in your TON wallet...", "info");
         const transaction = {
