@@ -1167,7 +1167,19 @@ function confirmCancelRoom(roomId, bet, currency = 'coins') {
 
                 try {
                     await tonConnectUI.sendTransaction(transaction);
-                    showToast("Cancellation transaction sent! The room will disappear shortly.", "success");
+                    
+                    // Удаляем комнату и с бэкенда тоже
+                    try {
+                        await fetch(`${API_BASE_URL}/api/rooms/delete/${roomId}`, {
+                            method: 'POST',
+                            headers: getHeaders()
+                        });
+                    } catch (e) {
+                        console.error("Backend delete error", e);
+                    }
+                    
+                    showToast("Cancellation transaction sent! Room is deleted.", "success");
+                    syncLobbyData();
                 } catch (e) {
                     console.error("Cancel TX error", e);
                     showToast("Transaction cancelled or failed.", "error");
@@ -1289,7 +1301,18 @@ async function leaveRoom() {
         };
         try {
             await tonConnectUI.sendTransaction(transaction);
-            showToast("Cancellation transaction sent! Room will close shortly.", "success");
+            
+            // Удаляем комнату и с бэкенда
+            try {
+                await fetch(`${API_BASE_URL}/api/rooms/delete/${currentRoomId}`, {
+                    method: 'POST',
+                    headers: getHeaders()
+                });
+            } catch (e) {
+                console.error("Backend delete error", e);
+            }
+
+            showToast("Cancellation transaction sent! Room deleted.", "success");
             if (gameSocket) { gameSocket.close(); gameSocket = null; }
             if (elements.gameplayScreen) elements.gameplayScreen.classList.add('hidden');
             if (elements.ownerWaitingActions) elements.ownerWaitingActions.classList.add('hidden');
