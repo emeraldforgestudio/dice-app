@@ -29,10 +29,10 @@ let initData = '';
 let currentUser = { id: 0, username: 'Player', first_name: 'Player', balance: 0, bonus_cooldown: null };
 let currentRoomId = null;
 let currentRoomBet = 0;
+let currentRoomCurrency = 'coins';
 let weAreRoomOwner = false;
-let lobbySocket = null;
-let gameSocket = null;
 let roomPollInterval = null;
+let gameSocket = null;
 let activeRooms = [];
 let lastRenderedRoomsHash = "";
 let welcomeChecked = false;
@@ -821,7 +821,7 @@ function renderRooms(rooms) {
 
         // Если комната принадлежит текущему пользователю, показываем кнопку Cancel
         const actionButton = isOwn
-            ? `<button class="btn-join btn-cancel-lobby" onclick="confirmCancelRoom('${room.id}', ${room.bet})">Cancel</button>`
+            ? `<button class="btn-join btn-cancel-lobby" onclick="confirmCancelRoom('${room.id}', ${room.bet}, '${room.currency}')">Cancel</button>`
             : `<button class="btn-join" onclick="confirmJoinRoom('${room.id}', '${room.owner_username}', ${room.bet})">Join Bet</button>`;
             
         const isPrivate = room.is_private === true;
@@ -830,7 +830,7 @@ function renderRooms(rooms) {
             : '';
             
         const isOwnClickHtml = isOwn
-            ? `onclick="if (!event.target.closest('button')) openGameplayScreen('${room.id}', true, ${room.bet})"`
+            ? `onclick="if (!event.target.closest('button')) openGameplayScreen('${room.id}', true, ${room.bet}, null, '${room.currency}')"`
             : '';
             
         return `
@@ -1132,13 +1132,13 @@ function confirmJoinRoom(roomId, ownerUsername, bet) {
     }
 }
 
-function confirmCancelRoom(roomId, bet) {
+function confirmCancelRoom(roomId, bet, currency = 'coins') {
     if (elements.confirmTitle) elements.confirmTitle.textContent = "Cancel Match Creation";
     if (elements.confirmOwner) elements.confirmOwner.textContent = "You (Owner)";
-    if (elements.confirmBet) elements.confirmBet.textContent = `${bet.toLocaleString()} 🪙`;
+    if (elements.confirmBet) elements.confirmBet.textContent = `${bet.toLocaleString()} ${currency === 'ton' ? 'TON' : 'coins'}`;
     if (elements.confirmMessageText) elements.confirmMessageText.textContent = "Are you sure you want to cancel this room? Your bet will be fully refunded to your balance.";
     
-    // Скрываем кнопку входа, показываем кнопку отмены комнаты
+    // Показываем модалку
     if (elements.btnConfirmActionSubmit) elements.btnConfirmActionSubmit.classList.add('hidden');
     if (elements.btnConfirmActionCancelRoom) elements.btnConfirmActionCancelRoom.classList.remove('hidden');
     
@@ -1147,6 +1147,34 @@ function confirmCancelRoom(roomId, bet) {
     if (elements.btnConfirmActionCancelRoom) {
         elements.btnConfirmActionCancelRoom.onclick = async () => {
             if (elements.confirmModal) elements.confirmModal.classList.add('hidden');
+            
+            if (currency === 'ton') {
+                const numericRoomId = Number(roomId.split('-')[1]);
+                const vaultContractAddress = globalVaultAddress;
+
+                showToast("Please confirm Cancel transaction in your TON wallet...", "info");
+
+                const transaction = {
+                    validUntil: Math.floor(Date.now() / 1000) + 300,
+                    messages: [
+                        {
+                            address: vaultContractAddress,
+                            amount: "50000000",
+                            payload: encodeTactPayload("02e3162d", numericRoomId) // CancelGame op-code 0x02e3162d
+                        }
+                    ]
+                };
+
+                try {
+                    await tonConnectUI.sendTransaction(transaction);
+                    showToast("Cancellation transaction sent! The room will disappear shortly.", "success");
+                } catch (e) {
+                    console.error("Cancel TX error", e);
+                    showToast("Transaction cancelled or failed.", "error");
+                }
+                return;
+            }
+
             try {
                 const res = await fetch(`${API_BASE_URL}/api/rooms/delete/${roomId}`, {
                     method: 'POST',
@@ -1158,11 +1186,10 @@ function confirmCancelRoom(roomId, bet) {
                     return;
                 }
                 
-                showToast("Room cancelled and bet refunded!", "success");
-                fetchUserProfile();
-                fetchActiveRooms();
+                showToast("Room deleted and bet refunded!", "success");
+                syncLobbyData();
             } catch (e) {
-                showToast("Network error", "error");
+                showToast("Connection error", "error");
             }
         };
     }
@@ -1173,8 +1200,7 @@ function confirmDeleteRoom() {
     
     if (elements.confirmTitle) elements.confirmTitle.textContent = "Delete & Leave Room";
     if (elements.confirmOwner) elements.confirmOwner.textContent = "You (Owner)";
-    if (elements.confirmBet) elements.confirmBet.textContent = `${currentRoomBet ? currentRoomBet.toLocaleString() : '0'} 🪙`;
-    if (elements.confirmMessageText) elements.confirmMessageText.textContent = "Are you sure you want to delete this room and leave? Your bet will be fully refunded to your balance.";
+    if (elements.confirmBet) elements.confirmBet.textContent = `${currentRoomBet ? currentRoomBet.toLocaleString() : '0'} ${currentRoomCurrency === 'ton' ? 'TON' : 'coins'}`;
     
     // Скрываем кнопку входа, показываем кнопку отмены комнаты
     if (elements.btnConfirmActionSubmit) elements.btnConfirmActionSubmit.classList.add('hidden');
@@ -1248,6 +1274,33 @@ function applyFiltersAndRender() {
 
 async function leaveRoom() {
     if (!currentRoomId) return;
+
+    if (currentRoomCurrency === 'ton') {
+        const numericRoomId = Number(currentRoomId.split('-')[1]);
+        const vaultContractAddress = globalVaultAddress;
+        showToast("Please confirm Cancel transaction in your TON wallet...", "info");
+        const transaction = {
+            validUntil: Math.floor(Date.now() / 1000) + 300,
+            messages: [{
+                address: vaultContractAddress,
+                amount: "50000000",
+                payload: encodeTactPayload("02e3162d", numericRoomId)
+            }]
+        };
+        try {
+            await tonConnectUI.sendTransaction(transaction);
+            showToast("Cancellation transaction sent! Room will close shortly.", "success");
+            if (gameSocket) { gameSocket.close(); gameSocket = null; }
+            if (elements.gameplayScreen) elements.gameplayScreen.classList.add('hidden');
+            if (elements.ownerWaitingActions) elements.ownerWaitingActions.classList.add('hidden');
+            syncLobbyData();
+        } catch (e) {
+            console.error("Cancel TX error", e);
+            showToast("Transaction cancelled or failed.", "error");
+        }
+        return;
+    }
+
     try {
         const res = await fetch(`${API_BASE_URL}/api/rooms/delete/${currentRoomId}`, {
             method: 'POST',
@@ -1391,9 +1444,10 @@ function systemShare() {
     });
 }
 
-function openGameplayScreen(roomId, isOwner, bet, result = null) {
+function openGameplayScreen(roomId, isOwner, bet, result = null, currency = 'coins') {
     currentRoomId = roomId;
     currentRoomBet = bet;
+    currentRoomCurrency = currency;
     weAreRoomOwner = isOwner;
     
     // Сбрасываем старый опрос, если он был активен
