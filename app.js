@@ -3,6 +3,13 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
     ? 'http://localhost:8000'
     : 'https://slideshow-similarly-settings-helicopter.trycloudflare.com'; 
 let BOT_USERNAME = 'VerdeCasinoBot'; 
+let globalVaultAddress = "EQCMvx6tFrkXWuDjjFAFjly_PZw41O3IoiHkfYUUTpJUihI-";
+
+// Fetch dynamic config
+fetch(`${API_BASE_URL}/api/config`)
+    .then(r => r.json())
+    .then(data => { if(data.vault_address) globalVaultAddress = data.vault_address; })
+    .catch(console.error);
 
 function maskUsername(username) {
     if (!username) return "anonymous";
@@ -917,7 +924,7 @@ async function createRoom(bet, isPrivate) {
         // 2. Для TON комнат запрашиваем подтверждение в кошельке используя ID от бэкенда
         if (currentBetCurrency === 'ton') {
             const nanoAmount = Math.round(bet * 1e9).toString();
-            const vaultContractAddress = "EQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmeAY";
+            const vaultContractAddress = globalVaultAddress;
 
             showToast("Please confirm transaction in your TON wallet...", "info");
 
@@ -1004,7 +1011,7 @@ async function joinRoom(roomId) {
             }
 
             const nanoAmount = Math.round(roomObj.bet * 1e9).toString();
-            const vaultContractAddress = "EQCb83enkcNtruOXAt6cdt0757zorCrZ_kn-uf6TDWUtmeAY";
+            const vaultContractAddress = globalVaultAddress;
 
             showToast("Please confirm transaction in your TON wallet...", "info");
 
