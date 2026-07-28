@@ -3,7 +3,7 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
     ? 'http://localhost:8000'
     : 'https://slideshow-similarly-settings-helicopter.trycloudflare.com'; 
 let BOT_USERNAME = 'VerdeCasinoBot'; 
-let globalVaultAddress = "EQCMvx6tFrkXWuDjjFAFjly_PZw41O3IoiHkfYUUTpJUihI-";
+let globalVaultAddress = "EQDyZVxo3TiooWPV2u3ZjrU-jRe1a58nUOaTJzCT3I2UOMLN";
 
 // Fetch dynamic config
 fetch(`${API_BASE_URL}/api/config`)
@@ -1136,7 +1136,7 @@ function confirmCancelRoom(roomId, bet, currency = 'coins') {
     if (elements.confirmTitle) elements.confirmTitle.textContent = "Cancel Match Creation";
     if (elements.confirmOwner) elements.confirmOwner.textContent = "You (Owner)";
     if (elements.confirmBet) elements.confirmBet.textContent = `${bet.toLocaleString()} ${currency === 'ton' ? 'TON' : 'coins'}`;
-    if (elements.confirmMessageText) elements.confirmMessageText.textContent = "Are you sure you want to cancel this room? Your bet will be fully refunded to your balance.";
+    if (elements.confirmMessageText) elements.confirmMessageText.textContent = "Are you sure you want to cancel this room? Your bet will be refunded to your balance (minus 0.01 TON fee).";
     
     // Показываем модалку
     if (elements.btnConfirmActionSubmit) elements.btnConfirmActionSubmit.classList.add('hidden');
