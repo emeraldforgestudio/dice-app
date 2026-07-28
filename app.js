@@ -934,7 +934,7 @@ async function createRoom(bet, isPrivate) {
                     {
                         address: vaultContractAddress,
                         amount: nanoAmount,
-                        payload: encodeTactPayload("c94d8c62", numericRoomId) // CreateGame op-code 0xc94d8c62
+                        payload: encodeTactPayload("c94dac62", numericRoomId) // CreateGame op-code 0xc94dac62
                     }
                 ]
             };
@@ -1021,7 +1021,7 @@ async function joinRoom(roomId) {
                     {
                         address: vaultContractAddress,
                         amount: nanoAmount,
-                        payload: encodeTactPayload("192d4e5d", numericRoomId) // JoinGame op-code 0x192d4e5d
+                        payload: encodeTactPayload("192d165d", numericRoomId) // JoinGame op-code 0x192d165d
                     }
                 ]
             };
@@ -1160,7 +1160,7 @@ function confirmCancelRoom(roomId, bet, currency = 'coins') {
                         {
                             address: vaultContractAddress,
                             amount: "50000000",
-                            payload: encodeTactPayload("02e3162d", numericRoomId) // CancelGame op-code 0x02e3162d
+                            payload: encodeTactPayload("02e3056d", numericRoomId) // CancelGame op-code 0x02e3056d
                         }
                     ]
                 };
@@ -1284,7 +1284,7 @@ async function leaveRoom() {
             messages: [{
                 address: vaultContractAddress,
                 amount: "50000000",
-                payload: encodeTactPayload("02e3162d", numericRoomId)
+                payload: encodeTactPayload("02e3056d", numericRoomId)
             }]
         };
         try {
