@@ -39,7 +39,7 @@ let welcomeChecked = false;
 
 // Параметры фильтрации и пагинации
 let currentFilterType = 'all'; // 'all', 'own', 'other'
-let currentCurrencyFilter = 'all'; // 'all', 'coins', 'ton'
+let currentCurrencyFilter = 'coins'; // 'all', 'coins', 'ton'
 let currentSearchQuery = '';
 let currentSortType = 'bet-desc'; // 'bet-asc', 'bet-desc', 'newest'
 let currentBetMin = null;
@@ -107,6 +107,8 @@ function initTonConnect() {
                     updateHeaderTonConnectButton();
                     toggleActiveBalance('ton');
                     updateTonBalanceDisplay();
+                    setCurrencyFilter('all');
+                    applyFiltersAndRender();
                 } else {
                     userTonAddress = null;
                     console.log('💎 TON Wallet disconnected');
@@ -114,6 +116,8 @@ function initTonConnect() {
                     toggleActiveBalance('coins');
                     const tonDisplay = document.getElementById('ton-balance-display');
                     if (tonDisplay) tonDisplay.innerText = '0.00 💎';
+                    setCurrencyFilter('coins');
+                    applyFiltersAndRender();
                 }
             });
         }
