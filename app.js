@@ -1031,14 +1031,11 @@ async function joinRoom(roomId) {
                 ]
             };
 
+            openGameplayScreen(roomId, false, roomObj.bet);
+
             try {
                 const txResult = await tonConnectUI.sendTransaction(transaction);
                 console.log("💎 TON Join Transaction sent:", txResult);
-                
-                await fetch(`${API_BASE_URL}/api/rooms/confirm_ton/${roomId}`, {
-                    method: 'POST',
-                    headers: getHeaders()
-                });
                 
                 showToast("TON deposit confirmed! Joining match...", "success");
                 setTimeout(updateTonBalanceDisplay, 3000);
@@ -1046,7 +1043,6 @@ async function joinRoom(roomId) {
                 console.error("TON Join Tx failed/cancelled:", txError);
                 showToast("Transaction cancelled or failed in wallet", "error");
                 
-                // Выходим из комнаты на бэкенде
                 try {
                     await fetch(`${API_BASE_URL}/api/rooms/leave/${roomId}`, {
                         method: 'POST',
@@ -1054,11 +1050,15 @@ async function joinRoom(roomId) {
                     });
                 } catch (e) {}
                 
+                if (gameSocket) { gameSocket.close(); gameSocket = null; }
+                if (elements.gameplayScreen) elements.gameplayScreen.classList.add('hidden');
+                syncLobbyData();
                 return;
             }
+        } else {
+            openGameplayScreen(roomId, false, roomObj ? roomObj.bet : 0);
         }
 
-        // Сразу блокируем интерфейс
         showToast("Connecting to match...", "info");
         
         const res = await fetch(`${API_BASE_URL}/api/rooms/join/${roomId}`, {
@@ -1068,7 +1068,6 @@ async function joinRoom(roomId) {
         const data = await res.json();
         
         if (!handleApiResponse(res, data, "Unable to join room")) {
-            // Восстанавливаем карточку комнаты при ошибке входа
             const roomEl = document.getElementById(`room-${roomId}`);
             if (roomEl) {
                 roomEl.style.opacity = '';
@@ -1079,10 +1078,12 @@ async function joinRoom(roomId) {
                     btn.textContent = 'Join Bet';
                 }
             }
+            if (gameSocket) { gameSocket.close(); gameSocket = null; }
+            if (elements.gameplayScreen) elements.gameplayScreen.classList.add('hidden');
             return;
         }
-        
-        // Открываем экран игры для оппонента (который только что зашел)
+
+        // We update with real data later
         openGameplayScreen(roomId, false, data.bet, data);
         
         // Запускаем анимацию броска
