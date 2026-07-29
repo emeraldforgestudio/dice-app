@@ -923,7 +923,6 @@ function encodeTactPayload(opcodeHex, gameIdNum) {
     for (let i = 0; i < finalBoc.length; i++) {
         binary += String.fromCharCode(finalBoc[i]);
     }
-    }
     return btoa(binary);
 }
 
