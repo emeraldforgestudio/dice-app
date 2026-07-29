@@ -996,11 +996,7 @@ async function createRoom(bet, isPrivate) {
         const numericRoomId = parseInt(roomId.toString().substring(0, 8), 16) || 0;
 
         elements.createRoomModal.classList.add('hidden');
-        openGameplayScreen(roomId, true, bet);
-
-        elements.createRoomModal.classList.add('hidden');
-        openGameplayScreen(roomId, true, bet);
-
+        openGameplayScreen(roomId, true, bet, null, currentBetCurrency);
         // 2. Для TON комнат запрашиваем подтверждение в кошельке используя ID от бэкенда
         if (currentBetCurrency === 'ton') {
             const attachAmount = (parseFloat(bet) + 0.02).toString();
@@ -1109,7 +1105,7 @@ async function joinRoom(roomId) {
                 ]
             };
 
-            openGameplayScreen(roomId, false, roomObj.bet);
+            openGameplayScreen(roomId, false, roomObj.bet, null, roomObj.currency);
 
             try {
                 const txResult = await tonConnectUI.sendTransaction(transaction);
@@ -1134,7 +1130,7 @@ async function joinRoom(roomId) {
                 return;
             }
         } else {
-            openGameplayScreen(roomId, false, roomObj ? roomObj.bet : 0);
+            openGameplayScreen(roomId, false, roomObj ? roomObj.bet : 0, null, roomObj ? roomObj.currency : 'coins');
         }
 
         showToast("Connecting to match...", "info");
@@ -1162,7 +1158,7 @@ async function joinRoom(roomId) {
         }
 
         // We update with real data later
-        openGameplayScreen(roomId, false, data.bet, data);
+        openGameplayScreen(roomId, false, data.bet, data, data.currency);
         
         // Запускаем анимацию броска
         playDiceRoll(data.rolls.owner, data.rolls.opponent, data);
@@ -1234,9 +1230,6 @@ function confirmCancelRoom(roomId, bet, currency = 'coins') {
             
             if (currency === 'ton') {
                 const numericRoomId = parseInt(roomId.toString().substring(0, 8), 16) || 0;
-
-        elements.createRoomModal.classList.add('hidden');
-        openGameplayScreen(roomId, true, bet);
                 const vaultContractAddress = globalVaultAddress;
 
                 showToast("Please confirm Cancel transaction in your TON wallet...", "info");
