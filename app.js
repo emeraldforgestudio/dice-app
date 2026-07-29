@@ -814,7 +814,6 @@ function renderRooms(rooms) {
             : `@${maskUsername(room.owner_username)}`;
             
         const isTon = room.currency === 'ton';
-        const currencySymbol = isTon ? '💎' : '🪙';
         const betFormatted = isTon 
             ? `${room.bet} 💎 <span style="font-size: 9px; color: #ffc107; background: rgba(255,193,7,0.15); padding: 1px 4px; border-radius: 4px; border: 1px solid rgba(255,193,7,0.3);">TESTNET</span>` 
             : `${room.bet.toLocaleString()} 🪙`;
@@ -837,7 +836,7 @@ function renderRooms(rooms) {
             <div class="room-card-item ${isPrivate ? 'private-room-card' : ''} ${isOwn ? 'my-room-card-clickable' : ''}" id="room-${room.id}" ${isOwnClickHtml}>
                 <div class="room-info-side">
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span class="room-bet-amount" style="${isTon ? 'color: #0088cc;' : ''}">${betFormatted}</span>
+                        <span class="room-bet-amount">${betFormatted}</span>
                         ${privateBadge}
                     </div>
                     <span class="room-owner-name">by ${displayName}</span>
@@ -921,6 +920,12 @@ async function createRoom(bet, isPrivate) {
         const roomId = data.room_id;
         const numericRoomId = parseInt(roomId.toString().substring(0, 8), 16) || 0;
 
+        elements.createRoomModal.classList.add('hidden');
+        openGameplayScreen(roomId, true, bet);
+
+        elements.createRoomModal.classList.add('hidden');
+        openGameplayScreen(roomId, true, bet);
+
         // 2. Для TON комнат запрашиваем подтверждение в кошельке используя ID от бэкенда
         if (currentBetCurrency === 'ton') {
             const nanoAmount = Math.round(bet * 1e9).toString();
@@ -963,6 +968,10 @@ async function createRoom(bet, isPrivate) {
                 } catch (e) {
                     console.error("Failed to delete unpaid room", e);
                 }
+                if (gameSocket) { gameSocket.close(); gameSocket = null; }
+                if (elements.gameplayScreen) elements.gameplayScreen.classList.add('hidden');
+                if (elements.ownerWaitingActions) elements.ownerWaitingActions.classList.add('hidden');
+                syncLobbyData();
                 return; 
             }
         }
@@ -974,14 +983,10 @@ async function createRoom(bet, isPrivate) {
             showToast(`Room registered successfully!${roomsLeftText}`, "success");
         }
         
-        elements.createRoomModal.classList.add('hidden');
         fetchUserProfile();
         if (currentBetCurrency === 'ton') {
             setTimeout(updateTonBalanceDisplay, 3000);
         }
-        
-        // Открываем экран ожидания игры
-        openGameplayScreen(roomId, true, bet);
         
         setTimeout(() => {
             if (elements.btnKeepRoomLobby) {
@@ -1150,6 +1155,9 @@ function confirmCancelRoom(roomId, bet, currency = 'coins') {
             
             if (currency === 'ton') {
                 const numericRoomId = parseInt(roomId.toString().substring(0, 8), 16) || 0;
+
+        elements.createRoomModal.classList.add('hidden');
+        openGameplayScreen(roomId, true, bet);
                 const vaultContractAddress = globalVaultAddress;
 
                 showToast("Please confirm Cancel transaction in your TON wallet...", "info");
