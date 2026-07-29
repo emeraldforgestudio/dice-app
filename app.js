@@ -21,7 +21,8 @@ function playSound(name) {
     try {
         if (gameSounds[name]) {
             gameSounds[name].currentTime = 0;
-            gameSounds[name].play().catch(e => {});
+            gameSounds[name].volume = 0.4; // 40% volume
+            gameSounds[name].play().catch(e => { console.warn('Sound error:', e) });
         }
     } catch(e){}
 }
