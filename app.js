@@ -286,7 +286,7 @@ function selectBetCurrency(currency) {
         inputBet.placeholder = 'e.g. 0.5';
         inputBet.min = '0.05';
         inputBet.step = '0.1';
-        inputBet.value = '0.5';
+        inputBet.value = '';
     } else {
         tonBtn.classList.remove('active');
         coinsBtn.classList.add('active');
@@ -298,7 +298,7 @@ function selectBetCurrency(currency) {
         inputBet.placeholder = 'e.g. 500';
         inputBet.min = '10';
         inputBet.step = '10';
-        inputBet.value = '500';
+        inputBet.value = '';
     }
 }
 
