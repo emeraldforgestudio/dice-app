@@ -1573,10 +1573,17 @@ function openGameplayScreen(roomId, isOwner, bet, result = null, currency = 'coi
     const potElement = document.getElementById('game-pot-amount');
     if (potElement) {
         const potAmount = bet * 2;
-        potElement.textContent = `${potAmount.toLocaleString()} 🪙`;
+        potElement.textContent = `${potAmount.toLocaleString()} ${currency === 'ton' ? 'TON' : '🪙'}`;
     }
     
-    if (elements.gameplayScreen) elements.gameplayScreen.classList.remove('hidden');
+    if (elements.gameplayScreen) {
+        elements.gameplayScreen.classList.remove('hidden');
+        if (currency === 'ton') {
+            elements.gameplayScreen.classList.add('ton-room');
+        } else {
+            elements.gameplayScreen.classList.remove('ton-room');
+        }
+    }
     if (elements.matchResults) elements.matchResults.classList.add('hidden');
     if (elements.gameStatusText) elements.gameStatusText.classList.remove('hidden');
     
@@ -1733,7 +1740,7 @@ function showGameResults(result) {
                     setTimeout(() => {
                         const coin = document.createElement('div');
                         coin.className = `flying-coin ${toLeft ? 'coin-to-left' : 'coin-to-right'}`;
-                        coin.textContent = "🪙";
+                        coin.textContent = currentRoomCurrency === 'ton' ? "💎" : "🪙";
                         
                         const randomY = (Math.random() * 20 - 10);
                         coin.style.top = `calc(50% - 12px + ${randomY}px)`;

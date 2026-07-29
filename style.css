@@ -2767,5 +2767,16 @@ input:checked + .slider:before {
     animation: nudgeRight 0.25s ease-in-out;
 }
 
-
-
+/* TON Room Theme */
+.ton-room .dice-face {
+    border-color: #0088cc !important;
+    box-shadow: inset 0 0 8px rgba(0, 136, 204, 0.4), 0 0 8px rgba(0, 136, 204, 0.4) !important;
+}
+.ton-room .dot-pattern span {
+    background: #0088cc !important;
+    box-shadow: 0 0 6px #0088cc !important;
+}
+.ton-room .flying-coin {
+    color: #0088cc !important;
+    text-shadow: 0 0 5px rgba(0,136,204,0.8) !important;
+}
