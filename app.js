@@ -6,6 +6,26 @@ let BOT_USERNAME = 'VerdeCasinoBot';
 let globalVaultAddress = "EQDyZVxo3TiooWPV2u3ZjrU-jRe1a58nUOaTJzCT3I2UOMLN";
 
 // Fetch dynamic config
+// --- SOUND MANAGER ---
+const gameSounds = {
+    click: new Audio('assets/sounds/click.wav'),
+    roll: new Audio('assets/sounds/roll.wav'),
+    success: new Audio('assets/sounds/success.wav'),
+    error: new Audio('assets/sounds/error.wav'),
+    coin: new Audio('assets/sounds/coin.wav'),
+    pop: new Audio('assets/sounds/pop.wav'),
+    cancel: new Audio('assets/sounds/cancel.wav')
+};
+
+function playSound(name) {
+    try {
+        if (gameSounds[name]) {
+            gameSounds[name].currentTime = 0;
+            gameSounds[name].play().catch(e => {});
+        }
+    } catch(e){}
+}
+
 fetch(`${API_BASE_URL}/api/config`)
     .then(r => r.json())
     .then(data => { if(data.vault_address) globalVaultAddress = data.vault_address; })
@@ -502,6 +522,10 @@ function closeNotifications() {
 
 // --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ (ТОСТЫ) ---
 function showToast(message, type = 'info') {
+    if (type === 'success') playSound('success');
+    else if (type === 'error') playSound('error');
+    else playSound('pop');
+
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.innerHTML = `
@@ -1481,6 +1505,7 @@ function systemShare() {
 }
 
 function openGameplayScreen(roomId, isOwner, bet, result = null, currency = 'coins') {
+    playSound('pop');
     currentRoomId = roomId;
     currentRoomBet = bet;
     currentRoomCurrency = currency;
@@ -1575,6 +1600,7 @@ function openGameplayScreen(roomId, isOwner, bet, result = null, currency = 'coi
         // Аватарка владельца комнаты (плейсхолдер с первой буквой имени)
         setGameAvatar(elements.gameAvatarOwner, false, ownerName, ownerName);
         
+        playSound('roll');
         if (elements.gameStatusText) elements.gameStatusText.textContent = "Rolling the dice...";
         if (elements.ownerWaitingActions) elements.ownerWaitingActions.classList.add('hidden'); // Скрываем кнопки создателя
     }
@@ -1903,6 +1929,7 @@ function checkDevPlayer() {
 
 // Управление модальным окном
 elements.btnCreateRoom.onclick = () => {
+    playSound('click');
     if (checkDevPlayer()) return;
     elements.createRoomModal.classList.remove('hidden');
     
@@ -1926,6 +1953,7 @@ if (elements.createRoomModal) {
                 // Вручную применяем пресет
                 const btn = e.target.closest('.btn-preset');
                 const currentVal = parseFloat(elements.inputBet.value) || 0;
+                playSound('coin');
                 const presetVal = parseFloat(btn.dataset.val) || 0;
                 const newVal = currentVal + presetVal;
                 elements.inputBet.value = currentBetCurrency === 'ton' ? parseFloat(newVal.toFixed(2)) : Math.round(newVal);
@@ -1990,6 +2018,7 @@ async function updateRoomLimitDisplay() {
 }
 
 elements.btnCloseCreateModal.onclick = () => {
+    playSound('cancel');
     elements.createRoomModal.classList.add('hidden');
 };
 
@@ -2007,7 +2036,8 @@ document.querySelectorAll('.preset-bets').forEach(container => {
         const btn = e.target.closest('.btn-preset');
         if (!btn) return;
         const currentVal = parseFloat(elements.inputBet.value) || 0;
-        const presetVal = parseFloat(btn.dataset.val) || 0;
+        playSound('coin');
+                const presetVal = parseFloat(btn.dataset.val) || 0;
         const newVal = currentVal + presetVal;
         elements.inputBet.value = currentBetCurrency === 'ton' ? parseFloat(newVal.toFixed(2)) : Math.round(newVal);
     });
