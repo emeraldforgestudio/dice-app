@@ -815,7 +815,7 @@ function renderRooms(rooms) {
             
         const isTon = room.currency === 'ton';
         const betFormatted = isTon 
-            ? `${room.bet} 💎 <span style="font-size: 9px; color: #ffc107; background: rgba(255,193,7,0.15); padding: 1px 4px; border-radius: 4px; border: 1px solid rgba(255,193,7,0.3);">TESTNET</span>` 
+            ? `${room.bet} 💎 <!-- <span style="font-size: 9px; color: #ffc107; background: rgba(255,193,7,0.15); padding: 1px 4px; border-radius: 4px; border: 1px solid rgba(255,193,7,0.3);">TESTNET</span> -->` 
             : `${room.bet.toLocaleString()} 🪙`;
 
         // Если комната принадлежит текущему пользователю, показываем кнопку Cancel
