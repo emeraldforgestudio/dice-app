@@ -1600,7 +1600,6 @@ function openGameplayScreen(roomId, isOwner, bet, result = null, currency = 'coi
         // Аватарка владельца комнаты (плейсхолдер с первой буквой имени)
         setGameAvatar(elements.gameAvatarOwner, false, ownerName, ownerName);
         
-        playSound('roll');
         if (elements.gameStatusText) elements.gameStatusText.textContent = "Rolling the dice...";
         if (elements.ownerWaitingActions) elements.ownerWaitingActions.classList.add('hidden'); // Скрываем кнопки создателя
     }
@@ -1611,6 +1610,7 @@ function openGameplayScreen(roomId, isOwner, bet, result = null, currency = 'coi
 }
 
 function playDiceRoll(ownerRoll, opponentRoll, gameResult) {
+    playSound('roll');
     if (elements.ownerWaitingActions) elements.ownerWaitingActions.classList.add('hidden'); // Скрываем кнопки создателя при броске
     if (elements.gameStatusText) elements.gameStatusText.textContent = "🎲 Shaking the cups...";
     
@@ -1708,11 +1708,13 @@ function showGameResults(result) {
             }
 
             if (isWinner) {
+                playSound('success');
                 if (elements.matchResults) elements.matchResults.className = "match-results-box victory";
                 if (elements.resultTitle) elements.resultTitle.textContent = "🏆 Victory!";
                 if (elements.resultSubtitle) elements.resultSubtitle.textContent = `+${(result.bet * 2).toLocaleString()} coins`;
                 if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             } else {
+                playSound('error');
                 if (elements.matchResults) elements.matchResults.className = "match-results-box defeat";
                 if (elements.resultTitle) elements.resultTitle.textContent = "🌚 Defeat";
                 if (elements.resultSubtitle) elements.resultSubtitle.textContent = `-${result.bet.toLocaleString()} coins`;
