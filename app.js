@@ -1901,7 +1901,13 @@ function checkDevPlayer() {
 elements.btnCreateRoom.onclick = () => {
     if (checkDevPlayer()) return;
     elements.createRoomModal.classList.remove('hidden');
-    // elements.inputBet.focus(); // Убрано автооткрытие клавиатуры со старта
+    
+    if (userTonAddress) {
+        selectBetCurrency('ton');
+    } else {
+        selectBetCurrency('coins');
+    }
+    
     updateRoomLimitDisplay();
 };
 
