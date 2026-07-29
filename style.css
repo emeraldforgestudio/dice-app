@@ -2964,24 +2964,25 @@ input:checked + .slider:before {
 
 /* TON Room Theme */
 .ton-room .dice-face {
-    border-color: #0088cc !important;
-    box-shadow: inset 0 0 8px rgba(0, 136, 204, 0.4), 0 0 8px rgba(0, 136, 204, 0.4) !important;
+    background: #050a0c !important;
+    border-color: #00a8ff !important;
+    box-shadow: inset 0 0 8px rgba(0, 168, 255, 0.25), 0 0 8px rgba(0, 168, 255, 0.25) !important;
 }
 .ton-room .dot-pattern span {
-    background: #0088cc !important;
-    box-shadow: 0 0 6px #0088cc !important;
+    background: #00a8ff !important;
+    box-shadow: 0 0 6px #00a8ff !important;
 }
 .ton-room .flying-coin {
-    color: #0088cc !important;
-    text-shadow: 0 0 5px rgba(0,136,204,0.8) !important;
+    color: #00a8ff !important;
+    text-shadow: 0 0 5px rgba(0, 168, 255, 0.8) !important;
 }
 .ton-room .vs-ring-fill {
-    stroke: #0088cc !important;
-    filter: drop-shadow(0 0 6px rgba(0,136,204,0.6)) !important;
+    stroke: #00a8ff !important;
+    filter: drop-shadow(0 0 6px rgba(0, 168, 255, 0.6)) !important;
 }
 .ton-room .vs-badge {
-    color: #0088cc !important;
-    text-shadow: 0 0 10px rgba(0, 136, 204, 0.5) !important;
+    color: #00a8ff !important;
+    text-shadow: 0 0 10px rgba(0, 168, 255, 0.5) !important;
 }
 .ton-room .match-balance-container {
     display: none !important;
