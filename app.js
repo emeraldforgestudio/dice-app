@@ -3,7 +3,7 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
     ? 'http://localhost:8000'
     : 'https://slideshow-similarly-settings-helicopter.trycloudflare.com'; 
 let BOT_USERNAME = 'VerdeCasinoBot'; 
-let globalVaultAddress = "EQDyZVxo3TiooWPV2u3ZjrU-jRe1a58nUOaTJzCT3I2UOMLN";
+let globalVaultAddress = "EQBjorAhG1Cs6kQUn4zkK2sDN3Z7kiufwI7MOK_oNDV8nVy7";
 
 // Fetch dynamic config
 // --- SOUND MANAGER ---
