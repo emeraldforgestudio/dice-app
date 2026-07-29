@@ -1780,41 +1780,30 @@ function showGameResults(result) {
     }
 }
 
-// --- WEBSOCKETS СОЕДИНЕНИЯ ---
+// --- LOBBY POLLING & LIVE TOGGLE ---
+let isLobbyLive = true;
+let lobbyPollInterval = null;
 
-function connectLobbySocket() {
-    try {
-        const wsUrl = API_BASE_URL.replace(/^http/, 'ws');
-        lobbySocket = new WebSocket(`${wsUrl}/api/ws/lobby`);
-        
-        lobbySocket.onmessage = (event) => {
-            try {
-                const msg = JSON.parse(event.data);
-                if (msg.type === 'room_created') {
-                    if (!activeRooms.some(r => r.id === msg.room.id)) {
-                        activeRooms.push(msg.room);
-                        renderRooms(activeRooms);
-                    }
-                } else if (msg.type === 'room_deleted') {
-                    activeRooms = activeRooms.filter(r => r.id !== msg.room_id);
-                    renderRooms(activeRooms);
-                }
-            } catch (err) {
-                console.error("Error parsing lobby message:", err);
+function initLobbyPolling() {
+    if (lobbyPollInterval) clearInterval(lobbyPollInterval);
+    lobbyPollInterval = setInterval(() => {
+        if (isLobbyLive) syncLobbyData();
+    }, 10000);
+
+    const liveIndicator = document.querySelector('.online-indicator');
+    if (liveIndicator) {
+        liveIndicator.style.cursor = 'pointer';
+        liveIndicator.addEventListener('click', function() {
+            isLobbyLive = !isLobbyLive;
+            if (isLobbyLive) {
+                this.innerHTML = '<span class="dot pulse" style="background-color: var(--neon-green)"></span> Live';
+                syncLobbyData();
+                showToast("Live updates enabled", "success");
+            } else {
+                this.innerHTML = '<span class="dot" style="background-color: gray;"></span> Paused';
+                showToast("Live updates paused", "info");
             }
-        };
-        
-        lobbySocket.onclose = () => {
-            console.log("Lobby socket closed. Reconnecting...");
-            setTimeout(connectLobbySocket, 3000);
-        };
-        
-        lobbySocket.onerror = (err) => {
-            console.error("Lobby WebSocket error:", err);
-        };
-    } catch (e) {
-        console.error("Failed to initialize lobby WebSocket:", e);
-        setTimeout(connectLobbySocket, 5000);
+        });
     }
 }
 
@@ -1822,6 +1811,18 @@ function startRoomPolling(roomId) {
     if (roomPollInterval) {
         clearInterval(roomPollInterval);
         roomPollInterval = null;
+    }
+
+    try {
+        const wsUrl = API_BASE_URL.replace(/^http/, 'ws');
+        if (gameSocket) gameSocket.close();
+        gameSocket = new WebSocket(`${wsUrl}/api/ws/game/${roomId}`);
+        gameSocket.onmessage = (event) => {
+            // Instant trigger on any websocket event
+            checkRoomStatus();
+        };
+    } catch (e) {
+        console.log("Game WebSocket not available yet, falling back to polling");
     }
     
     const POLL_INTERVAL_MS = 10000; // 10 секунд на один оборот
@@ -2277,7 +2278,7 @@ window.applyFiltersAndRender = applyFiltersAndRender;
 
 // --- ИНИЦИАЛИЗАЦИЯ ПРИ ЗАПУСКЕ ---
 syncLobbyData();
-connectLobbySocket();
+initLobbyPolling();
 if (elements.btnClaimGift) {
     setTimeout(() => {
         triggerClaimBonusShimmer();
