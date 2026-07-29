@@ -3,7 +3,7 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
     ? 'http://localhost:8000'
     : 'https://slideshow-similarly-settings-helicopter.trycloudflare.com'; 
 let BOT_USERNAME = 'VerdeCasinoBot'; 
-let globalVaultAddress = "EQBjorAhG1Cs6kQUn4zkK2sDN3Z7kiufwI7MOK_oNDV8nVy7";
+let globalVaultAddress = "EQCaVhiAh4O_PMr1vtNa4w1ae9fCjTYbqa7gYDXFwv58f5zB";
 
 // Fetch dynamic config
 // --- SOUND MANAGER ---
@@ -923,6 +923,52 @@ function encodeTactPayload(opcodeHex, gameIdNum) {
     for (let i = 0; i < finalBoc.length; i++) {
         binary += String.fromCharCode(finalBoc[i]);
     }
+    }
+    return btoa(binary);
+}
+
+function encodeCreateGamePayload(opcodeHex, gameIdNum, betNanoString) {
+    const dataBuffer = new ArrayBuffer(20);
+    const view = new DataView(dataBuffer);
+    
+    view.setUint32(0, parseInt(opcodeHex, 16), false); 
+    view.setUint32(4, 0, false);
+    view.setUint32(8, gameIdNum || 0, false); 
+    
+    const betBigInt = BigInt(betNanoString);
+    view.setBigUint64(12, betBigInt, false);
+
+    const payloadBytes = new Uint8Array(dataBuffer);
+
+    const headerBytes = new Uint8Array([
+        0xb5, 0xee, 0x9c, 0x72,
+        0x41, 0x01, 0x01, 0x01,
+        0x00, 0x16, 0x00,
+        0x00, 0x28
+    ]);
+
+    const bocWithoutCrc = new Uint8Array(headerBytes.length + payloadBytes.length);
+    bocWithoutCrc.set(headerBytes, 0);
+    bocWithoutCrc.set(payloadBytes, headerBytes.length);
+
+    let crc = 0xFFFFFFFF;
+    for (let i = 0; i < bocWithoutCrc.length; i++) {
+        crc ^= bocWithoutCrc[i];
+        for (let j = 0; j < 8; j++) {
+            crc = (crc & 1) ? (crc >>> 1) ^ 0x82F63B78 : (crc >>> 1);
+        }
+    }
+    crc = (crc ^ 0xFFFFFFFF) >>> 0;
+
+    const finalBoc = new Uint8Array(bocWithoutCrc.length + 4);
+    finalBoc.set(bocWithoutCrc, 0);
+    const crcView = new DataView(finalBoc.buffer);
+    crcView.setUint32(bocWithoutCrc.length, crc, true);
+
+    let binary = '';
+    for (let i = 0; i < finalBoc.length; i++) {
+        binary += String.fromCharCode(finalBoc[i]);
+    }
     return btoa(binary);
 }
 
@@ -958,7 +1004,9 @@ async function createRoom(bet, isPrivate) {
 
         // 2. Для TON комнат запрашиваем подтверждение в кошельке используя ID от бэкенда
         if (currentBetCurrency === 'ton') {
-            const nanoAmount = Math.round(bet * 1e9).toString();
+            const attachAmount = (parseFloat(bet) + 0.02).toString();
+            const nanoAttach = Math.round(attachAmount * 1e9).toString();
+            const nanoBet = Math.round(bet * 1e9).toString();
             const vaultContractAddress = globalVaultAddress;
 
             showToast("Please confirm transaction in your TON wallet...", "info");
@@ -968,8 +1016,8 @@ async function createRoom(bet, isPrivate) {
                 messages: [
                     {
                         address: vaultContractAddress,
-                        amount: nanoAmount,
-                        payload: encodeTactPayload("c94dac62", numericRoomId) // CreateGame op-code 0xc94dac62
+                        amount: nanoAttach,
+                        payload: encodeCreateGamePayload("c94dac62", numericRoomId, nanoBet) // CreateGame op-code 0xc94dac62
                     }
                 ]
             };
@@ -1045,7 +1093,8 @@ async function joinRoom(roomId) {
                 return;
             }
 
-            const nanoAmount = Math.round(roomObj.bet * 1e9).toString();
+            const attachAmount = (parseFloat(roomObj.bet) + 0.02).toString();
+            const nanoAttach = Math.round(attachAmount * 1e9).toString();
             const vaultContractAddress = globalVaultAddress;
 
             showToast("Please confirm transaction in your TON wallet...", "info");
@@ -1055,7 +1104,7 @@ async function joinRoom(roomId) {
                 messages: [
                     {
                         address: vaultContractAddress,
-                        amount: nanoAmount,
+                        amount: nanoAttach,
                         payload: encodeTactPayload("192d165d", numericRoomId) // JoinGame op-code 0x192d165d
                     }
                 ]
