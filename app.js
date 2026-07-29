@@ -21,7 +21,8 @@ function playSound(name) {
     try {
         if (gameSounds[name]) {
             gameSounds[name].currentTime = 0;
-            gameSounds[name].volume = 0.4; // 40% volume
+            // Устанавливаем 20% для 'coin', для остальных 40%
+            gameSounds[name].volume = (name === 'coin') ? 0.2 : 0.4;
             gameSounds[name].play().catch(e => { console.warn('Sound error:', e) });
         }
     } catch(e){}
