@@ -1787,7 +1787,11 @@ let lobbyPollInterval = null;
 function initLobbyPolling() {
     if (lobbyPollInterval) clearInterval(lobbyPollInterval);
     lobbyPollInterval = setInterval(() => {
-        if (isLobbyLive) syncLobbyData();
+        if (!isLobbyLive) return;
+        if (document.hidden) return;
+        if (elements.gameplayScreen && elements.gameplayScreen.classList.contains('hidden')) {
+            syncLobbyData();
+        }
     }, 10000);
 
     const liveIndicator = document.querySelector('.online-indicator');
@@ -2312,14 +2316,7 @@ if (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
 }
 
 
-// Фоновое обновление лобби раз в 10 секунд (синхронизация)
-setInterval(async () => {
-    if (document.hidden) return; // Пропускаем обновление, если приложение свёрнуто
-    // Делаем фоновые запросы только когда игрок находится на экране лобби (экран игры скрыт)
-    if (elements.gameplayScreen && elements.gameplayScreen.classList.contains('hidden')) {
-        await syncLobbyData();
-    }
-}, 10000);
+// Фоновое обновление лобби теперь управляется через initLobbyPolling()
 
 
 
