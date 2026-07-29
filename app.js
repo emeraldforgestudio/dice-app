@@ -1733,7 +1733,7 @@ function showGameResults(result) {
                     setTimeout(() => {
                         const coin = document.createElement('div');
                         coin.className = `flying-coin ${toLeft ? 'coin-to-left' : 'coin-to-right'}`;
-                        coin.textContent = currentRoomCurrency === 'ton' ? "💎" : "🪙";
+                        coin.textContent = currentRoomCurrency === 'ton' ? '\uD83D\uDC8E' : '\uD83E\uDE99';
                         
                         const randomY = (Math.random() * 20 - 10);
                         coin.style.top = `calc(50% - 12px + ${randomY}px)`;
@@ -1761,13 +1761,13 @@ function showGameResults(result) {
                 playSound('success');
                 if (elements.matchResults) elements.matchResults.className = "match-results-box victory";
                 if (elements.resultTitle) elements.resultTitle.textContent = "🏆 Victory!";
-                if (elements.resultSubtitle) elements.resultSubtitle.textContent = `+${(result.bet * 2).toLocaleString()} coins`;
+                if (elements.resultSubtitle) elements.resultSubtitle.textContent = `+${(result.bet * 2).toLocaleString()} ${currentRoomCurrency === 'ton' ? 'TON' : 'coins'}`;
                 if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             } else {
                 playSound('error');
                 if (elements.matchResults) elements.matchResults.className = "match-results-box defeat";
                 if (elements.resultTitle) elements.resultTitle.textContent = "🌚 Defeat";
-                if (elements.resultSubtitle) elements.resultSubtitle.textContent = `-${result.bet.toLocaleString()} coins`;
+                if (elements.resultSubtitle) elements.resultSubtitle.textContent = `-${result.bet.toLocaleString()} ${currentRoomCurrency === 'ton' ? 'TON' : 'coins'}`;
                 if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
             }
         }
