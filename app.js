@@ -1016,7 +1016,7 @@ async function createRoom(bet, isPrivate) {
                     {
                         address: vaultContractAddress,
                         amount: nanoAttach,
-                        payload: encodeCreateGamePayload("c94dac62", numericRoomId, nanoBet) // CreateGame op-code 0xc94dac62
+                        payload: encodeCreateGamePayload("41f0a601", numericRoomId, nanoBet) // CreateGame op-code (updated for v5.1)
                     }
                 ]
             };
