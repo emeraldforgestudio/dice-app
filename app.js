@@ -123,14 +123,14 @@ function initTonConnect() {
 
             tonConnectUI.onStatusChange(async (wallet) => {
                 if (wallet) {
-                    // Защита от дурака: блокируем Mainnet кошельки (-239), разрешаем только Testnet (-3)
-                    if (wallet.account.chain === "-239") {
-                        showToast("⚠️ MAINNET BLOCKED! Please switch your wallet to TON Testnet.", "error");
+                    // Защита от дурака: разрешаем Mainnet (-239), блокируем Testnet (-3)
+                    if (wallet.account.chain === "-3") {
+                        showToast("⚠️ TESTNET BLOCKED! Please switch your wallet to TON Mainnet.", "error");
                         await tonConnectUI.disconnect();
                         return;
                     }
                     
-                    userTonAddress = tonAddressToUserFriendly(wallet.account.address, true);
+                    userTonAddress = tonAddressToUserFriendly(wallet.account.address, false);
                     console.log('💎 TON Wallet connected:', userTonAddress);
                     closeTonWarningModal();
                     updateHeaderTonConnectButton();
