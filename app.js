@@ -317,7 +317,7 @@ function selectBetCurrency(currency) {
         coinsBtn.classList.remove('active');
         tonBtn.classList.add('active');
         symbolDisplay.innerText = '💎';
-        labelBet.innerText = 'Enter Bet Amount (TON Testnet)';
+        labelBet.innerText = 'Enter Bet Amount (TON)';
         presetCoins.classList.add('hidden');
         presetTon.classList.remove('hidden');
         if (testnetWarning) testnetWarning.classList.remove('hidden');
