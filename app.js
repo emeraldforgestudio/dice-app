@@ -1036,10 +1036,14 @@ async function createRoom(bet, isPrivate) {
                 console.log("💎 TON Transaction sent:", txResult);
                 
                 // 3. Подтверждаем бэкенду что оплата прошла, чтобы он разослал комнату всем
-                await fetch(`${API_BASE_URL}/api/rooms/confirm_ton/${roomId}`, {
+                const confirmRes = await fetch(`${API_BASE_URL}/api/rooms/confirm_ton/${roomId}`, {
                     method: 'POST',
                     headers: getHeaders()
                 });
+                
+                if (!confirmRes.ok) {
+                    throw new Error("Blockchain confirmation timeout or error");
+                }
                 
                 showToast("TON deposit confirmed!", "success");
             } catch (txError) {
@@ -1168,6 +1172,8 @@ async function joinRoom(roomId) {
             }
             if (gameSocket) { gameSocket.close(); gameSocket = null; }
             if (elements.gameplayScreen) elements.gameplayScreen.classList.add('hidden');
+            if (elements.lobbyScreen) elements.lobbyScreen.classList.remove('hidden');
+            loadRooms();
             return;
         }
 
@@ -1189,6 +1195,9 @@ async function joinRoom(roomId) {
                 btn.textContent = 'Join Bet';
             }
         }
+        if (gameSocket) { gameSocket.close(); gameSocket = null; }
+        if (elements.gameplayScreen) elements.gameplayScreen.classList.add('hidden');
+        if (elements.lobbyScreen) elements.lobbyScreen.classList.remove('hidden');
     }
 }
 
