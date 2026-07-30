@@ -33,6 +33,16 @@ fetch(`${API_BASE_URL}/api/config`)
     .then(data => { if(data.vault_address) globalVaultAddress = data.vault_address; })
     .catch(console.error);
 
+function escapeHtml(unsafe) {
+    if (typeof unsafe !== 'string') return '';
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
+
 function maskUsername(username) {
     if (!username) return "anonymous";
     let clean = username.startsWith("@") ? username.slice(1) : username;
@@ -83,14 +93,11 @@ if (tg) {
 
 // Заглушка для локального тестирования (если запущен вне Telegram)
 if (!initData) {
-    console.log("⚠️ Running outside Telegram. Injecting mock auth data.");
-    const mockUser = {
-        id: 99999,
-        first_name: "Developer",
-        username: "player",
-        language_code: "en"
-    };
-    initData = `mock_${encodeURIComponent(JSON.stringify(mockUser))}`;
+    console.log("⚠️ Running outside Telegram. Showing error message.");
+    document.addEventListener("DOMContentLoaded", () => {
+        document.body.innerHTML = '<div style="color:white;text-align:center;margin-top:20px;font-family:sans-serif;"><h2>Access Denied</h2><p>Please open this application inside Telegram.</p></div>';
+    });
+    throw new Error("Cannot run outside Telegram");
 }
 
 function tonAddressToUserFriendly(rawAddress, isTestnet = true) {
@@ -849,6 +856,8 @@ function renderRooms(rooms) {
         const displayName = isOwn 
             ? (room.owner_username ? `@${room.owner_username}` : "You")
             : `@${maskUsername(room.owner_username)}`;
+        const safeDisplayName = escapeHtml(displayName);
+        const safeOwnerUsername = escapeHtml(room.owner_username || "");
             
         const isTon = room.currency === 'ton';
         const betFormatted = isTon 
@@ -858,7 +867,7 @@ function renderRooms(rooms) {
         // Если комната принадлежит текущему пользователю, показываем кнопку Cancel
         const actionButton = isOwn
             ? `<button class="btn-join btn-cancel-lobby" onclick="confirmCancelRoom('${room.id}', ${room.bet}, '${room.currency}')">Cancel</button>`
-            : `<button class="btn-join" onclick="confirmJoinRoom('${room.id}', '${room.owner_username}', ${room.bet})">Join Bet</button>`;
+            : `<button class="btn-join" onclick="confirmJoinRoom('${room.id}', '${safeOwnerUsername}', ${room.bet})">Join Bet</button>`;
             
         const isPrivate = room.is_private === true;
         const privateBadge = isPrivate 
@@ -876,7 +885,7 @@ function renderRooms(rooms) {
                         <span class="room-bet-amount">${betFormatted}</span>
                         ${privateBadge}
                     </div>
-                    <span class="room-owner-name">by ${displayName}</span>
+                    <span class="room-owner-name">by ${safeDisplayName}</span>
                 </div>
                 <div class="room-action-side">
                     ${actionButton}
@@ -2488,7 +2497,7 @@ function renderLeaderboard(data) {
                 const isMe   = e.user_id === myId;
                 const rawName = e.username ? `@${e.username}` : (e.first_name || 'Player');
                 const maskedName = e.username ? `@${maskUsername(e.username)}` : maskUsername(e.first_name || 'Player');
-                const name   = isMe ? rawName : maskedName;
+                const name = escapeHtml(isMe ? rawName : maskedName);
                 const initial = (e.first_name || e.username || 'P').charAt(0).toUpperCase();
                 const avCls  = ['gold-av','silver-av','bronze-av'][e.rank - 1];
                 const prize  = PRIZES[e.rank] ? `${PRIZES[e.rank]} 🎁` : '';
@@ -2535,7 +2544,7 @@ function renderLeaderboard(data) {
                 const isMe   = e.user_id === myId;
                 const rawName = e.username ? `@${e.username}` : (e.first_name || 'Player');
                 const maskedName = e.username ? `@${maskUsername(e.username)}` : maskUsername(e.first_name || 'Player');
-                const name   = isMe ? rawName : maskedName;
+                const name = escapeHtml(isMe ? rawName : maskedName);
                 const initial = (e.first_name || e.username || 'P').charAt(0).toUpperCase();
 
                 return `
