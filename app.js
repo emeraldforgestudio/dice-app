@@ -2522,7 +2522,7 @@ function renderLeaderboard(data) {
                         </div>
                     </div>
                     <span class="lb-podium-name">${isMe ? '⭐ You' : name}</span>
-                    <span class="lb-podium-score">${e.won_today.toLocaleString()} 🪙</span>
+                    ${e.currency === "ton" ? `<span class="lb-podium-score">${e.won_today.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 2})} 💎</span>` : `<span class="lb-podium-score">${e.won_today.toLocaleString()} 🪙</span>`}
                     ${prize ? `<span class="lb-podium-prize">${prize}</span>` : ''}
                 </div>`;
             }).join('');
@@ -2553,7 +2553,7 @@ function renderLeaderboard(data) {
                         <div class="lb-list-name">${isMe ? '⭐ ' + name : name}</div>
                         <div class="lb-list-league">${meta.label}</div>
                     </div>
-                    <span class="lb-list-score">${e.won_today.toLocaleString()} 🪙</span>
+                    ${e.currency === "ton" ? `<span class="lb-list-score">${e.won_today.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 2})} 💎</span>` : `<span class="lb-list-score">${e.won_today.toLocaleString()} 🪙</span>`}
                 </div>`;
             }).join('');
         }
@@ -2572,7 +2572,7 @@ function renderLeaderboard(data) {
                     <div class="lb-my-name">⭐ You</div>
                     <div class="lb-my-sub">${meta.label}</div>
                 </div>
-                <span class="lb-my-score">${(myEntry.won_today || 0).toLocaleString()} 🪙</span>
+                ${(myEntry.currency || "coins") === "ton" ? `<span class="lb-my-score">${(myEntry.won_today || 0).toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 2})} 💎</span>` : `<span class="lb-my-score">${(myEntry.won_today || 0).toLocaleString()} 🪙</span>`}
             `;
         } else {
             myPosEl.classList.add('hidden');
