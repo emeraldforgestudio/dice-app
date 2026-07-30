@@ -255,7 +255,12 @@ async function updateTonBalanceDisplay() {
         if (data.ok) {
             const balanceNano = parseInt(data.result.balance || 0);
             const balanceTon = (balanceNano / 1e9).toFixed(2);
-            document.getElementById('ton-balance-display').innerText = `${balanceTon} 💎`;
+            document.getElementById('ton-balance-display').innerText = `${balanceTon} \uD83D\uDC8E`;
+            
+            const matchBalEl = document.getElementById('match-new-balance');
+            if (matchBalEl && typeof currentRoomCurrency !== 'undefined' && currentRoomCurrency === 'ton') {
+                matchBalEl.innerText = `${balanceTon} \uD83D\uDC8E`;
+            }
         }
     } catch (e) {
         console.error('Failed to fetch TON balance:', e);
@@ -628,7 +633,9 @@ async function fetchUserProfile() {
         // Обновляем баланс в результатах матча, если элемент существует
         const matchBalEl = document.getElementById('match-new-balance');
         if (matchBalEl) {
-            matchBalEl.textContent = `${currentUser.balance.toLocaleString()} 🪙`;
+            if (typeof currentRoomCurrency === 'undefined' || currentRoomCurrency !== 'ton') {
+                matchBalEl.textContent = `${currentUser.balance.toLocaleString()} 🪙`;
+            }
         }
         
         // Настройка аватарки пользователя
@@ -1694,6 +1701,9 @@ function showGameResults(result) {
         
         // Принудительно обновляем профиль для получения свежего баланса после матча
         fetchUserProfile();
+        if (currentRoomCurrency === 'ton') {
+            setTimeout(updateTonBalanceDisplay, 2000);
+        }
         
         if (elements.matchResults) elements.matchResults.classList.remove('hidden');
         const isWinner = Number(result.winner_id) === Number(currentUser.id);
@@ -2630,7 +2640,9 @@ async function syncLobbyData() {
             
             const matchBalEl = document.getElementById('match-new-balance');
             if (matchBalEl) {
-                matchBalEl.textContent = `${currentUser.balance.toLocaleString()} 🪙`;
+                if (typeof currentRoomCurrency === 'undefined' || currentRoomCurrency !== 'ton') {
+                    matchBalEl.textContent = `${currentUser.balance.toLocaleString()} 🪙`;
+                }
             }
             
             const userAvatarElement = document.getElementById('user-avatar');

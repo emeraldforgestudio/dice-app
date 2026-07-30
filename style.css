@@ -2788,6 +2788,3 @@ input:checked + .slider:before {
     color: #00a8ff !important;
     text-shadow: 0 0 10px rgba(0, 168, 255, 0.5) !important;
 }
-.ton-room .match-balance-container {
-    display: none !important;
-}
