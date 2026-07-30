@@ -257,7 +257,7 @@ if (document.readyState === 'loading') {
 async function updateTonBalanceDisplay() {
     if (!userTonAddress) return;
     try {
-        const response = await fetch(`https://testnet.toncenter.com/api/v2/getAddressInformation?address=${userTonAddress}`);
+        const response = await fetch(`https://toncenter.com/api/v2/getAddressInformation?address=${userTonAddress}`);
         const data = await response.json();
         if (data.ok) {
             const balanceNano = parseInt(data.result.balance || 0);
