@@ -900,9 +900,8 @@ function encodeTactPayload(opcodeHex, gameIdNum) {
     // 1. Формируем данные (12 байт: 4 байта opcode + 8 байт uint64)
     const dataBuffer = new ArrayBuffer(12);
     const view = new DataView(dataBuffer);
-    view.setUint32(0, parseInt(opcodeHex, 16), false); // Big-Endian
-    view.setUint32(4, 0, false); // Старшие 4 байта 64-битного числа (всегда 0 для timestamp)
-    view.setUint32(8, gameIdNum || 0, false); // Младшие 4 байта
+    view.setUint32(0, parseInt(opcodeHex, 16), false);
+    view.setBigUint64(4, gameIdNum || 0n, false);
     const payloadBytes = new Uint8Array(dataBuffer);
 
     // 2. Стандартный заголовок BOC для одной ячейки (12 байт, 0 ссылок)
@@ -947,8 +946,7 @@ function encodeCreateGamePayload(opcodeHex, gameIdNum, betNanoString) {
     const view = new DataView(dataBuffer);
     
     view.setUint32(0, parseInt(opcodeHex, 16), false); 
-    view.setUint32(4, 0, false);
-    view.setUint32(8, gameIdNum || 0, false); 
+    view.setBigUint64(4, gameIdNum || 0n, false); 
     
     const betBigInt = BigInt(betNanoString);
     view.setBigUint64(12, betBigInt, false);
@@ -1009,7 +1007,7 @@ async function createRoom(bet, isPrivate) {
         }
 
         const roomId = data.room_id;
-        const numericRoomId = parseInt(roomId.toString().substring(0, 8), 16) || 0;
+        const numericRoomId = BigInt("0x" + roomId.toString().replace('-', '').substring(0, 16));
 
         elements.createRoomModal.classList.add('hidden');
         openGameplayScreen(roomId, true, bet, null, currentBetCurrency);
@@ -1096,7 +1094,7 @@ async function joinRoom(roomId) {
     try {
         // Проверяем, является ли комната TON комнатой
         const roomObj = activeRooms.find(r => r.id === roomId);
-        const numericRoomId = parseInt(roomId.substring(0, 8), 16) || 0;
+        const numericRoomId = BigInt("0x" + roomId.toString().replace('-', '').substring(0, 16));
 
         if (roomObj && roomObj.currency === 'ton') {
             if (!tonConnectUI || !userTonAddress) {
@@ -1245,7 +1243,7 @@ function confirmCancelRoom(roomId, bet, currency = 'coins') {
             if (elements.confirmModal) elements.confirmModal.classList.add('hidden');
             
             if (currency === 'ton') {
-                const numericRoomId = parseInt(roomId.toString().substring(0, 8), 16) || 0;
+                const numericRoomId = BigInt("0x" + roomId.toString().replace('-', '').substring(0, 16));
                 const vaultContractAddress = globalVaultAddress;
 
                 showToast("Please confirm Cancel transaction in your TON wallet...", "info");
@@ -1384,7 +1382,7 @@ async function leaveRoom() {
     if (!currentRoomId) return;
 
     if (currentRoomCurrency === 'ton') {
-        const numericRoomId = parseInt(currentRoomId.toString().substring(0, 8), 16) || 0;
+        const numericRoomId = BigInt("0x" + currentRoomId.toString().replace('-', '').substring(0, 16));
         const vaultContractAddress = globalVaultAddress;
         showToast("Please confirm Cancel transaction in your TON wallet...", "info");
         const transaction = {
@@ -3366,4 +3364,5 @@ function checkAndShowWelcome() {
         };
     }
 })();
+
 
