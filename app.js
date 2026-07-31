@@ -1022,6 +1022,7 @@ async function createRoom(bet, isPrivate) {
 
             const transaction = {
                 validUntil: Math.floor(Date.now() / 1000) + 300,
+                network: "-239",
                 messages: [
                     {
                         address: vaultContractAddress,
@@ -1114,6 +1115,7 @@ async function joinRoom(roomId) {
 
             const transaction = {
                 validUntil: Math.floor(Date.now() / 1000) + 300,
+                network: "-239",
                 messages: [
                     {
                         address: vaultContractAddress,
@@ -1259,6 +1261,7 @@ function confirmCancelRoom(roomId, bet, currency = 'coins') {
 
                 const transaction = {
                     validUntil: Math.floor(Date.now() / 1000) + 300,
+                    network: "-239",
                     messages: [
                         {
                             address: vaultContractAddress,
@@ -1396,6 +1399,7 @@ async function leaveRoom() {
         showToast("Please confirm Cancel transaction in your TON wallet...", "info");
         const transaction = {
             validUntil: Math.floor(Date.now() / 1000) + 300,
+            network: "-239",
             messages: [{
                 address: vaultContractAddress,
                 amount: "50000000",
