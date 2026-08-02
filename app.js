@@ -1,7 +1,7 @@
 // --- CONFIGURATION ---
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:8000'
-    : 'https://slideshow-similarly-settings-helicopter.trycloudflare.com'; 
+    : 'https://plop-slang-osmosis.ngrok-free.dev'; 
 let BOT_USERNAME = 'VerdeCasinoBot'; 
 let globalVaultAddress = "EQDgBza6Feso19dmBpYqJiv95ZgQnZKCuXvO0LIAvvXjf6Z1";
 
