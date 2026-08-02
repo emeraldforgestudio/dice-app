@@ -1740,7 +1740,10 @@ function showGameResults(result) {
                 : currentUser.balance.toLocaleString() + ' 🪙';
         }
         
-        renderNextMatchCarousel(currentRoomBet, currentRoomCurrency);
+        // Fetch fresh lobby data before showing the next match carousel
+        fetchActiveRooms().then(() => {
+            renderNextMatchCarousel(currentRoomBet, currentRoomCurrency);
+        });
         // -------------------------
 
         const isWinner = Number(result.winner_id) === Number(currentUser.id);
