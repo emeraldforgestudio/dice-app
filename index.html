@@ -144,7 +144,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #299 (40201aa)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #300 (976cc59)</p>
         </footer>
     </div>
 
@@ -522,12 +522,20 @@
                 </div>
 
                 <div class="match-results-box hidden" id="match-results">
-                    <!-- Carousel for next match will be injected here -->
-                    <div id="next-match-carousel" class="next-match-carousel hidden" style="margin-bottom: 15px; overflow-x: auto; white-space: nowrap; padding-bottom: 10px;"></div>
-                    
                     <h2 id="result-title">Victory!</h2>
                     <p id="result-subtitle">+1,000 coins</p>
                     <button class="btn btn-secondary btn-block" id="btn-return-lobby">Back to Lobby</button>
+                </div>
+                
+                <!-- COPY OF LOBBY ROOMS FOR RESULTS SCREEN -->
+                <div id="results-rooms-container" class="hidden" style="margin-top: 20px;">
+                    <h3 style="color: var(--text-secondary); text-align: center; margin-bottom: 10px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Available Rooms</h3>
+                    <div class="rooms-container" id="results-rooms-list"></div>
+                    <div class="pagination-controls" id="results-pagination-controls" style="margin-bottom: 30px;">
+                        <button class="btn btn-icon" id="btn-results-prev-page" onclick="changePage(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                        <span id="results-page-indicator" class="page-indicator">Page 1</span>
+                        <button class="btn btn-icon" id="btn-results-next-page" onclick="changePage(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
                 </div>
             </div>
         </div>

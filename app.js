@@ -1605,6 +1605,8 @@ function openGameplayScreen(roomId, isOwner, bet, result = null, currency = 'coi
         }
     }
     if (elements.matchResults) elements.matchResults.classList.add('hidden');
+    const resultsRoomsContainer = document.getElementById('results-rooms-container');
+    if (resultsRoomsContainer) resultsRoomsContainer.classList.add('hidden');
     const potLabelText = document.getElementById('pot-label-text');
     if (potLabelText) potLabelText.textContent = 'Total Pot:';
 
@@ -1729,6 +1731,8 @@ function showGameResults(result) {
         }
         
         if (elements.matchResults) elements.matchResults.classList.remove('hidden');
+        const resultsRoomsContainer = document.getElementById('results-rooms-container');
+        if (resultsRoomsContainer) resultsRoomsContainer.classList.remove('hidden');
         
         // --- NEW CAROUSEL LOGIC ---
         const potLabelText = document.getElementById('pot-label-text');
@@ -1741,9 +1745,7 @@ function showGameResults(result) {
         }
         
         // Fetch fresh lobby data before showing the next match carousel
-        fetchActiveRooms().then(() => {
-            renderNextMatchCarousel(currentRoomBet, currentRoomCurrency);
-        });
+        fetchActiveRooms();
         // -------------------------
 
         const isWinner = Number(result.winner_id) === Number(currentUser.id);
