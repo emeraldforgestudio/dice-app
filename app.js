@@ -3409,7 +3409,6 @@ function renderNextMatchCarousel(bet, currency) {
     
     // Find matching rooms
     const matching = activeRooms.filter(r => 
-        r.status === 'waiting' && 
         r.currency === currency && 
         Number(r.owner_id) !== Number(currentUser.id)
     );
