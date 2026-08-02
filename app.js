@@ -28,7 +28,7 @@ function playSound(name) {
     } catch(e){}
 }
 
-fetch(`${API_BASE_URL}/api/config`)
+fetch(`${API_BASE_URL}/api/config`, { headers: { 'ngrok-skip-browser-warning': 'true' } })
     .then(r => r.json())
     .then(data => { if(data.vault_address) globalVaultAddress = data.vault_address; })
     .catch(console.error);
@@ -343,7 +343,8 @@ function selectBetCurrency(currency) {
 // Заголовки для авторизованных запросов
 const getHeaders = () => ({
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${initData}`
+    'Authorization': `Bearer ${initData}`,
+    'ngrok-skip-browser-warning': 'true'
 });
 
 // --- ДОМ ЭЛЕМЕНТЫ ---
