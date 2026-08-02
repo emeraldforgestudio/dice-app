@@ -144,7 +144,7 @@
         
         <!-- FOOTER INFO -->
         <footer class="footer-info">
-            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #296 (2c3fbef)</p>
+            <p><i class="fa-solid fa-circle-info"></i> Rules: Lowest dice roll wins (⚀ beats ⚅). Tie rolls refund bets. | Build: #297 (171c046)</p>
         </footer>
     </div>
 
@@ -437,7 +437,7 @@
             
             <div class="game-arena-info">
                 <div class="game-pot-container">
-                    <span class="pot-label">Total Pot:</span>
+                    <span class="pot-label" id="pot-label-text">Total Pot:</span>
                     <span class="pot-value" id="game-pot-amount">0 🪙</span>
                 </div>
                 <div class="game-rule-text">
@@ -522,11 +522,9 @@
                 </div>
 
                 <div class="match-results-box hidden" id="match-results">
-                    <!-- Блок нового баланса (показывается в конце игры) -->
-                    <div class="game-pot-container match-balance-container" style="margin: 0 auto 16px auto; width: max-content;">
-                        <span class="pot-label">Your Balance:</span>
-                        <span class="pot-value" id="match-new-balance">0 🪙</span>
-                    </div>
+                    <!-- Carousel for next match will be injected here -->
+                    <div id="next-match-carousel" class="next-match-carousel hidden" style="margin-bottom: 15px; overflow-x: auto; white-space: nowrap; padding-bottom: 10px;"></div>
+                    
                     <h2 id="result-title">Victory!</h2>
                     <p id="result-subtitle">+1,000 coins</p>
                     <button class="btn btn-secondary btn-block" id="btn-return-lobby">Back to Lobby</button>

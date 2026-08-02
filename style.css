@@ -2788,3 +2788,22 @@ input:checked + .slider:before {
     color: #00a8ff !important;
     text-shadow: 0 0 10px rgba(0, 168, 255, 0.5) !important;
 }
+
+/* Next Match Carousel */
+.next-match-carousel {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+.next-match-carousel::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+}
+.next-match-carousel .room-row {
+    animation: fadeInScale 0.3s ease-out forwards;
+}
+.next-match-carousel .room-row:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.2);
+}
+.next-match-carousel .ton-room-row:hover {
+    box-shadow: 0 4px 15px rgba(0, 152, 234, 0.2);
+}
