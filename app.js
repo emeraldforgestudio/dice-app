@@ -1605,11 +1605,6 @@ function openGameplayScreen(roomId, isOwner, bet, result = null, currency = 'coi
         }
     }
     if (elements.matchResults) elements.matchResults.classList.add('hidden');
-    const resultsRoomsContainer = document.getElementById('results-rooms-container');
-    if (resultsRoomsContainer) resultsRoomsContainer.classList.add('hidden');
-    const potLabelText = document.getElementById('pot-label-text');
-    if (potLabelText) potLabelText.textContent = 'Total Pot:';
-
     if (elements.gameStatusText) elements.gameStatusText.classList.remove('hidden');
     
     // Сбрасываем текст VS-баджа и видимость SVG кольца
@@ -1731,23 +1726,6 @@ function showGameResults(result) {
         }
         
         if (elements.matchResults) elements.matchResults.classList.remove('hidden');
-        const resultsRoomsContainer = document.getElementById('results-rooms-container');
-        if (resultsRoomsContainer) resultsRoomsContainer.classList.remove('hidden');
-        
-        // --- NEW CAROUSEL LOGIC ---
-        const potLabelText = document.getElementById('pot-label-text');
-        const gamePotAmount = document.getElementById('game-pot-amount');
-        if (potLabelText) potLabelText.textContent = 'Your Balance:';
-        if (gamePotAmount) {
-            gamePotAmount.textContent = currentRoomCurrency === 'ton' 
-                ? (userTonAddress ? (window.lastTonBalance || 0).toLocaleString() + ' TON' : '0 TON')
-                : currentUser.balance.toLocaleString() + ' 🪙';
-        }
-        
-        // Fetch fresh lobby data before showing the next match carousel
-        fetchActiveRooms();
-        // -------------------------
-
         const isWinner = Number(result.winner_id) === Number(currentUser.id);
         
         // Определяем победителя и показываем корону над нужным аватаром
@@ -3401,100 +3379,3 @@ function checkAndShowWelcome() {
 })();
 
 
-
-// ==========================================
-// NEXT MATCH CAROUSEL LOGIC
-// ==========================================
-function renderNextMatchCarousel(bet, currency) {
-    const carousel = document.getElementById('next-match-carousel');
-    if (!carousel) return;
-    
-    // Find matching rooms
-    const matching = activeRooms.filter(r => 
-        r.currency === currency && 
-        Number(r.owner_id) !== Number(currentUser.id)
-    );
-    
-    // Sort by absolute difference from current bet, then by bet itself
-    matching.sort((a, b) => {
-        const diffA = Math.abs(a.bet - bet);
-        const diffB = Math.abs(b.bet - bet);
-        if (diffA === diffB) return b.bet - a.bet;
-        return diffA - diffB;
-    });
-    
-    // Clear and hide if no rooms
-    carousel.innerHTML = '';
-    if (matching.length === 0) {
-        carousel.classList.add('hidden');
-        return;
-    }
-    
-    carousel.classList.remove('hidden');
-    
-    // Create elements
-    matching.forEach(room => {
-        const item = document.createElement('div');
-        // We style it similar to room-row but compact, with display inline-block
-        item.className = `room-row ${room.currency === 'ton' ? 'ton-room-row' : ''}`;
-        item.style.display = 'inline-flex';
-        item.style.minWidth = '250px';
-        item.style.maxWidth = '250px';
-        item.style.marginRight = '10px';
-        item.style.verticalAlign = 'top';
-        item.style.cursor = 'pointer';
-        
-        const avatarUrl = room.owner_avatar_url || 'https://styles.redditmedia.com/t5_38qmt/styles/communityIcon_72w0g364o2061.png';
-        const displayAvatarUrl = avatarUrl;
-        
-        const usernameStr = room.owner_username 
-            ? `@${room.owner_username}` 
-            : (room.owner_first_name || 'Player');
-            
-        let potStr;
-        if (room.currency === 'ton') {
-            potStr = `${(room.bet * 2).toLocaleString()} TON`;
-        } else {
-            potStr = `${(room.bet * 2).toLocaleString()} 🪙`;
-        }
-        
-        item.innerHTML = `
-            <div class="room-avatar-container">
-                <img src="${displayAvatarUrl}" alt="Avatar" class="room-avatar" onerror="this.src='https://styles.redditmedia.com/t5_38qmt/styles/communityIcon_72w0g364o2061.png'">
-            </div>
-            <div class="room-info">
-                <div class="room-user-name">${usernameStr}</div>
-                <div class="room-bet">Bet: ${room.bet.toLocaleString()} ${room.currency === 'ton' ? 'TON' : 'coins'}</div>
-            </div>
-            <div class="room-action">
-                <div class="room-pot-val">${potStr}</div>
-            </div>
-        `;
-        
-        // On click, close results and prepare room
-        item.addEventListener('click', () => {
-            // Check ton balance immediately
-            if (room.currency === 'ton') {
-                if (!userTonAddress) {
-                    showToast("Connect TON wallet to play TON rooms", "error");
-                    return;
-                }
-                const bal = window.lastTonBalance || 0;
-                if (room.bet > bal) {
-                    showToast("Insufficient TON balance for this room", "error");
-                    return;
-                }
-            } else {
-                if (room.bet > currentUser.balance) {
-                    showToast("Insufficient coins balance", "error");
-                    return;
-                }
-            }
-            
-            showLobby();
-            prepareJoinRoom(room.id, room.bet, room.currency);
-        });
-        
-        carousel.appendChild(item);
-    });
-}
